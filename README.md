@@ -6,13 +6,14 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 
 ## ✨ Features
 
-- **Modern Interface**: Clean, responsive design that works on mobile and desktop
-- **Media Browsing**: View your movies and TV shows with poster art
-- **Search Capability**: Quickly find content across your libraries
-- **Detailed View**: See cast information, genres, and descriptions
-- **MD5 Checksum Verification**: Only downloads images when they've changed
-- **Dockerized**: Easy deployment with Docker and Docker Compose
-- **Customizable**: Configure update schedule, app title, and more
+* **Modern Interface**: Clean, responsive design that works on mobile and desktop
+* **Media Browsing**: View your movies and TV shows with poster art
+* **Search Capability**: Quickly find content across your libraries
+* **Detailed View**: See cast information, genres, and descriptions
+* **MD5 Checksum Verification**: Only downloads images when they've changed
+* **Dockerized**: Easy deployment with Docker and Docker Compose
+* **Customizable**: Configure update schedule, app title, and more
+* **Installable as PWA**: Access your media library like a native app on any device
 
 ## 🔧 Prerequisites
 
