@@ -190,14 +190,18 @@ docker exec glimpse-media-viewer python /app/scripts/plex_data_fetcher.py --url 
 
 If you see the default Nginx welcome page, there might be an issue with the configuration:
 
+Check if the app files are present
 ```bash
-# Check if the app files are present
 docker exec glimpse-media-viewer ls -la /app/web
+```
 
-# Check Nginx configuration
+Check Nginx configuration
+```bash
 docker exec glimpse-media-viewer cat /etc/nginx/conf.d/default.conf
+```
 
-# Restart Nginx
+Restart Nginx
+```bash
 docker exec glimpse-media-viewer nginx -s reload
 ```
 
