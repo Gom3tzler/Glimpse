@@ -17,7 +17,7 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 * **Customizable**: Configure update schedule, app title, and more
 * **Installable as PWA**: Access your media library like a native app on any device
 
-## Support this project
+## ❤️ Support this project
 
 [![Donate](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/donate-button.png)](https://www.buymeacoffee.com/jeremehancock)
 
@@ -97,12 +97,6 @@ In the info dialog, click "View XML"
 In the URL of the new tab, find the "X-Plex-Token=" parameter
 For more detailed instructions, visit the [Plex support article](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 
-## 🏗️ Project Structure
-
-```
-## 🏗️ Project Structure
-
-```
 ## 🏗️ Project Structure
 
 ```
