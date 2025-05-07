@@ -21,7 +21,7 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 - Plex authentication token
 - Basic knowledge of Docker and containerization
 
-## 🚀 Quick Start
+## 🚀 Installation
 
 ### 1: Grab Docker Compose
 
