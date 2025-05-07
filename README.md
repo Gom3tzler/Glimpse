@@ -28,10 +28,14 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 ```bash
 # Create a directory for your data
 mkdir -p Glimpse/data
+```
 
+```bash
 # Create a docker-compose.yml file
 curl -o Glimpse/docker-compose.yml https://raw.githubusercontent.com/jeremehancock/Glimpse/main/docker-compose.yml
+```
 
+```bash
 # Change to Glimpse directory
 cd Glimpse
 ```
