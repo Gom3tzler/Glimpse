@@ -224,6 +224,6 @@ This application works well behind a reverse proxy like Traefik or Nginx Proxy M
 
 This project is released under the MIT License. See the `LICENSE` file for details.
 
-## AI Assistance Disclosure
+## 🤖 AI Assistance Disclosure
 
 This tool was developed with assistance from AI language models.
