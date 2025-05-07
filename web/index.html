@@ -1515,34 +1515,80 @@
 			
 			// Handle duration (for movies) or episode/season count (for TV shows)
 			if (type === 'movies' && item.duration) {
+				// For movies, show duration in minutes
 				const minutes = Math.floor(item.duration / 60000);
 				durationElem.textContent = `${minutes} min`;
 				durationElem.style.display = 'block';
+				
+				// Hide seasons element (in case it was visible from previous TV show)
+				const seasonsElem = document.getElementById('modal-seasons');
+				if (seasonsElem) {
+					seasonsElem.style.display = 'none';
+				}
+				
+				// Hide episodes element (in case it was visible from previous TV show)
+				const episodesElem = document.getElementById('modal-episodes');
+				if (episodesElem) {
+					episodesElem.style.display = 'none';
+				}
 			} else if (type === 'tvshows') {
-				let metadataText = '';
+				// For TV shows, show seasons and episodes in separate containers
 				
-				// Add season count if available
+				// First, ensure the seasons element exists
+				let seasonsElem = document.getElementById('modal-seasons');
+				if (!seasonsElem) {
+					// Create a new element for seasons if it doesn't exist
+					seasonsElem = document.createElement('div');
+					seasonsElem.className = 'metadata-item';
+					seasonsElem.id = 'modal-seasons';
+					
+					// Insert it before the duration element
+					durationElem.parentNode.insertBefore(seasonsElem, durationElem);
+				}
+				
+				// Create or get the episodes element
+				let episodesElem = document.getElementById('modal-episodes');
+				if (!episodesElem) {
+					// Create a new element for episodes if it doesn't exist
+					episodesElem = document.createElement('div');
+					episodesElem.className = 'metadata-item';
+					episodesElem.id = 'modal-episodes';
+					
+					// Insert it after the seasons element
+					seasonsElem.parentNode.insertBefore(episodesElem, seasonsElem.nextSibling);
+				}
+				
+				// Hide the duration element for TV shows
+				durationElem.style.display = 'none';
+				
+				// Handle season count
 				if (item.childCount) {
-					metadataText += `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
-				}
-				
-				// Add episode count if available
-				if (item.leafCount) {
-					// Add separator if we already have season count
-					if (metadataText) {
-						metadataText += ' - ';
-					}
-					metadataText += `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
-				}
-				
-				if (metadataText) {
-					durationElem.textContent = metadataText;
-					durationElem.style.display = 'block';
+					seasonsElem.textContent = `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
+					seasonsElem.style.display = 'block';
 				} else {
-					durationElem.style.display = 'none';
+					seasonsElem.style.display = 'none';
+				}
+				
+				// Handle episode count
+				if (item.leafCount) {
+					episodesElem.textContent = `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
+					episodesElem.style.display = 'block';
+				} else {
+					episodesElem.style.display = 'none';
 				}
 			} else {
+				// Default case - hide all elements
 				durationElem.style.display = 'none';
+				
+				const seasonsElem = document.getElementById('modal-seasons');
+				if (seasonsElem) {
+					seasonsElem.style.display = 'none';
+				}
+				
+				const episodesElem = document.getElementById('modal-episodes');
+				if (episodesElem) {
+					episodesElem.style.display = 'none';
+				}
 			}
 			
 			// Set summary
