@@ -96,7 +96,7 @@ For more detailed instructions, visit the [Plex support article](https://support
 ## 🏗️ Project Structure
 
 ```
-plex-media-viewer/
+Glimpse/
 │
 ├── docker-compose.yml        # Docker Compose configuration
 ├── Dockerfile                # Docker build configuration
@@ -173,7 +173,7 @@ docker-compose logs
 docker-compose logs -f
 
 # View specific service logs
-docker-compose logs plex-viewer
+docker-compose logs glimpse-media-viewer
 ```
 
 ### Manual Data Update
@@ -181,7 +181,7 @@ docker-compose logs plex-viewer
 To trigger a data update manually:
 
 ```bash
-docker exec plex-viewer python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data
+docker exec glimpse-media-viewer python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data
 ```
 
 ### Common Issues
@@ -192,13 +192,13 @@ If you see the default Nginx welcome page, there might be an issue with the conf
 
 ```bash
 # Check if the app files are present
-docker exec plex-viewer ls -la /app/web
+docker exec glimpse-media-viewer ls -la /app/web
 
 # Check Nginx configuration
-docker exec plex-viewer cat /etc/nginx/conf.d/default.conf
+docker exec glimpse-media-viewer cat /etc/nginx/conf.d/default.conf
 
 # Restart Nginx
-docker exec plex-viewer nginx -s reload
+docker exec glimpse-media-viewer nginx -s reload
 ```
 
 #### Missing Images
