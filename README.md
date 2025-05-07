@@ -165,14 +165,18 @@ Set the `APP_TITLE` environment variable:
 
 ### Viewing Logs
 
+View all container logs
 ```bash
-# View all container logs
 docker-compose logs
+```
 
-# Follow logs in real-time
+Follow logs in real-time
+```bash
 docker-compose logs -f
+```
 
-# View specific service logs
+View specific service logs
+```bash
 docker-compose logs glimpse-media-viewer
 ```
 
