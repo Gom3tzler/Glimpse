@@ -68,7 +68,7 @@ http://your-server:9090
 | `PLEX_TOKEN` | Authentication token for Plex | *Required* |
 | `CRON_SCHEDULE` | When to update data (cron format) | `0 */6 * * *` (every 6 hours) |
 | `TZ` | Timezone for scheduled tasks | `UTC` |
-| `APP_TITLE` | Custom title for the application | `Anansi` |
+| `APP_TITLE` | Custom title for the application | `Glimpse` |
 
 ### Finding Your Plex Token
 
