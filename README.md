@@ -25,18 +25,18 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 
 ### 1: Grab Docker Compose
 
+Create a directory for your data
 ```bash
-# Create a directory for your data
 mkdir -p Glimpse/data
 ```
 
+Create a docker-compose.yml file
 ```bash
-# Create a docker-compose.yml file
 curl -o Glimpse/docker-compose.yml https://raw.githubusercontent.com/jeremehancock/Glimpse/main/docker-compose.yml
 ```
 
+Change to Glimpse directory
 ```bash
-# Change to Glimpse directory
 cd Glimpse
 ```
 
