@@ -1168,17 +1168,11 @@
         
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
-            // Get the first letter of each word for the initials
-            const initials = title.split(' ')
-                .filter(word => word.length > 0)
-                .map(word => word[0])
-                .slice(0, 2)
-                .join('');
+
                 
             const placeholder = document.createElement('div');
             placeholder.className = 'text-placeholder';
             placeholder.innerHTML = `
-                <div class="media-initial">${initials}</div>
                 <div class="media-name">${title}</div>
             `;
             
@@ -1463,16 +1457,8 @@
                 // Create a large text placeholder
                 const placeholder = document.createElement('div');
                 placeholder.className = 'text-placeholder large';
-                
-                // Get initials
-                const initials = item.title.split(' ')
-                    .filter(word => word.length > 0)
-                    .map(word => word[0])
-                    .slice(0, 2)
-                    .join('');
-                
+               
                 placeholder.innerHTML = `
-                    <div class="media-initial">${initials}</div>
                     <div class="media-name">${item.title}</div>
                 `;
                 
