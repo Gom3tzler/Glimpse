@@ -175,7 +175,7 @@ Modify the `ports` section in `docker-compose.yml`:
 
 ```yaml
 ports:
-  - "8080:80"  # Change to your desired port
+  - "9090:80"  # Change to your desired port
 ```
 
 ### Customizing the App Title
