@@ -2,7 +2,9 @@
 
 A sleek, responsive web application for browsing and viewing your Plex media library content. This dockerized solution fetches metadata and artwork from your Plex server and presents it in an elegant, user-friendly interface.
 
-![Plex Media Viewer Screenshot](https://user-images.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/screenshots/screenshot.png)
+![Glimpse Media Viewer Screenshot](https://user-images.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-1.png)
+
+![Glimpse Media Viewer Screenshot](https://user-images.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-2.png)
 
 ## ✨ Features
 
