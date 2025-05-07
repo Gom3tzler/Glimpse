@@ -96,7 +96,13 @@ For more detailed instructions, visit the [Plex support article](https://support
 ## 🏗️ Project Structure
 
 ```
-Glimpse/
+## 🏗️ Project Structure
+
+```
+## 🏗️ Project Structure
+
+```
+glimpse-media-viewer/
 │
 ├── docker-compose.yml        # Docker Compose configuration
 ├── Dockerfile                # Docker build configuration
@@ -105,7 +111,18 @@ Glimpse/
 │   └── plex_data_fetcher.py  # Python script to fetch Plex data
 │
 ├── web/
-│   └── index.html            # Frontend web interface
+│   ├── index.html            # Frontend web interface
+│   ├── manifest.json         # PWA manifest file
+│   ├── sw.js                 # Service worker for PWA functionality
+│   ├── offline.html          # Offline fallback page
+│   └── images/               # Icons and images
+│       ├── icon.png          # Original app icon
+│       ├── android-chrome-192x192.png  # App icon (192×192)
+│       ├── android-chrome-512x512.png  # App icon (512×512)
+│       ├── apple-touch-icon.png        # Apple Touch icon (180x180)
+│       ├── favicon.ico                 # Favicon
+│       ├── favicon-16x16.png           # Favicon (16x16)
+│       └── favicon-32x32.png           # Favicon (32x32)
 │
 ├── config/
 │   ├── entrypoint.sh         # Container entrypoint script
@@ -116,8 +133,12 @@ Glimpse/
     ├── movies.json           # Movie metadata
     ├── tvshows.json          # TV show metadata
     ├── checksums.pkl         # MD5 checksums for media artwork
-    ├── posters/
-    └── backdrops/
+    ├── posters/              # Movie and TV show posters
+    │   ├── movies/           # Movie poster images
+    │   └── tvshows/          # TV show poster images
+    └── backdrops/            # Movie and TV show backgrounds
+        ├── movies/           # Movie backdrop images
+        └── tvshows/          # TV show backdrop images
 ```
 
 ## 🔄 How It Works
