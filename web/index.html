@@ -900,6 +900,28 @@
             }
         }
         
+        /* Swipe indicator styles */
+        .swipe-indicator {
+            display: none;
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 90;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: auto;
+            max-width: 80%;
+        }
+        
         /* Mobile responsiveness */
         @media screen and (max-width: 768px) {
             :root {
@@ -984,6 +1006,11 @@
 		    .search-container {
 		        max-width: 100%;
 		    }
+            
+            /* Show swipe indicator on mobile */
+            .swipe-indicator {
+                display: block;
+            }
         }
         
         @media screen and (max-width: 600px) {
@@ -1118,6 +1145,9 @@
         </div>
     </div>
     
+    <!-- Swipe Indicator -->
+    <div class="swipe-indicator"></div>
+    
     <!-- Modal -->
     <div class="modal-overlay">
         <div class="modal-content">
@@ -1241,38 +1271,43 @@
             }
         });
 
+        // Function to switch tabs
+        function switchTab(contentName) {
+            // Get current search query before switching tabs
+            const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+            
+            // Update active tab (both mobile and desktop)
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.dataset.content === contentName) {
+                    t.classList.add('active');
+                } else {
+                    t.classList.remove('active');
+                }
+            });
+            
+            // Update active content
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(contentName + '-content').classList.add('active');
+            
+            // Apply the current search to the newly selected tab content
+            filterMedia(currentSearchTerm);
+            
+            // Close mobile menu if open
+            mobileMenu.classList.remove('open');
+            
+            // Scroll to top when switching tabs
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
 		// Tab switching - update for both desktop and mobile tabs
 		document.querySelectorAll('.tab').forEach(tab => {
 			tab.addEventListener('click', () => {
-				// Get current search query before switching tabs
-				const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
-				
-				// Update active tab (both mobile and desktop)
-				document.querySelectorAll('.tab').forEach(t => {
-				    if (t.dataset.content === tab.dataset.content) {
-				        t.classList.add('active');
-				    } else {
-				        t.classList.remove('active');
-				    }
-				});
-				
-				// Update active content
-				document.querySelectorAll('.content').forEach(content => {
-				    content.classList.remove('active');
-				});
-				document.getElementById(tab.dataset.content + '-content').classList.add('active');
-				
-				// Apply the current search to the newly selected tab content
-				filterMedia(currentSearchTerm);
-				
-				// Close mobile menu if open
-				mobileMenu.classList.remove('open');
-				
-				// Scroll to top when switching tabs
-				window.scrollTo({
-				    top: 0,
-				    behavior: 'smooth'
-				});
+                switchTab(tab.dataset.content);
 			});
 		});
 
@@ -1713,6 +1748,118 @@
             
             lastScrollTop = scrollTop;
         });
+
+        // ==========================================
+        // SWIPE FUNCTIONALITY FOR MOBILE
+        // ==========================================
+        
+        // Check if device is mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+        
+        if (isMobile) {
+            // Variables to track swipe
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
+            let swipeThreshold = 100; // Minimum distance to be considered a swipe
+            let swipeAngleThreshold = 30; // Maximum angle in degrees to be considered a horizontal swipe
+            
+            // Get swipe indicator element
+            const swipeIndicator = document.querySelector('.swipe-indicator');
+            
+            // Show swipe tip on first load for mobile users
+            setTimeout(() => {
+                swipeIndicator.textContent = 'Swipe left or right to switch between Movies and TV Shows';
+                swipeIndicator.style.opacity = '1';
+                
+                // Hide the tip after 3 seconds
+                setTimeout(() => {
+                    swipeIndicator.style.opacity = '0';
+                }, 3000);
+            }, 2000);
+            
+            // Add touch event listeners to the container
+            const container = document.querySelector('.container');
+            
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, false);
+            
+            container.addEventListener('touchmove', (e) => {
+                // Prevent default only if we detect a significant horizontal movement
+                // This allows vertical scrolling to continue working normally
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                
+                const diffX = touchStartX - currentX;
+                const diffY = touchStartY - currentY;
+                
+                // If horizontal movement is greater than vertical and exceeds threshold
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            container.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].clientX;
+                touchEndY = e.changedTouches[0].clientY;
+                handleSwipe();
+            }, false);
+            
+            // Handle swipe gesture
+            function handleSwipe() {
+                // Calculate distances and angle
+                const diffX = touchStartX - touchEndX;
+                const diffY = touchStartY - touchEndY;
+                const angle = Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180 / Math.PI;
+                
+                // Check if swipe is horizontal enough (angle less than threshold)
+                if (angle < swipeAngleThreshold) {
+                    // Don't process swipes when modal is open
+                    if (modalOverlay.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    // Get current active tab
+                    const activeTab = document.querySelector('.tab.active').dataset.content;
+                    
+                    // Calculate swipe distance and direction
+                    const distance = Math.abs(diffX);
+                    
+                    if (distance > swipeThreshold) {
+                        let switched = false;
+                        
+                        if (diffX > 0) {
+                            // Swiped left, show TV Shows
+                            if (activeTab === 'movies') {
+                                switched = true;
+                                swipeIndicator.textContent = 'Switched to TV Shows';
+                                switchTab('tvshows');
+                            }
+                        } else {
+                            // Swiped right, show Movies
+                            if (activeTab === 'tvshows') {
+                                switched = true;
+                                swipeIndicator.textContent = 'Switched to Movies';
+                                switchTab('movies');
+                            }
+                        }
+                        
+                        // Only show the indicator if we actually switched tabs
+                        if (switched) {
+                            swipeIndicator.style.opacity = '0.9';
+                            
+                            // Hide indicator after 1.5 seconds
+                            setTimeout(() => {
+                                swipeIndicator.style.opacity = '0';
+                            }, 1500);
+                        }
+                    }
+                }
+            }
+        }
     </script>
     
 	<script>
