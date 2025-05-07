@@ -24,10 +24,27 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Option 1: Pull from Docker Hub (Recommended)
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Glimpse.git
+# Create a directory for your data
+mkdir -p Glimpse/data
+
+# Create a docker-compose.yml file
+curl -o Glimpse/docker-compose.yml https://raw.githubusercontent.com/jeremehancock/Glimpse/main/docker-compose.yml
+
+# Edit the docker-compose.yml file to set your Plex server details
+cd Glimpse
+nano docker-compose.yml
+
+# Start the container
+docker-compose up -d
+```
+
+### Option 2: Build from Source
+
+```bash
+git clone https://github.com/jeremehancock/Glimpse.git
 cd Glimpse
 ```
 
@@ -204,26 +221,10 @@ This application works well behind a reverse proxy like Traefik or Nginx Proxy M
 - The Plex token provides access to your Plex server. Keep it secure.
 - All data is read-only, so there's no risk of modifying your Plex library.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📝 License
 
 This project is released under the MIT License. See the `LICENSE` file for details.
 
-## 🙏 Acknowledgments
+## AI Assistance Disclosure
 
-- [Plex](https://www.plex.tv/) for their amazing media server
-- [Docker](https://www.docker.com/) for containerization
-- All the open-source libraries used in this project
-
----
-
-*This is not an official Plex product and is not affiliated with Plex Inc. in any way.*
+This tool was developed with assistance from AI language models.
