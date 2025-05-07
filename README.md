@@ -81,10 +81,14 @@ http://your-server:9090
 
 ### Finding Your Plex Token
 
-Several methods exist to find your Plex token:
-1. [Official Plex support article](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
-2. Using the Plex Web app (inspect network requests)
-3. Using third-party scripts like [Plex Token](https://github.com/jbzdarkid/plex-token)
+You can find your Plex authentication token (X-Plex-Token) by following these steps:
+
+Log in to your Plex Web App
+Browse to any media item
+Click the 3 dots menu and select "Get Info"
+In the info dialog, click "View XML"
+In the URL of the new tab, find the "X-Plex-Token=" parameter
+For more detailed instructions, visit the [Plex support article](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 
 ## 🏗️ Project Structure
 
