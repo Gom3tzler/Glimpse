@@ -7,10 +7,9 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 ## ✨ Features
 
 - **Modern Interface**: Clean, responsive design that works on mobile and desktop
-- **Library Browsing**: View your movies and TV shows with poster art
+- **Media Browsing**: View your movies and TV shows with poster art
 - **Search Capability**: Quickly find content across your libraries
 - **Detailed View**: See cast information, genres, and descriptions
-- **Multiple Libraries**: Support for multiple Plex libraries of the same type
 - **MD5 Checksum Verification**: Only downloads images when they've changed
 - **Dockerized**: Easy deployment with Docker and Docker Compose
 - **Customizable**: Configure update schedule, app title, and more
@@ -24,7 +23,7 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 
 ## 🚀 Quick Start
 
-### Option 1: Pull from Docker Hub (Recommended)
+### 1: Grab Docker Compose
 
 ```bash
 # Create a directory for your data
@@ -33,18 +32,7 @@ mkdir -p Glimpse/data
 # Create a docker-compose.yml file
 curl -o Glimpse/docker-compose.yml https://raw.githubusercontent.com/jeremehancock/Glimpse/main/docker-compose.yml
 
-# Edit the docker-compose.yml file to set your Plex server details
-cd Glimpse
-nano docker-compose.yml
-
-# Start the container
-docker-compose up -d
-```
-
-### Option 2: Build from Source
-
-```bash
-git clone https://github.com/jeremehancock/Glimpse.git
+# Change to Glimpse directory
 cd Glimpse
 ```
 
