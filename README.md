@@ -17,6 +17,10 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 * **Customizable**: Configure update schedule, app title, and more
 * **Installable as PWA**: Access your media library like a native app on any device
 
+## Support this project
+
+[![Donate](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/donate-button.png)](https://www.buymeacoffee.com/jeremehancock)
+
 ## 🔧 Prerequisites
 
 - Docker and Docker Compose installed on your host system

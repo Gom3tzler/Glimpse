@@ -818,6 +818,79 @@
             word-break: break-word;
         }
         
+        /* Text placeholder styles for missing images */
+        .text-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #333, #222);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(229, 160, 13, 0.2);
+            overflow: hidden;
+        }
+        
+        .text-placeholder .media-initial {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .text-placeholder .media-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.2;
+            opacity: 0.8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        .text-placeholder.large {
+            background: linear-gradient(145deg, #333, #222);
+        }
+        
+        .text-placeholder.large .media-initial {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+        
+        .text-placeholder.large .media-name {
+            font-size: 1.5rem;
+            -webkit-line-clamp: 2;
+        }
+        
+        .backdrop-text-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(42, 42, 42, 0.8), var(--secondary-bg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 20px;
+            opacity: 0.5;
+            z-index: 0;
+        }
+        
         /* Touch target sizing for mobile */
         @media (pointer: coarse) {
             .media-title {
@@ -1093,6 +1166,26 @@
         let moviesData = [];
         let tvShowsData = [];
         
+        // Function to create text placeholders for missing images
+        function createTextPlaceholder(container, title) {
+            // Get the first letter of each word for the initials
+            const initials = title.split(' ')
+                .filter(word => word.length > 0)
+                .map(word => word[0])
+                .slice(0, 2)
+                .join('');
+                
+            const placeholder = document.createElement('div');
+            placeholder.className = 'text-placeholder';
+            placeholder.innerHTML = `
+                <div class="media-initial">${initials}</div>
+                <div class="media-name">${title}</div>
+            `;
+            
+            container.appendChild(placeholder);
+            return placeholder;
+        }
+        
         // Set up Intersection Observer for lazy loading
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -1108,6 +1201,24 @@
                                 if (placeholder) placeholder.remove();
                             }, 300);
                         }
+                    };
+                    
+                    img.onerror = () => {
+                        // Get the media title from the parent item
+                        const mediaItem = img.closest('.media-item');
+                        const title = mediaItem.querySelector('.media-title').textContent;
+                        
+                        // Create a text placeholder
+                        const textPlaceholder = createTextPlaceholder(img.parentElement, title);
+                        
+                        // Hide the loading placeholder and the img
+                        if (placeholder) {
+                            placeholder.style.opacity = '0';
+                            setTimeout(() => {
+                                if (placeholder) placeholder.remove();
+                            }, 300);
+                        }
+                        img.style.display = 'none';
                     };
                     
                     img.src = img.dataset.src;
@@ -1262,8 +1373,7 @@
                         </div>
                         <img data-src="${posterPath}" 
                              alt="${item.title}" 
-                             class="poster" 
-                             onerror="this.src='data/placeholder.jpg'; this.classList.add('loaded')">
+                             class="poster">
                     </div>
                     <div class="media-info">
                         <div class="media-title">${item.title}</div>
@@ -1338,10 +1448,36 @@
 				`data/posters/movies/${item.id}.jpg` : 
 				`data/posters/tvshows/${item.id}.jpg`;
 			
-			document.querySelector('.modal-poster img').src = posterPath;
-			document.querySelector('.modal-poster img').onerror = function() {
-				this.src = 'data/placeholder.jpg';
-			};
+            const posterContainer = document.querySelector('.modal-poster');
+            posterContainer.innerHTML = ''; // Clear existing content
+            
+            const posterImg = document.createElement('img');
+            posterImg.src = posterPath;
+            posterImg.alt = item.title;
+            posterContainer.appendChild(posterImg);
+            
+            posterImg.onerror = function() {
+                // Remove the failed image
+                this.remove();
+                
+                // Create a large text placeholder
+                const placeholder = document.createElement('div');
+                placeholder.className = 'text-placeholder large';
+                
+                // Get initials
+                const initials = item.title.split(' ')
+                    .filter(word => word.length > 0)
+                    .map(word => word[0])
+                    .slice(0, 2)
+                    .join('');
+                
+                placeholder.innerHTML = `
+                    <div class="media-initial">${initials}</div>
+                    <div class="media-name">${item.title}</div>
+                `;
+                
+                posterContainer.appendChild(placeholder);
+            };
 			
 			// Set backdrop image
 			const backdropPath = type === 'movies' ? 
@@ -1349,6 +1485,7 @@
 				`data/backdrops/tvshows/${item.id}.jpg`;
 			
 			const backdropElement = document.querySelector('.modal-backdrop');
+            backdropElement.innerHTML = ''; // Clear any existing content
 			backdropElement.style.backgroundImage = `url(${backdropPath})`;
 			
 			// Add error handling for backdrop
@@ -1359,6 +1496,18 @@
 			testImage.onerror = function() {
 				// Image failed to load, remove background image
 				backdropElement.style.backgroundImage = 'none';
+                
+                // Add text-based placeholder
+                const backdropPlaceholder = document.createElement('div');
+                backdropPlaceholder.className = 'backdrop-text-placeholder';
+                
+                if (type === 'movies') {
+                    backdropPlaceholder.textContent = 'Movie';
+                } else {
+                    backdropPlaceholder.textContent = 'TV Show';
+                }
+                
+                backdropElement.appendChild(backdropPlaceholder);
 			};
 			testImage.src = backdropPath;
 			

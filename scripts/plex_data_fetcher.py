@@ -14,10 +14,11 @@ import hashlib
 import pickle
 
 class PlexDataFetcher:
-    def __init__(self, plex_url, plex_token, output_dir="data"):
+    def __init__(self, plex_url, plex_token, output_dir="data", page_size=100):
         self.plex_url = plex_url.rstrip('/')
         self.plex_token = plex_token
         self.output_dir = Path(output_dir)
+        self.page_size = page_size  # Number of items per page
         self.checksums_file = self.output_dir / "checksums.pkl"
         self.checksums = self.load_checksums()
         
@@ -91,15 +92,49 @@ class PlexDataFetcher:
             return None
 
     def fetch_section_content(self, section_key):
-        """Fetch all content from a specific section"""
-        try:
-            # Fetch all items at once
-            response = self.session.get(f"{self.plex_url}/library/sections/{section_key}/all")
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            print(f"Error fetching section content: {e}")
-            return None
+        """Fetch all content from a specific section using pagination"""
+        all_items = []
+        offset = 0
+        
+        while True:
+            try:
+                # Fetch items with pagination
+                response = self.session.get(
+                    f"{self.plex_url}/library/sections/{section_key}/all",
+                    params={"X-Plex-Container-Start": offset, "X-Plex-Container-Size": self.page_size}
+                )
+                response.raise_for_status()
+                data = response.json()
+                
+                if 'MediaContainer' not in data:
+                    break
+                    
+                items = data['MediaContainer'].get('Metadata', [])
+                items_count = len(items)
+                
+                if not items:
+                    break
+                    
+                all_items.extend(items)
+                
+                print(f"  Fetched {items_count} items (offset: {offset})")
+                
+                # If we got fewer items than requested, we've reached the end
+                if items_count < self.page_size:
+                    break
+                    
+                # Move to the next page
+                offset += self.page_size
+                
+                # Small delay to reduce server stress
+                time.sleep(0.5)
+                
+            except requests.RequestException as e:
+                print(f"Error fetching section content (offset: {offset}): {e}")
+                break
+        
+        # Return in the same format as the original function
+        return {'MediaContainer': {'Metadata': all_items}} if all_items else None
 
     def calculate_remote_md5(self, image_url):
         """Calculate MD5 hash of remote image"""
@@ -324,10 +359,11 @@ def main():
     parser.add_argument('--url', required=True, help='Plex server URL (e.g., http://localhost:32400)')
     parser.add_argument('--token', required=True, help='Plex authentication token')
     parser.add_argument('--output', default='data', help='Output directory (default: data)')
+    parser.add_argument('--page-size', type=int, default=100, help='Number of items to fetch per page (default: 100)')
     
     args = parser.parse_args()
     
-    fetcher = PlexDataFetcher(args.url, args.token, args.output)
+    fetcher = PlexDataFetcher(args.url, args.token, args.output, args.page_size)
     fetcher.fetch_and_save_data()
 
 if __name__ == "__main__":
