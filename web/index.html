@@ -1513,14 +1513,34 @@
 				ratingElem.style.display = 'none';
 			}
 			
-			// Handle duration (for movies) or episode count (for TV shows)
+			// Handle duration (for movies) or episode/season count (for TV shows)
 			if (type === 'movies' && item.duration) {
 				const minutes = Math.floor(item.duration / 60000);
 				durationElem.textContent = `${minutes} min`;
 				durationElem.style.display = 'block';
-			} else if (type === 'tvshows' && item.leafCount) {
-				durationElem.textContent = `${item.leafCount} episodes`;
-				durationElem.style.display = 'block';
+			} else if (type === 'tvshows') {
+				let metadataText = '';
+				
+				// Add season count if available
+				if (item.childCount) {
+					metadataText += `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
+				}
+				
+				// Add episode count if available
+				if (item.leafCount) {
+					// Add separator if we already have season count
+					if (metadataText) {
+						metadataText += ' - ';
+					}
+					metadataText += `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
+				}
+				
+				if (metadataText) {
+					durationElem.textContent = metadataText;
+					durationElem.style.display = 'block';
+				} else {
+					durationElem.style.display = 'none';
+				}
 			} else {
 				durationElem.style.display = 'none';
 			}
