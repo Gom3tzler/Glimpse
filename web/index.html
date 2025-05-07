@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glimpse</title>
+    
+    <!-- Plex favicon using SVG data URI -->
+    <link rel="icon" type="image/svg+xml" href="data:image/vnd.microsoft.icon;base64,AAABAAIAICAAAAEAIACoEAAAJgAAABAQAAABACAAaAQAAM4QAAAoAAAAIAAAAEAAAAABACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAHx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//GmWi/xl8zP8ZfMz/GXzM/xl8zP8ZfMz/GXzM/xl7y/8eKTH/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8eLz3/GXvK/xl8zP8ZfMz/GXzM/xl8zP8ZfMz/GXzM/xlrq/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8cU3//GXzM/xl8zP8ZfMz/GXzM/xl9zf8Xgc//FoTR/xw+V/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8kKP8Ze8v/GXzM/xl8zP8Yfs3/F4LQ/xaG0/8VidX/FoPK/x8gIP8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xtWhf8ZfMz/GX3M/xeB0P8WhtP/FIrW/xOO2P8Skdr/GV6L/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HyAg/xl3wv8YgM//FoXS/xSK1f8Tjtj/EpLb/xCW3v8Qld3/Hisy/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HTxW/xeD0f8ViNT/E43Y/xKS2/8Qlt7/D5rh/w6e4/8Ufrj/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//GW+t/xSL1v8SkNr/EZXd/w+a4P8OnuP/DKLm/wul6P8bRFr/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8eKTL/FIvW/xGT2/8QmN//Dp3i/wyi5v8Lpun/Cqrr/w2b2/8fICD/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8ZXYn/EZXd/w+a4f8NoOT/C6Xo/wqp6/8Iru7/B7Hw/xRqkv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8gIP8Tis//Dpzi/wyi5v8Lp+n/Cazt/wex8P8GtfP/B7Lv/x0sNP8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xxBWP8OneP/DKPn/wqo6v8Iru7/B7Px/wW39f8Eu/f/Do/D/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xR9t/8MpOf/Cqnr/wiv7/8GtPL/Bbn2/wO9+P8Dvfj/GkVY/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hisz/w2g4/8Kquv/CK/v/wa18/8Euvb/A775/wO++f8Knc7/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8eKzP/DaDj/wqp6/8Ir+//BrTy/wW59v8Dvfn/A775/wqdzv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xR8t/8Mo+f/Cqjq/wiu7v8Hs/H/Bbf1/wS79/8Dvfj/GkVY/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8cQVj/Dpzi/wyi5v8Lp+n/Cazt/wex8P8GtfP/Bbj1/w6Mwf8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HyAg/xSJz/8PmuH/DaDk/wul6P8Kqev/CK7u/wex8P8Iru3/HSwz/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8ZXIn/EZPb/xCY3/8OneP/DKLm/wum6f8Kquv/Ca3t/xZnkf8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hiky/xSJ1P8SkNr/EZXd/w+a4P8OnuP/DKLm/wul6P8Ol9j/HyAg/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8Zbqz/FYjU/xON2P8Sktv/EJbe/w+a4f8OnuP/DaDl/xtDWv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HTxV/xiAz/8WhdL/FIrV/xOO2P8Sktv/EJbe/w+Z4P8Ve7b/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8gIP8Zd8L/GX3M/xeB0P8WhtP/FIrW/xOO2P8Skdr/EpDa/x4qMv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//G1aF/xl8zP8ZfMz/GH7N/xeC0P8WhtP/FYnV/xSM1/8ZXIn/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8kKP8Ze8v/GXzM/xl8zP8ZfMz/GX3N/xeBz/8WhNH/F37H/x8gIP8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HFN//xl8zP8ZfMz/GXzM/xl8zP8ZfMz/GXzM/xh+zf8dPVb/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x4vPf8Ze8r/GXzM/xl8zP8ZfMz/GXzM/xl8zP8ZfMz/Gmqq/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//GmWi/xl8zP8ZfMz/GXzM/xl8zP8ZfMz/GXzM/xl7y/8eKTH/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAABAAAAAgAAAAAQAgAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAB8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//GmKd/xl8zP8ZfMz/GXvL/x00Rv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x4tOf8Ze8v/GHzM/xeBz/8Xc7H/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//G1qM/xeAz/8UitX/EZHa/xlPbv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x4mLP8Wgcr/EpHa/w+a4P8OmNr/Higt/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Gkxs/xCW3v8MoeX/Canr/xF1n/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8Sgbv/C6Xo/wev7/8FtvP/Gj5N/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//HDlK/wul6P8HsfD/A7v3/wqXxf8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xw5Sv8Lpef/B7Hw/wS69v8Kl8X/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8TgLr/C6Pm/wit7f8Gs/H/Gj1M/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8aS2v/EZTc/w2d4/8Lpej/E3Kd/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8eJiz/F37I/xON2P8Qlt7/D5TX/x4oLf8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//G1qM/xh+zf8VhtP/E43X/xpNbf8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hi05/xl7y/8ZfMz/GH3N/xhvrv8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/xpinf8ZfMz/GXzM/xl7y/8dNEb/Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8fHx//Hx8f/x8fH/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+    
+    <style>
+        :root {
+            --poster-width: 200px;
+            --primary-color: #e5a00d;
+            --primary-hover: #f1b020;
+            --primary-light: rgba(229, 160, 13, 0.1);
+            --bg-color: #1a1a1a;
+            --secondary-bg: #2a2a2a;
+            --header-bg: #242424;
+            --light-text: #fff;
+            --muted-text: #aaa;
+            --tab-bg: #333;
+            --border-color: #555;
+            --header-height: 70px;
+            --mobile-header-height: 120px;
+            --transition-speed: 0.3s;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height); /* Space for sticky header */
+            background-color: var(--bg-color);
+            color: var(--light-text);
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        
+        /* Enhanced Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--header-bg);
+            z-index: 100;
+            transition: height var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            white-space: nowrap;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            font-weight: 700;
+            transition: font-size var(--transition-speed);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+        
+        /* Tabs with pill styling */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            transition: all var(--transition-speed);
+        }
+        
+        .tab {
+            padding: 8px 18px;
+            cursor: pointer;
+            background-color: var(--tab-bg);
+            border: none;
+            border-radius: 20px;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Enhanced search */
+        .search-box {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            display: inline-block;
+        }
+        
+        .search-input {
+            padding: 10px 36px 10px 16px;
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 20px;
+            background-color: rgba(0, 0, 0, 0.25);
+            color: var(--light-text);
+            font-size: 0.95rem;
+            transition: all var(--transition-speed);
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-input:focus {
+            background-color: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 0 2px rgba(229, 160, 13, 0.4);
+        }
+        
+        .search-input::placeholder {
+            color: var(--muted-text);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted-text);
+            font-size: 0.95rem;
+        }
+        
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted-text);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+            line-height: 0;
+            transition: color var(--transition-speed);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .search-clear:hover {
+            color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .search-clear.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Content area styling */
+        .content {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity var(--transition-speed), transform var(--transition-speed);
+        }
+        
+        .content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--poster-width), 1fr));
+            gap: 20px;
+            padding: 20px 0;
+            margin-bottom: 60px;
+        }
+        
+        /* Enhanced media items */
+        .media-item {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .media-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .poster-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2/3;
+            background-color: var(--tab-bg);
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .poster {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: var(--tab-bg);
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease-in;
+        }
+        
+        .poster.loaded {
+            opacity: 1;
+        }
+        
+        /* Improved loading animation */
+        .poster-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--tab-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spinner-rotate 1s linear infinite;
+        }
+        
+        @keyframes spinner-rotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Media item info section */
+        .media-info {
+            padding: 15px;
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .media-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            transition: color var(--transition-speed);
+        }
+        
+        .media-title:hover {
+            color: var(--primary-color);
+        }
+        
+        .media-year {
+            color: var(--muted-text);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+        
+        /* Enhanced tooltip */
+        .title-tooltip {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: normal;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed) ease-in-out, 
+                        visibility var(--transition-speed) ease-in-out,
+                        transform var(--transition-speed) ease-in-out;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            width: 180px;
+        }
+        
+        .title-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 12px;
+            height: 12px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .title-tooltip +
+        .media-info.show-tooltip .title-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Loading and error states */
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            padding: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 35vh;
+        }
+        
+        .loading .loading-spinner {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .error {
+            text-align: center;
+            color: #ff4444;
+            padding: 20px;
+            background-color: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        /* Enhanced scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-color);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: background-color var(--transition-speed), 
+                        opacity var(--transition-speed),
+                        transform var(--transition-speed);
+            opacity: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            font-family: monospace;
+            transform: scale(0.8) translateY(20px);
+        }
+        
+        .scroll-to-top::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-top: 3px solid #000;
+            border-right: 3px solid #000;
+            transform: rotate(-45deg);
+            top: 35%;
+            left: 50%;
+            margin-top: 2px;
+            margin-left: -7px;
+            transition: inherit;
+        }
+        
+        .scroll-to-top:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.05) translateY(0);
+        }
+        
+        .scroll-to-top.visible {
+            display: flex;
+            opacity: 0.95;
+            transform: scale(1) translateY(0);
+        }
+        
+        /* Enhanced Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: var(--secondary-bg);
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 100%;
+            margin: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            transform: translateY(30px);
+            transition: transform var(--transition-speed) ease;
+            overflow: hidden;
+        }
+        
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 280px;
+            background-size: cover;
+            background-position: center center;
+            opacity: 0.35;
+            z-index: 0;
+        }
+        
+        .modal-backdrop::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(42, 42, 42, 0.3) 0%, var(--secondary-bg) 100%);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: flex-end;
+            padding: 30px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .modal-poster {
+            width: 180px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            margin-right: 25px;
+            transition: transform var(--transition-speed);
+        }
+        
+        .modal-poster img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .modal-title {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            color: var(--light-text);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        
+        .modal-year {
+            font-size: 1.2em;
+            color: var(--muted-text);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .modal-metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .metadata-item {
+            padding: 6px 12px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none;
+            color: var(--light-text);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color var(--transition-speed);
+            padding: 0;
+            z-index: 10;
+        }
+        
+        .modal-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+        
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.2);
+            scroll-behavior: smooth;
+        }
+        
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-height: calc(90vh - 180px);
+            position: relative;
+            z-index: 1;
+            scroll-behavior: smooth;
+        }
+        
+        .modal-section {
+            margin-bottom: 5px;
+        }
+        
+        .modal-section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .summary-section {
+            line-height: 1.7;
+            color: var(--light-text);
+        }
+        
+        .cast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .cast-item {
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            transition: transform var(--transition-speed), background-color var(--transition-speed);
+        }
+        
+        .cast-name {
+            font-weight: 600;
+        }
+        
+        .cast-role {
+            color: var(--muted-text);
+            font-size: 0.9em;
+        }
+        
+        .genres-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .genre-tag {
+            background-color: rgba(229, 160, 13, 0.2);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            transition: background-color var(--transition-speed);
+            font-weight: 500;
+        }
+        
+        .genre-tag:hover {
+            background-color: rgba(229, 160, 13, 0.3);
+        }
+        
+        /* Mobile menu button */
+        .mobile-menu-button {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border: none;
+            color: var(--light-text);
+            font-size: 24px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            top: var(--mobile-header-height);
+            left: 0;
+            width: 100%;
+            background-color: var(--header-bg);
+            z-index: 99;
+            padding: 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-100%);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .mobile-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .mobile-menu .tabs {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .mobile-menu .tab {
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        /* No results message */
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 20px 30px 40px;
+            color: var(--light-text);
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            margin: 40px auto;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity var(--transition-speed), transform var(--transition-speed);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .no-results.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: block;
+        }
+        
+        .no-results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .no-results-message {
+            color: var(--muted-text);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .search-term {
+            color: var(--primary-color);
+            font-weight: 600;
+            word-break: break-word;
+        }
+        
+        /* Touch target sizing for mobile */
+        @media (pointer: coarse) {
+            .media-title {
+                display: flex;
+                align-items: center;
+                padding: 5px 0;
+            }
+        }
+        
+        /* Mobile responsiveness */
+        @media screen and (max-width: 768px) {
+            :root {
+                --mobile-header-height: 70px;
+            }
+            
+            body {
+                padding-top: var(--mobile-header-height);
+            }
+            
+            .header {
+                height: var(--mobile-header-height);
+            }
+            
+            .header-content {
+                justify-content: space-between;
+                padding: 0 15px;
+            }
+            
+            .logo-section {
+                order: 1;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .search-box {
+                order: 2;
+                flex: 1;
+            }
+            
+            .search-input {
+                padding: 8px 30px 8px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .header-content .tabs {
+                display: none;
+            }
+            
+            .mobile-menu-button {
+                display: flex;
+                order: 3;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .modal-header {
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .modal-poster {
+                margin-right: 0;
+                margin-bottom: 20px;
+                width: 130px;
+                align-self: center;
+            }
+            
+            .modal-title {
+                font-size: 1.5em;
+
+            }
+            
+            .modal-body {
+                padding: 20px;
+                gap: 20px;
+                scroll-behavior: smooth;
+            }
+            
+            .cast-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+		    .loading {
+		        margin-top: 35vh;
+		    }
+
+		    .search-container {
+		        max-width: 100%;
+		    }
+        }
+        
+        @media screen and (max-width: 600px) {
+            :root {
+                --poster-width: 150px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .scroll-to-top {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .media-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px 0;
+            }
+            
+            .media-info {
+                padding: 12px;
+            }
+            
+            .media-title {
+                font-size: 0.9em;
+            }
+            
+            .media-year {
+                font-size: 0.8em;
+            }
+            
+            /* Adjust tooltip for mobile */
+            .title-tooltip {
+                width: 160px;
+                font-size: 0.9em;
+                bottom: 70px;
+            }
+            
+            .modal-title {
+                font-size: 1.4em;
+            }
+            
+            .modal-body {
+                scroll-behavior: smooth;
+            }
+            
+            .modal-section-title {
+                font-size: 1.1em;
+            }
+            
+            .cast-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .cast-item {
+                padding: 12px;
+            }
+		    .loading {
+		        margin-top: 35vh;
+		    }
+		    .search-container {
+		        max-width: 100%;
+		    }
+        }
+        
+		/* Hide scroll-to-top when modal is open */
+		.modal-overlay.active ~ .scroll-to-top {
+			display: none !important;
+			opacity: 0;
+			visibility: hidden;
+		}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1><span class="logo-icon">🎬</span>Glimpse</h1>
+            </div>
+            <div class="search-box">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search...">
+                    <button class="search-clear" aria-label="Clear search">×</button>
+                </div>
+            </div>
+            <div class="tabs">
+                <div class="tab active" data-content="movies">Movies</div>
+                <div class="tab" data-content="tvshows">TV Shows</div>
+            </div>
+            <button class="mobile-menu-button" aria-label="Menu">☰</button>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <div class="tabs">
+            <div class="tab active" data-content="movies">Movies</div>
+            <div class="tab" data-content="tvshows">TV Shows</div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="movies-content" class="content active">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="no-results">
+                <span class="no-results-icon">🔍</span>
+                <h3 class="no-results-title">No results found</h3>
+                <p class="no-results-message">We couldn't find any movies matching "<span class="search-term"></span>"</p>
+                <p>Try searching for something else or clearing your search</p>
+            </div>
+            <div class="media-grid"></div>
+        </div>
+
+        <div id="tvshows-content" class="content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="no-results">
+                <span class="no-results-icon">🔍</span>
+                <h3 class="no-results-title">No results found</h3>
+                <p class="no-results-message">We couldn't find any TV Shows matching "<span class="search-term"></span>"</p>
+                <p>Try searching for something else or clearing your search</p>
+            </div>
+            <div class="media-grid"></div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-backdrop"></div>
+            <button class="modal-close" aria-label="Close modal">×</button>
+            <div class="modal-header">
+                <div class="modal-poster">
+                    <img src="data/placeholder.jpg" alt="Movie poster">
+                </div>
+                <div class="modal-title-section">
+                    <h2 class="modal-title">Movie Title</h2>
+                    <div class="modal-year">2023</div>
+                    <div class="modal-metadata">
+                        <div class="metadata-item" id="modal-rating">PG-13</div>
+                        <div class="metadata-item" id="modal-duration">120 min</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section summary-section">
+                    <div class="modal-section-title">Overview</div>
+                    <div id="modal-summary">Loading summary...</div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Genres</div>
+                    <div class="genres-list" id="modal-genres">
+                        <!-- Genres will be added here -->
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Cast</div>
+                    <div class="cast-grid" id="modal-cast">
+                        <!-- Cast members will be added here -->
+                    </div>
+                </div>
+              
+            </div>
+        </div>
+    </div>
+    
+    <button class="scroll-to-top" aria-label="Scroll to top"></button>
+
+    <script>
+        let moviesData = [];
+        let tvShowsData = [];
+        
+        // Set up Intersection Observer for lazy loading
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const placeholder = img.parentElement.querySelector('.poster-placeholder');
+                    
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        if (placeholder) {
+                            placeholder.style.opacity = '0';
+                            setTimeout(() => {
+                                if (placeholder) placeholder.remove();
+                            }, 300);
+                        }
+                    };
+                    
+                    img.src = img.dataset.src;
+                    imageObserver.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '100px 0px',  // Load images 100px before they enter viewport
+            threshold: 0.01
+        });
+        
+        // Mobile menu functionality
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileMenu.classList.contains('open') && 
+                !mobileMenu.contains(e.target) && 
+                !mobileMenuButton.contains(e.target)) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+
+		// Tab switching - update for both desktop and mobile tabs
+		document.querySelectorAll('.tab').forEach(tab => {
+			tab.addEventListener('click', () => {
+				// Get current search query before switching tabs
+				const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+				
+				// Update active tab (both mobile and desktop)
+				document.querySelectorAll('.tab').forEach(t => {
+				    if (t.dataset.content === tab.dataset.content) {
+				        t.classList.add('active');
+				    } else {
+				        t.classList.remove('active');
+				    }
+				});
+				
+				// Update active content
+				document.querySelectorAll('.content').forEach(content => {
+				    content.classList.remove('active');
+				});
+				document.getElementById(tab.dataset.content + '-content').classList.add('active');
+				
+				// Apply the current search to the newly selected tab content
+				filterMedia(currentSearchTerm);
+				
+				// Close mobile menu if open
+				mobileMenu.classList.remove('open');
+				
+				// Scroll to top when switching tabs
+				window.scrollTo({
+				    top: 0,
+				    behavior: 'smooth'
+				});
+			});
+		});
+
+        // Enhanced search functionality
+        const searchInput = document.querySelector('.search-input');
+        const searchClear = document.querySelector('.search-clear');
+        
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filterMedia(searchTerm);
+            
+            // Toggle clear button visibility
+            if (searchTerm) {
+                searchClear.classList.add('visible');
+            } else {
+                searchClear.classList.remove('visible');
+            }
+        });
+        
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.classList.remove('visible');
+            filterMedia('');
+            searchInput.focus();
+        });
+
+        // Load and display media data
+        async function loadMedia() {
+            try {
+                // Load movies
+                const moviesResponse = await fetch('data/movies.json');
+                moviesData = await moviesResponse.json();
+                displayMedia(moviesData, 'movies');
+                
+                // Load TV shows
+                const tvShowsResponse = await fetch('data/tvshows.json');
+                tvShowsData = await tvShowsResponse.json();
+                displayMedia(tvShowsData, 'tvshows');
+            } catch (error) {
+                console.error('Error loading media data:', error);
+                document.querySelector('#movies-content .loading').innerHTML = 
+                    '<div class="error">Failed to load movies data. Please try again later.</div>';
+                document.querySelector('#tvshows-content .loading').innerHTML = 
+                    '<div class="error">Failed to load TV shows data. Please try again later.</div>';
+            }
+        }
+
+        // Display media items with enhanced animations
+        function displayMedia(data, type) {
+            const contentDiv = document.querySelector(`#${type}-content`);
+            const loadingDiv = contentDiv.querySelector('.loading');
+            const grid = contentDiv.querySelector('.media-grid');
+            const noResultsDiv = contentDiv.querySelector('.no-results');
+            
+            loadingDiv.style.display = 'none';
+            grid.innerHTML = '';
+            
+            // Check if there are no results to display
+            if (data.length === 0) {
+                // Get search term and update the no results message
+                const searchTerm = document.querySelector('.search-input').value;
+                const searchTermSpan = contentDiv.querySelector('.search-term');
+                searchTermSpan.textContent = searchTerm;
+                
+                // Show no results message
+                noResultsDiv.classList.add('active');
+                grid.style.display = 'none';
+                return;
+            } else {
+                // Hide no results message and show grid
+                noResultsDiv.classList.remove('active');
+                grid.style.display = 'grid';
+            }
+            
+            // Create and append items with staggered animation
+            data.forEach((item, index) => {
+                const mediaItem = document.createElement('div');
+                mediaItem.className = 'media-item';
+                mediaItem.dataset.id = item.id;
+                mediaItem.dataset.type = type;
+                mediaItem.style.opacity = '0';
+                mediaItem.style.transition = `opacity 0.3s ease ${index * 0.03}s, transform 0.3s ease ${index * 0.03}s`;
+                
+                const posterPath = type === 'movies' ? 
+                    `data/posters/movies/${item.id}.jpg` : 
+                    `data/posters/tvshows/${item.id}.jpg`;
+                
+                mediaItem.innerHTML = `
+                    <div class="poster-container">
+                        <div class="poster-placeholder">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <img data-src="${posterPath}" 
+                             alt="${item.title}" 
+                             class="poster" 
+                             onerror="this.src='data/placeholder.jpg'; this.classList.add('loaded')">
+                    </div>
+                    <div class="media-info">
+                        <div class="media-title">${item.title}</div>
+                        <div class="title-tooltip">${item.title}</div>
+                        <div class="media-year">${item.year}</div>
+                    </div>
+                `;
+                
+                grid.appendChild(mediaItem);
+                
+                // Trigger animation after a small delay
+                setTimeout(() => {
+                    mediaItem.style.opacity = '1';
+                }, 10);
+                
+                // Observe the image for lazy loading
+                const img = mediaItem.querySelector('.poster');
+                imageObserver.observe(img);
+                
+                // Add touch handling for mobile tooltips
+                const mediaInfo = mediaItem.querySelector('.media-info');
+                const title = mediaItem.querySelector('.media-title');
+                
+                title.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent text selection
+                    const allMediaInfo = document.querySelectorAll('.media-info');
+                    
+                    // Hide all tooltips first
+                    allMediaInfo.forEach(info => info.classList.remove('show-tooltip'));
+                    
+                    // Show this tooltip
+                    mediaInfo.classList.add('show-tooltip');
+                });
+                
+                // Hide tooltip when touching elsewhere
+                title.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    
+                    // Hide tooltip after a delay
+                    setTimeout(() => {
+                        mediaInfo.classList.remove('show-tooltip');
+                    }, 2000);
+                });
+                
+                // Add click event to open modal
+                mediaItem.addEventListener('click', () => {
+                    openModal(item, type);
+                });
+            });
+        }
+
+        // Filter media based on search
+        function filterMedia(searchTerm) {
+            const activeTab = document.querySelector('.tab.active').dataset.content;
+            const data = activeTab === 'movies' ? moviesData : tvShowsData;
+            
+            const filtered = data.filter(item => 
+                item.title.toLowerCase().includes(searchTerm)
+            );
+            
+            displayMedia(filtered, activeTab);
+        }
+
+        // Modal functionality
+        const modalOverlay = document.querySelector('.modal-overlay');
+        const modalClose = document.querySelector('.modal-close');
+        
+		// Function to open modal with media details
+		function openModal(item, type) {
+			// Set poster image
+			const posterPath = type === 'movies' ? 
+				`data/posters/movies/${item.id}.jpg` : 
+				`data/posters/tvshows/${item.id}.jpg`;
+			
+			document.querySelector('.modal-poster img').src = posterPath;
+			document.querySelector('.modal-poster img').onerror = function() {
+				this.src = 'data/placeholder.jpg';
+			};
+			
+			// Set backdrop image
+			const backdropPath = type === 'movies' ? 
+				`data/backdrops/movies/${item.id}.jpg` : 
+				`data/backdrops/tvshows/${item.id}.jpg`;
+			
+			const backdropElement = document.querySelector('.modal-backdrop');
+			backdropElement.style.backgroundImage = `url(${backdropPath})`;
+			
+			// Add error handling for backdrop
+			const testImage = new Image();
+			testImage.onload = function() {
+				// Image loaded successfully, keep the backdrop
+			};
+			testImage.onerror = function() {
+				// Image failed to load, remove background image
+				backdropElement.style.backgroundImage = 'none';
+			};
+			testImage.src = backdropPath;
+			
+			// Set title and year
+			document.querySelector('.modal-title').textContent = item.title;
+			document.querySelector('.modal-year').textContent = item.year || '';
+			
+			// Set metadata
+			const ratingElem = document.getElementById('modal-rating');
+			const durationElem = document.getElementById('modal-duration');
+			
+			// Handle content rating
+			if (item.contentRating) {
+				ratingElem.textContent = item.contentRating;
+				ratingElem.style.display = 'block';
+			} else {
+				ratingElem.style.display = 'none';
+			}
+			
+			// Handle duration (for movies) or episode count (for TV shows)
+			if (type === 'movies' && item.duration) {
+				const minutes = Math.floor(item.duration / 60000);
+				durationElem.textContent = `${minutes} min`;
+				durationElem.style.display = 'block';
+			} else if (type === 'tvshows' && item.leafCount) {
+				durationElem.textContent = `${item.leafCount} episodes`;
+				durationElem.style.display = 'block';
+			} else {
+				durationElem.style.display = 'none';
+			}
+			
+			// Set summary
+			document.getElementById('modal-summary').textContent = item.summary || 'No summary available.';
+			
+			// Set genres
+			const genresContainer = document.getElementById('modal-genres');
+			genresContainer.innerHTML = '';
+			
+			if (item.genres && item.genres.length > 0) {
+				item.genres.forEach(genre => {
+				    const genreElement = document.createElement('div');
+				    genreElement.className = 'genre-tag';
+				    genreElement.textContent = genre;
+				    genresContainer.appendChild(genreElement);
+				});
+			} else {
+				genresContainer.innerHTML = '<div>No genres available</div>';
+			}
+			
+			// Set cast
+			const castContainer = document.getElementById('modal-cast');
+			castContainer.innerHTML = '';
+			
+			if (item.actors && item.actors.length > 0) {
+				item.actors.forEach(actor => {
+				    const actorElement = document.createElement('div');
+				    actorElement.className = 'cast-item';
+				    actorElement.innerHTML = `
+				        <div class="cast-name">${actor.name}</div>
+				        <div class="cast-role">${actor.role || ''}</div>
+				    `;
+				    castContainer.appendChild(actorElement);
+				});
+			} else {
+				castContainer.innerHTML = '<div>No cast information available</div>';
+			}
+			
+			// Make sure any previous modal content is reset before showing new modal
+			const modalBody = document.querySelector('.modal-body');
+			modalBody.scrollTop = 0;
+			
+			// Show modal with animation
+			document.body.style.overflow = 'hidden'; // Prevent background scrolling
+			modalOverlay.classList.add('active');
+			
+			// Double attempt to reset scroll after modal is visible
+			// This addresses timing issues on mobile devices
+			setTimeout(() => {
+				// First reset
+				modalBody.scrollTop = 0;
+				
+				// Second delayed reset with forced reflow (critical for mobile browsers)
+				setTimeout(() => {
+				    modalBody.scrollTop = 0;
+				    // Force layout recalculation on mobile
+				    void modalBody.offsetHeight;
+				}, 50);
+			}, 10);
+		}
+        
+        // Close modal functionality
+        modalClose.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent event propagation
+            e.stopPropagation(); // Stop event bubbling
+            closeModal();
+        });
+        
+        // Close modal when clicking outside
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+        
+        // Function to close the modal
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+        
+        // Initialize on page load
+        loadMedia();
+        
+        // Enhanced scroll to top button functionality
+        const scrollToTopButton = document.querySelector('.scroll-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.add('visible');
+            } else {
+                scrollToTopButton.classList.remove('visible');
+            }
+        });
+        
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Header scroll effect - shrink on scroll
+        const header = document.querySelector('.header');
+        let lastScrollTop = 0;
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 100) {
+                header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.3)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+    </script>
+</body>
+</html>

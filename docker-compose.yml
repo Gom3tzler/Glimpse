@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  glimpse-media-viewer:
+    build: .
+    container_name: glimpse-media-viewer
+    ports:
+      - "9090:80"
+    volumes:
+      - ./data:/app/data
+    environment:
+	  - PLEX_URL=http://your-plex-server:32400
+	  - PLEX_TOKEN=your-plex-token
+      - CRON_SCHEDULE=0 */6 * * *  # Default: every 6 hours
+      - TZ=UTC  # Set your timezone
+      - APP_TITLE=Glimpse  # Default app title, customize as needed
+    restart: unless-stopped
