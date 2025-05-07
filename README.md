@@ -206,7 +206,7 @@ docker-compose logs glimpse-media-viewer
 To trigger a data update manually:
 
 ```bash
-docker exec glimpse-media-viewer python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data
+docker exec glimpse-media-viewer bash -c 'python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data'
 ```
 
 ### Common Issues
