@@ -9,7 +9,6 @@ const STATIC_ASSETS = [
   '/index.html',
   '/manifest.json',
   '/test.html',
-  '/data/placeholder.jpg'
 ];
 
 // Install event - cache static assets
