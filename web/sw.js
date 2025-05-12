@@ -1,66 +1,69 @@
 // Service Worker for Glimpse Media Viewer
 
-const CACHE_NAME = 'glimpse-media-viewer-v1';
-const DYNAMIC_CACHE = 'glimpse-media-dynamic-v1';
+const CACHE_NAME = "glimpse-media-viewer-v3";
+const DYNAMIC_CACHE = "glimpse-media-dynamic-v3";
 
 // Assets to cache on install
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/test.html',
-];
+const STATIC_ASSETS = ["/", "/index.html", "/manifest.json", "/test.html"];
 
 // Install event - cache static assets
-self.addEventListener('install', event => {
-  console.log('Service Worker: Installing');
+self.addEventListener("install", (event) => {
+  console.log("Service Worker: Installing");
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Caching static files');
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        console.log("Service Worker: Caching static files");
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('Service Worker: All static assets added to cache');
+        console.log("Service Worker: All static assets added to cache");
         return self.skipWaiting(); // Ensure the new service worker activates right away
       })
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', event => {
-  console.log('Service Worker: Activating');
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker: Activating");
   event.waitUntil(
-    caches.keys()
-      .then(cacheNames => {
+    caches
+      .keys()
+      .then((cacheNames) => {
         return Promise.all(
-          cacheNames.filter(cacheName => {
-            return cacheName.startsWith('glimpse-media-') && 
-                   cacheName !== CACHE_NAME && 
-                   cacheName !== DYNAMIC_CACHE;
-          }).map(cacheName => {
-            console.log('Service Worker: Clearing old cache:', cacheName);
-            return caches.delete(cacheName);
-          })
+          cacheNames
+            .filter((cacheName) => {
+              return (
+                cacheName.startsWith("glimpse-media-") &&
+                cacheName !== CACHE_NAME &&
+                cacheName !== DYNAMIC_CACHE
+              );
+            })
+            .map((cacheName) => {
+              console.log("Service Worker: Clearing old cache:", cacheName);
+              return caches.delete(cacheName);
+            })
         );
       })
       .then(() => {
-        console.log('Service Worker: Claiming clients');
+        console.log("Service Worker: Claiming clients");
         return self.clients.claim(); // Take control of all clients
       })
   );
 });
 
 // Fetch event - serve from cache or network
-self.addEventListener('fetch', event => {
+self.addEventListener("fetch", (event) => {
   // Skip cross-origin requests
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
   // JSON data - network first, then cache
-  if (event.request.url.includes('/data/') && 
-      (event.request.url.endsWith('.json') || event.request.url.endsWith('.jpg'))) {
+  if (
+    event.request.url.includes("/data/") &&
+    (event.request.url.endsWith(".json") || event.request.url.endsWith(".jpg"))
+  ) {
     event.respondWith(networkFirstStrategy(event.request));
     return;
   }
@@ -85,10 +88,10 @@ async function cacheFirstStrategy(request) {
     }
     return networkResponse;
   } catch (error) {
-    console.error('Fetch failed:', error);
+    console.error("Fetch failed:", error);
     // If it's an HTML request, return a simple offline page
-    if (request.headers.get('Accept').includes('text/html')) {
-      return caches.match('/offline.html');
+    if (request.headers.get("Accept").includes("text/html")) {
+      return caches.match("/offline.html");
     }
     // For other resources, just return the error
     throw error;
@@ -105,12 +108,12 @@ async function networkFirstStrategy(request) {
     }
     return networkResponse;
   } catch (error) {
-    console.log('Network request failed, trying cache:', request.url);
+    console.log("Network request failed, trying cache:", request.url);
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
     }
-    console.error('No cached response available for:', request.url);
+    console.error("No cached response available for:", request.url);
     throw error;
   }
 }
@@ -181,20 +184,19 @@ const OFFLINE_HTML = `
 `;
 
 // Create offline page on install
-self.addEventListener('install', event => {
-  const offlineRequest = new Request('/offline.html');
+self.addEventListener("install", (event) => {
+  const offlineRequest = new Request("/offline.html");
   event.waitUntil(
     fetch(offlineRequest)
       .catch(() => {
         return new Response(OFFLINE_HTML, {
-          headers: { 'Content-Type': 'text/html' }
+          headers: { "Content-Type": "text/html" },
         });
       })
-      .then(response => {
-        return caches.open(CACHE_NAME)
-          .then(cache => {
-            return cache.put(offlineRequest, response);
-          });
+      .then((response) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          return cache.put(offlineRequest, response);
+        });
       })
   );
 });
