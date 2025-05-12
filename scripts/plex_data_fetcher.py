@@ -355,13 +355,36 @@ class PlexDataFetcher:
         print(f"Data saved to: {self.output_dir}")
 
 def main():
+    # Get values from environment variables first
+    default_url = os.environ.get('PLEX_URL', '')
+    default_token = os.environ.get('PLEX_TOKEN', '')
+    default_output = os.environ.get('OUTPUT_DIR', 'data')
+    default_page_size = int(os.environ.get('PAGE_SIZE', '100'))
+    
     parser = argparse.ArgumentParser(description='Fetch Plex media data and posters')
-    parser.add_argument('--url', required=True, help='Plex server URL (e.g., http://localhost:32400)')
-    parser.add_argument('--token', required=True, help='Plex authentication token')
-    parser.add_argument('--output', default='data', help='Output directory (default: data)')
-    parser.add_argument('--page-size', type=int, default=100, help='Number of items to fetch per page (default: 100)')
+    
+    # Use environment variables as defaults
+    parser.add_argument('--url', default=default_url, help='Plex server URL (e.g., http://localhost:32400)')
+    parser.add_argument('--token', default=default_token, help='Plex authentication token')
+    parser.add_argument('--output', default=default_output, help='Output directory (default: data)')
+    parser.add_argument('--page-size', type=int, default=default_page_size, help='Number of items per page (default: 100)')
+    
+    # Handle special case for tokens with leading hyphens
+    # This allows using "=" syntax for the token (--token=-abc123)
+    for i, arg in enumerate(sys.argv):
+        if arg == '--token' and i + 1 < len(sys.argv) and sys.argv[i + 1].startswith('-') and not sys.argv[i + 1].startswith('--'):
+            sys.argv[i:i+2] = [f'--token={sys.argv[i+1]}']
+            break
     
     args = parser.parse_args()
+    
+    # Validate required parameters
+    if not args.url:
+        print("Error: Plex URL is required. Set with --url or PLEX_URL environment variable.")
+        sys.exit(1)
+    if not args.token:
+        print("Error: Plex token is required. Set with --token or PLEX_TOKEN environment variable.")
+        sys.exit(1)
     
     fetcher = PlexDataFetcher(args.url, args.token, args.output, args.page_size)
     fetcher.fetch_and_save_data()

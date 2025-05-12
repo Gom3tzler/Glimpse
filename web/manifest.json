@@ -4,7 +4,7 @@
   "description": "A sleek, responsive web application for browsing your Plex media library",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a1a",
+  "background_color": "#131313",
   "theme_color": "#e5a00d",
   "orientation": "any",
   "icons": [
