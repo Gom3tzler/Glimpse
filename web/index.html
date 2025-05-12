@@ -8,10 +8,10 @@
 
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#e5a00d">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Glimpse Media">
     <meta name="application-name" content="Glimpse Media Viewer">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -613,7 +613,7 @@
             background-color: rgba(0, 0, 0, 0.4);
             border: none;
             color: var(--light-text);
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -975,6 +975,7 @@
             }
 
             .modal-header {
+                margin-top: 40px;
                 padding: 20px;
                 gap: 20px;
             }
@@ -988,14 +989,6 @@
 
             .modal-title {
                 font-size: 1.5em;
-
-            }
-
-            .modal-close {
-                top: 5px;
-                right: 5px;
-                width: 24px;
-                height: 24px;
 
             }
 
@@ -1073,16 +1066,12 @@
                 bottom: 70px;
             }
 
-            .modal-title {
-                font-size: 1.4em;
+            .modal-header {
+                margin-top: 40px;
             }
 
-            .modal-close {
-                top: 5px;
-                right: 5px;
-                width: 24px;
-                height: 24px;
-
+            .modal-title {
+                font-size: 1.4em;
             }
 
             .modal-body {
@@ -1381,9 +1370,9 @@
             } catch (error) {
                 console.error('Error loading media data:', error);
                 document.querySelector('#movies-content .loading').innerHTML =
-                    '<div class="error">Failed to load movies data. Please try again later.</div>';
+                    '<div class="error">Failed to load movie data. Please try again later.</div>';
                 document.querySelector('#tvshows-content .loading').innerHTML =
-                    '<div class="error">Failed to load TV shows data. Please try again later.</div>';
+                    '<div class="error">Failed to load TV show data. Please try again later.</div>';
             }
         }
 

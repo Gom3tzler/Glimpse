@@ -14,8 +14,8 @@ CRON_SCHEDULE=${CRON_SCHEDULE:-"0 */6 * * *"}
 PYTHON_PATH=$(which python)
 echo "Python path: $PYTHON_PATH"
 # Create the cron job with PATH and absolute path to Python
-echo "PATH=/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin" > /etc/cron.d/plex-cron
-echo "$CRON_SCHEDULE root cd /app && $PYTHON_PATH /app/scripts/plex_data_fetcher.py --url \"$PLEX_URL\" --token \"$PLEX_TOKEN\" --output /app/data >> /var/log/cron.log 2>&1" >> /etc/cron.d/plex-cron
+echo "PATH=/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin" >/etc/cron.d/plex-cron
+echo "$CRON_SCHEDULE root cd /app && $PYTHON_PATH /app/scripts/plex_data_fetcher.py --url \"$PLEX_URL\" --token \"$PLEX_TOKEN\" --output /app/data >> /var/log/cron.log 2>&1" >>/etc/cron.d/plex-cron
 # Apply cron job
 crontab /etc/cron.d/plex-cron
 # Update the app title in the HTML file
@@ -31,7 +31,7 @@ else
 fi
 # Ensure nginx configuration is correct
 # Create a simple test page to check if nginx is serving from the correct directory
-echo "<!DOCTYPE html><html><head><title>Nginx Test</title></head><body><h1>Nginx is working from /app/web!</h1></body></html>" > /app/web/test.html
+echo "<!DOCTYPE html><html><head><title>Nginx Test</title></head><body><h1>Nginx is working from /app/web!</h1></body></html>" >/app/web/test.html
 # Run the initial data fetch
 echo "Running initial data fetch..."
 $PYTHON_PATH /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data
