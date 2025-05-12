@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glimpse</title>
-    
-	<!-- PWA Meta Tags -->
-	<meta name="theme-color" content="#e5a00d">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="Glimpse Media">
-	<meta name="application-name" content="Glimpse Media Viewer">
 
-	<!-- PWA Manifest -->
-	<link rel="manifest" href="/manifest.json">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#e5a00d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Glimpse Media">
+    <meta name="application-name" content="Glimpse Media Viewer">
 
-	<!-- PWA Icons -->
-	<link rel="icon" type="image/png" sizes="192x192" href="/images/android-chrome-192x192.png">
-	<link rel="icon" type="image/png" sizes="512x512" href="/images/android-chrome-592x592.png">
-	
-	<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/android-chrome-592x592.png">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+
     <style>
         :root {
             --poster-width: 200px;
@@ -42,30 +43,31 @@
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
             --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 0 20px;
         }
-        
+
         body {
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
-            padding-top: var(--header-height); /* Space for sticky header */
+            padding-top: var(--header-height);
+            /* Space for sticky header */
             background-color: var(--bg-color);
             color: var(--light-text);
             line-height: 1.5;
             font-size: 16px;
         }
-        
+
         /* Enhanced Header Styles */
         .header {
             position: fixed;
@@ -80,7 +82,7 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
-        
+
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -90,13 +92,13 @@
             align-items: center;
             gap: 20px;
         }
-        
+
         .logo-section {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         h1 {
             color: var(--primary-color);
             margin: 0;
@@ -108,20 +110,20 @@
             display: flex;
             align-items: center;
         }
-        
+
         .logo-icon {
             font-size: 1.8rem;
             color: var(--primary-color);
             margin-right: 8px;
         }
-        
+
         /* Tabs with pill styling */
         .tabs {
             display: flex;
             gap: 10px;
             transition: all var(--transition-speed);
         }
-        
+
         .tab {
             padding: 8px 18px;
             cursor: pointer;
@@ -133,18 +135,18 @@
             font-weight: 500;
             font-size: 0.9rem;
         }
-        
+
         .tab.active {
             background-color: var(--primary-color);
             color: #000;
             font-weight: 600;
             box-shadow: var(--shadow-sm);
         }
-        
+
         .tab:hover:not(.active) {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         /* Enhanced search */
         .search-box {
             flex: 1;
@@ -153,14 +155,14 @@
             display: flex;
             justify-content: center;
         }
-        
+
         .search-container {
             position: relative;
             width: 100%;
             max-width: 400px;
             display: inline-block;
         }
-        
+
         .search-input {
             padding: 10px 36px 10px 16px;
             width: 100%;
@@ -174,16 +176,16 @@
             outline: none;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
-        
+
         .search-input:focus {
             background-color: rgba(0, 0, 0, 0.35);
             box-shadow: 0 0 0 2px rgba(229, 160, 13, 0.4);
         }
-        
+
         .search-input::placeholder {
             color: var(--muted-text);
         }
-        
+
         .search-icon {
             position: absolute;
             left: 12px;
@@ -192,7 +194,7 @@
             color: var(--muted-text);
             font-size: 0.95rem;
         }
-        
+
         .search-clear {
             position: absolute;
             right: 10px;
@@ -212,18 +214,18 @@
             border-radius: 50%;
             z-index: 1;
         }
-        
+
         .search-clear:hover {
             color: var(--primary-color);
             background-color: rgba(255, 255, 255, 0.05);
         }
-        
+
         .search-clear.visible {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
+
         /* Content area styling */
         .content {
             display: none;
@@ -231,13 +233,13 @@
             transform: translateY(10px);
             transition: opacity var(--transition-speed), transform var(--transition-speed);
         }
-        
+
         .content.active {
             display: block;
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .media-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(var(--poster-width), 1fr));
@@ -245,7 +247,7 @@
             padding: 20px 0;
             margin-bottom: 60px;
         }
-        
+
         /* Enhanced media items */
         .media-item {
             background-color: var(--secondary-bg);
@@ -258,11 +260,11 @@
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
+
         .media-item:hover {
             transform: translateY(-5px);
         }
-        
+
         .poster-container {
             position: relative;
             width: 100%;
@@ -271,7 +273,7 @@
             border-radius: 8px 8px 0 0;
             overflow: hidden;
         }
-        
+
         .poster {
             position: absolute;
             top: 0;
@@ -283,11 +285,11 @@
             opacity: 0;
             transition: opacity var(--transition-speed) ease-in;
         }
-        
+
         .poster.loaded {
             opacity: 1;
         }
-        
+
         /* Improved loading animation */
         .poster-placeholder {
             position: absolute;
@@ -300,7 +302,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .loading-spinner {
             width: 30px;
             height: 30px;
@@ -309,13 +311,13 @@
             border-radius: 50%;
             animation: spinner-rotate 1s linear infinite;
         }
-        
+
         @keyframes spinner-rotate {
             to {
                 transform: rotate(360deg);
             }
         }
-        
+
         /* Media item info section */
         .media-info {
             padding: 15px;
@@ -324,7 +326,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .media-title {
             font-size: 1rem;
             font-weight: 600;
@@ -343,17 +345,17 @@
             box-sizing: border-box;
             transition: color var(--transition-speed);
         }
-        
+
         .media-title:hover {
             color: var(--primary-color);
         }
-        
+
         .media-year {
             color: var(--muted-text);
             font-size: 0.85rem;
             margin-top: auto;
         }
-        
+
         /* Enhanced tooltip */
         .title-tooltip {
             position: absolute;
@@ -369,9 +371,9 @@
             white-space: normal;
             opacity: 0;
             visibility: hidden;
-            transition: opacity var(--transition-speed) ease-in-out, 
-                        visibility var(--transition-speed) ease-in-out,
-                        transform var(--transition-speed) ease-in-out;
+            transition: opacity var(--transition-speed) ease-in-out,
+                visibility var(--transition-speed) ease-in-out,
+                transform var(--transition-speed) ease-in-out;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
             z-index: 10;
             pointer-events: none;
@@ -379,7 +381,7 @@
             text-align: center;
             width: 180px;
         }
-        
+
         .title-tooltip::after {
             content: '';
             position: absolute;
@@ -392,14 +394,13 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .title-tooltip +
-        .media-info.show-tooltip .title-tooltip {
+
+        .title-tooltip+.media-info.show-tooltip .title-tooltip {
             opacity: 1;
             visibility: visible;
             transform: translateX(-50%) translateY(0);
         }
-        
+
         /* Loading and error states */
         .loading {
             text-align: center;
@@ -413,12 +414,12 @@
             gap: 15px;
             margin-top: 35vh;
         }
-        
+
         .loading .loading-spinner {
             width: 40px;
             height: 40px;
         }
-        
+
         .error {
             text-align: center;
             color: #ff4444;
@@ -427,7 +428,7 @@
             border-radius: 8px;
             margin: 20px 0;
         }
-        
+
         /* Enhanced scroll to top button */
         .scroll-to-top {
             position: fixed;
@@ -444,9 +445,9 @@
             align-items: center;
             justify-content: center;
             font-size: 26px;
-            transition: background-color var(--transition-speed), 
-                        opacity var(--transition-speed),
-                        transform var(--transition-speed);
+            transition: background-color var(--transition-speed),
+                opacity var(--transition-speed),
+                transform var(--transition-speed);
             opacity: 0;
             z-index: 1000;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
@@ -454,7 +455,7 @@
             font-family: monospace;
             transform: scale(0.8) translateY(20px);
         }
-        
+
         .scroll-to-top::before {
             content: '';
             position: absolute;
@@ -469,18 +470,18 @@
             margin-left: -7px;
             transition: inherit;
         }
-        
+
         .scroll-to-top:hover {
             background-color: var(--primary-hover);
             transform: scale(1.05) translateY(0);
         }
-        
+
         .scroll-to-top.visible {
             display: flex;
             opacity: 0.95;
             transform: scale(1) translateY(0);
         }
-        
+
         /* Enhanced Modal styles */
         .modal-overlay {
             display: none;
@@ -499,12 +500,12 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        
+
         .modal-overlay.active {
             display: flex;
             opacity: 1;
         }
-        
+
         .modal-content {
             position: relative;
             background-color: var(--secondary-bg);
@@ -520,7 +521,7 @@
             transition: transform var(--transition-speed) ease;
             overflow: hidden;
         }
-        
+
         .modal-backdrop {
             position: absolute;
             top: 0;
@@ -532,7 +533,7 @@
             opacity: 0.35;
             z-index: 0;
         }
-        
+
         .modal-backdrop::after {
             content: '';
             position: absolute;
@@ -542,11 +543,11 @@
             height: 100%;
             background: linear-gradient(to bottom, rgba(42, 42, 42, 0.3) 0%, var(--secondary-bg) 100%);
         }
-        
+
         .modal-overlay.active .modal-content {
             transform: translateY(0);
         }
-        
+
         .modal-header {
             display: flex;
             align-items: flex-end;
@@ -555,7 +556,7 @@
             position: relative;
             z-index: 1;
         }
-        
+
         .modal-poster {
             width: 180px;
             flex-shrink: 0;
@@ -565,13 +566,13 @@
             margin-right: 25px;
             transition: transform var(--transition-speed);
         }
-        
+
         .modal-poster img {
             width: 100%;
             height: auto;
             display: block;
         }
-        
+
         .modal-title {
             margin: 0 0 10px 0;
             font-size: 2.2em;
@@ -579,21 +580,21 @@
             font-weight: 700;
             line-height: 1.1;
         }
-        
+
         .modal-year {
             font-size: 1.2em;
             color: var(--muted-text);
             margin-bottom: 15px;
             font-weight: 500;
         }
-        
+
         .modal-metadata {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
         }
-        
+
         .metadata-item {
             padding: 6px 12px;
             background-color: rgba(0, 0, 0, 0.3);
@@ -601,7 +602,7 @@
             font-size: 0.9em;
             font-weight: 500;
         }
-        
+
         .modal-close {
             position: absolute;
             top: 15px;
@@ -621,40 +622,40 @@
             padding: 0;
             z-index: 10;
         }
-        
+
         .modal-close:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         /* Custom scrollbar styles */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 10px;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: var(--primary-color);
             border-radius: 10px;
             border: 2px solid rgba(0, 0, 0, 0.2);
             transition: background 0.3s ease;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-hover);
         }
-        
+
         /* Firefox scrollbar */
         * {
             scrollbar-width: thin;
             scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.2);
             scroll-behavior: smooth;
         }
-        
+
         .modal-body {
             padding: 30px;
             overflow-y: auto;
@@ -666,51 +667,51 @@
             z-index: 1;
             scroll-behavior: smooth;
         }
-        
+
         .modal-section {
             margin-bottom: 5px;
         }
-        
+
         .modal-section-title {
             font-size: 1.3em;
             margin-bottom: 15px;
             color: var(--primary-color);
             font-weight: 600;
         }
-        
+
         .summary-section {
             line-height: 1.7;
             color: var(--light-text);
         }
-        
+
         .cast-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
         }
-        
+
         .cast-item {
             background-color: rgba(0, 0, 0, 0.15);
             border-radius: 10px;
             padding: 15px;
             transition: transform var(--transition-speed), background-color var(--transition-speed);
         }
-        
+
         .cast-name {
             font-weight: 600;
         }
-        
+
         .cast-role {
             color: var(--muted-text);
             font-size: 0.9em;
         }
-        
+
         .genres-list {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .genre-tag {
             background-color: rgba(229, 160, 13, 0.2);
             padding: 8px 14px;
@@ -719,11 +720,11 @@
             transition: background-color var(--transition-speed);
             font-weight: 500;
         }
-        
+
         .genre-tag:hover {
             background-color: rgba(229, 160, 13, 0.3);
         }
-        
+
         /* Mobile menu button */
         .mobile-menu-button {
             display: none;
@@ -737,7 +738,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         /* Mobile menu */
         .mobile-menu {
             position: fixed;
@@ -753,18 +754,18 @@
             opacity: 0;
             visibility: hidden;
         }
-        
+
         .mobile-menu.open {
             transform: translateY(0);
             opacity: 1;
             visibility: visible;
         }
-        
+
         .mobile-menu .tabs {
             flex-direction: column;
             width: 100%;
         }
-        
+
         .mobile-menu .tab {
             width: 100%;
             text-align: center;
@@ -786,38 +787,38 @@
             transition: opacity var(--transition-speed), transform var(--transition-speed);
             box-shadow: var(--shadow-sm);
         }
-        
+
         .no-results.active {
             display: block;
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .no-results-icon {
             font-size: 3rem;
             margin-bottom: 15px;
             color: var(--primary-color);
             display: block;
         }
-        
+
         .no-results-title {
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 10px;
         }
-        
+
         .no-results-message {
             color: var(--muted-text);
             line-height: 1.6;
             margin-bottom: 20px;
         }
-        
+
         .search-term {
             color: var(--primary-color);
             font-weight: 600;
             word-break: break-word;
         }
-        
+
         /* Text placeholder styles for missing images */
         .text-placeholder {
             position: absolute;
@@ -837,7 +838,7 @@
             border: 1px solid rgba(229, 160, 13, 0.2);
             overflow: hidden;
         }
-        
+
         .text-placeholder .media-initial {
             font-size: 3rem;
             font-weight: 700;
@@ -845,7 +846,7 @@
             margin-bottom: 10px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         .text-placeholder .media-name {
             font-size: 0.9rem;
             font-weight: 500;
@@ -857,21 +858,21 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
-        
+
         .text-placeholder.large {
             background: linear-gradient(145deg, #333, #222);
         }
-        
+
         .text-placeholder.large .media-initial {
             font-size: 5rem;
             margin-bottom: 15px;
         }
-        
+
         .text-placeholder.large .media-name {
             font-size: 1.5rem;
             -webkit-line-clamp: 2;
         }
-        
+
         .backdrop-text-placeholder {
             position: absolute;
             top: 0;
@@ -890,17 +891,17 @@
             opacity: 0.5;
             z-index: 0;
         }
-        
-		/* Touch target sizing for mobile */
-		@media (pointer: coarse) {
-			.media-title {
-				padding: 5px 0;
-				overflow: hidden;        
-				text-overflow: ellipsis; 
-				white-space: nowrap;      
-			}
-		}
-        
+
+        /* Touch target sizing for mobile */
+        @media (pointer: coarse) {
+            .media-title {
+                padding: 5px 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
         /* Swipe indicator styles */
         .swipe-indicator {
             display: none;
@@ -922,183 +923,202 @@
             width: auto;
             max-width: 80%;
         }
-        
+
         /* Mobile responsiveness */
         @media screen and (max-width: 768px) {
             :root {
                 --mobile-header-height: 70px;
             }
-            
+
             body {
                 padding-top: var(--mobile-header-height);
             }
-            
+
             .header {
                 height: var(--mobile-header-height);
             }
-            
+
             .header-content {
                 justify-content: space-between;
                 padding: 0 15px;
             }
-            
+
             .logo-section {
                 order: 1;
             }
-            
+
             h1 {
                 font-size: 1.3rem;
             }
-            
+
             .search-box {
                 order: 2;
                 flex: 1;
             }
-            
+
             .search-input {
                 padding: 8px 30px 8px 10px;
                 font-size: 0.9rem;
             }
-            
+
             .header-content .tabs {
                 display: none;
             }
-            
+
             .mobile-menu-button {
                 display: flex;
                 order: 3;
             }
-            
+
             .mobile-menu {
                 display: block;
             }
-            
+
             .modal-header {
                 padding: 20px;
                 gap: 20px;
             }
-            
+
             .modal-poster {
                 margin-right: 0;
                 margin-bottom: 20px;
                 width: 130px;
                 align-self: center;
             }
-            
+
             .modal-title {
                 font-size: 1.5em;
 
             }
 
-            .media-title {
-                overflow: hidden;        
-				text-overflow: ellipsis;  
-				white-space: nowrap;    
+            .modal-close {
+                top: 5px;
+                right: 5px;
+                width: 24px;
+                height: 24px;
+
             }
-            
+
+            .media-title {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
             .modal-body {
                 padding: 20px;
                 gap: 20px;
                 scroll-behavior: smooth;
             }
-            
+
             .cast-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
-            
-		    .loading {
-		        margin-top: 35vh;
-		    }
 
-		    .search-container {
-		        max-width: 100%;
-		    }
-            
+            .loading {
+                margin-top: 35vh;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
             /* Show swipe indicator on mobile */
             .swipe-indicator {
                 display: block;
             }
         }
-        
+
         @media screen and (max-width: 600px) {
             :root {
                 --poster-width: 150px;
             }
-            
+
             .container {
                 padding: 0 10px;
             }
-            
+
             .scroll-to-top {
                 bottom: 20px;
                 right: 20px;
                 width: 45px;
                 height: 45px;
             }
-            
+
             .media-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
                 padding: 15px 0;
             }
-            
+
             .media-info {
                 padding: 12px;
             }
-            
+
             .media-title {
                 font-size: 0.9em;
-                overflow: hidden;        
-				text-overflow: ellipsis;  
-				white-space: nowrap;    
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
-            
+
             .media-year {
                 font-size: 0.8em;
             }
-            
+
             /* Adjust tooltip for mobile */
             .title-tooltip {
                 width: 160px;
                 font-size: 0.9em;
                 bottom: 70px;
             }
-            
+
             .modal-title {
                 font-size: 1.4em;
             }
-            
+
+            .modal-close {
+                top: 5px;
+                right: 5px;
+                width: 24px;
+                height: 24px;
+
+            }
+
             .modal-body {
                 scroll-behavior: smooth;
             }
-            
+
             .modal-section-title {
                 font-size: 1.1em;
             }
-            
+
             .cast-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            
+
             .cast-item {
                 padding: 12px;
             }
-		    .loading {
-		        margin-top: 35vh;
-		    }
-		    .search-container {
-		        max-width: 100%;
-		    }
+
+            .loading {
+                margin-top: 35vh;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
         }
-        
-		/* Hide scroll-to-top when modal is open */
-		.modal-overlay.active ~ .scroll-to-top {
-			display: none !important;
-			opacity: 0;
-			visibility: hidden;
-		}
+
+        /* Hide scroll-to-top when modal is open */
+        .modal-overlay.active~.scroll-to-top {
+            display: none !important;
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="header-content">
@@ -1118,7 +1138,7 @@
             <button class="mobile-menu-button" aria-label="Menu">☰</button>
         </div>
     </div>
-    
+
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <div class="tabs">
@@ -1126,7 +1146,7 @@
             <div class="tab" data-content="tvshows">TV Shows</div>
         </div>
     </div>
-    
+
     <div class="container">
         <div id="movies-content" class="content active">
             <div class="loading">
@@ -1135,7 +1155,8 @@
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
                 <h3 class="no-results-title">No results found</h3>
-                <p class="no-results-message">We couldn't find any movies matching "<span class="search-term"></span>"</p>
+                <p class="no-results-message">We couldn't find any movies matching "<span class="search-term"></span>"
+                </p>
                 <p>Try searching for something else or clearing your search</p>
             </div>
             <div class="media-grid"></div>
@@ -1148,16 +1169,17 @@
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
                 <h3 class="no-results-title">No results found</h3>
-                <p class="no-results-message">We couldn't find any TV Shows matching "<span class="search-term"></span>"</p>
+                <p class="no-results-message">We couldn't find any TV Shows matching "<span class="search-term"></span>"
+                </p>
                 <p>Try searching for something else or clearing your search</p>
             </div>
             <div class="media-grid"></div>
         </div>
     </div>
-    
+
     <!-- Swipe Indicator -->
     <div class="swipe-indicator"></div>
-    
+
     <!-- Modal -->
     <div class="modal-overlay">
         <div class="modal-content">
@@ -1181,52 +1203,52 @@
                     <div class="modal-section-title">Overview</div>
                     <div id="modal-summary">Loading summary...</div>
                 </div>
-                
+
                 <div class="modal-section">
                     <div class="modal-section-title">Genres</div>
                     <div class="genres-list" id="modal-genres">
                         <!-- Genres will be added here -->
                     </div>
                 </div>
-                
+
                 <div class="modal-section">
                     <div class="modal-section-title">Cast</div>
                     <div class="cast-grid" id="modal-cast">
                         <!-- Cast members will be added here -->
                     </div>
                 </div>
-              
+
             </div>
         </div>
     </div>
-    
+
     <button class="scroll-to-top" aria-label="Scroll to top"></button>
 
     <script>
         let moviesData = [];
         let tvShowsData = [];
-        
+
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
 
-                
+
             const placeholder = document.createElement('div');
             placeholder.className = 'text-placeholder';
             placeholder.innerHTML = `
                 <div class="media-name">${title}</div>
             `;
-            
+
             container.appendChild(placeholder);
             return placeholder;
         }
-        
+
         // Set up Intersection Observer for lazy loading
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
                     const placeholder = img.parentElement.querySelector('.poster-placeholder');
-                    
+
                     img.onload = () => {
                         img.classList.add('loaded');
                         if (placeholder) {
@@ -1236,15 +1258,15 @@
                             }, 300);
                         }
                     };
-                    
+
                     img.onerror = () => {
                         // Get the media title from the parent item
                         const mediaItem = img.closest('.media-item');
                         const title = mediaItem.querySelector('.media-title').textContent;
-                        
+
                         // Create a text placeholder
                         const textPlaceholder = createTextPlaceholder(img.parentElement, title);
-                        
+
                         // Hide the loading placeholder and the img
                         if (placeholder) {
                             placeholder.style.opacity = '0';
@@ -1254,7 +1276,7 @@
                         }
                         img.style.display = 'none';
                     };
-                    
+
                     img.src = img.dataset.src;
                     imageObserver.unobserve(img);
                 }
@@ -1263,19 +1285,19 @@
             rootMargin: '100px 0px',  // Load images 100px before they enter viewport
             threshold: 0.01
         });
-        
+
         // Mobile menu functionality
         const mobileMenuButton = document.querySelector('.mobile-menu-button');
         const mobileMenu = document.querySelector('.mobile-menu');
-        
+
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
         });
-        
+
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (mobileMenu.classList.contains('open') && 
-                !mobileMenu.contains(e.target) && 
+            if (mobileMenu.classList.contains('open') &&
+                !mobileMenu.contains(e.target) &&
                 !mobileMenuButton.contains(e.target)) {
                 mobileMenu.classList.remove('open');
             }
@@ -1285,7 +1307,7 @@
         function switchTab(contentName) {
             // Get current search query before switching tabs
             const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
-            
+
             // Update active tab (both mobile and desktop)
             document.querySelectorAll('.tab').forEach(t => {
                 if (t.dataset.content === contentName) {
@@ -1294,19 +1316,19 @@
                     t.classList.remove('active');
                 }
             });
-            
+
             // Update active content
             document.querySelectorAll('.content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(contentName + '-content').classList.add('active');
-            
+
             // Apply the current search to the newly selected tab content
             filterMedia(currentSearchTerm);
-            
+
             // Close mobile menu if open
             mobileMenu.classList.remove('open');
-            
+
             // Scroll to top when switching tabs
             window.scrollTo({
                 top: 0,
@@ -1314,21 +1336,21 @@
             });
         }
 
-		// Tab switching - update for both desktop and mobile tabs
-		document.querySelectorAll('.tab').forEach(tab => {
-			tab.addEventListener('click', () => {
+        // Tab switching - update for both desktop and mobile tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
                 switchTab(tab.dataset.content);
-			});
-		});
+            });
+        });
 
         // Enhanced search functionality
         const searchInput = document.querySelector('.search-input');
         const searchClear = document.querySelector('.search-clear');
-        
+
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             filterMedia(searchTerm);
-            
+
             // Toggle clear button visibility
             if (searchTerm) {
                 searchClear.classList.add('visible');
@@ -1336,7 +1358,7 @@
                 searchClear.classList.remove('visible');
             }
         });
-        
+
         searchClear.addEventListener('click', () => {
             searchInput.value = '';
             searchClear.classList.remove('visible');
@@ -1351,16 +1373,16 @@
                 const moviesResponse = await fetch('data/movies.json');
                 moviesData = await moviesResponse.json();
                 displayMedia(moviesData, 'movies');
-                
+
                 // Load TV shows
                 const tvShowsResponse = await fetch('data/tvshows.json');
                 tvShowsData = await tvShowsResponse.json();
                 displayMedia(tvShowsData, 'tvshows');
             } catch (error) {
                 console.error('Error loading media data:', error);
-                document.querySelector('#movies-content .loading').innerHTML = 
+                document.querySelector('#movies-content .loading').innerHTML =
                     '<div class="error">Failed to load movies data. Please try again later.</div>';
-                document.querySelector('#tvshows-content .loading').innerHTML = 
+                document.querySelector('#tvshows-content .loading').innerHTML =
                     '<div class="error">Failed to load TV shows data. Please try again later.</div>';
             }
         }
@@ -1371,17 +1393,17 @@
             const loadingDiv = contentDiv.querySelector('.loading');
             const grid = contentDiv.querySelector('.media-grid');
             const noResultsDiv = contentDiv.querySelector('.no-results');
-            
+
             loadingDiv.style.display = 'none';
             grid.innerHTML = '';
-            
+
             // Check if there are no results to display
             if (data.length === 0) {
                 // Get search term and update the no results message
                 const searchTerm = document.querySelector('.search-input').value;
                 const searchTermSpan = contentDiv.querySelector('.search-term');
                 searchTermSpan.textContent = searchTerm;
-                
+
                 // Show no results message
                 noResultsDiv.classList.add('active');
                 grid.style.display = 'none';
@@ -1391,7 +1413,7 @@
                 noResultsDiv.classList.remove('active');
                 grid.style.display = 'grid';
             }
-            
+
             // Create and append items with staggered animation
             data.forEach((item, index) => {
                 const mediaItem = document.createElement('div');
@@ -1400,11 +1422,11 @@
                 mediaItem.dataset.type = type;
                 mediaItem.style.opacity = '0';
                 mediaItem.style.transition = `opacity 0.3s ease ${index * 0.03}s, transform 0.3s ease ${index * 0.03}s`;
-                
-                const posterPath = type === 'movies' ? 
-                    `data/posters/movies/${item.id}.jpg` : 
+
+                const posterPath = type === 'movies' ?
+                    `data/posters/movies/${item.id}.jpg` :
                     `data/posters/tvshows/${item.id}.jpg`;
-                
+
                 mediaItem.innerHTML = `
                     <div class="poster-container">
                         <div class="poster-placeholder">
@@ -1420,43 +1442,43 @@
                         <div class="media-year">${item.year}</div>
                     </div>
                 `;
-                
+
                 grid.appendChild(mediaItem);
-                
+
                 // Trigger animation after a small delay
                 setTimeout(() => {
                     mediaItem.style.opacity = '1';
                 }, 10);
-                
+
                 // Observe the image for lazy loading
                 const img = mediaItem.querySelector('.poster');
                 imageObserver.observe(img);
-                
+
                 // Add touch handling for mobile tooltips
                 const mediaInfo = mediaItem.querySelector('.media-info');
                 const title = mediaItem.querySelector('.media-title');
-                
+
                 title.addEventListener('touchstart', (e) => {
                     e.preventDefault(); // Prevent text selection
                     const allMediaInfo = document.querySelectorAll('.media-info');
-                    
+
                     // Hide all tooltips first
                     allMediaInfo.forEach(info => info.classList.remove('show-tooltip'));
-                    
+
                     // Show this tooltip
                     mediaInfo.classList.add('show-tooltip');
                 });
-                
+
                 // Hide tooltip when touching elsewhere
                 title.addEventListener('touchend', (e) => {
                     e.preventDefault();
-                    
+
                     // Hide tooltip after a delay
                     setTimeout(() => {
                         mediaInfo.classList.remove('show-tooltip');
                     }, 2000);
                 });
-                
+
                 // Add click event to open modal
                 mediaItem.addEventListener('click', () => {
                     openModal(item, type);
@@ -1468,266 +1490,266 @@
         function filterMedia(searchTerm) {
             const activeTab = document.querySelector('.tab.active').dataset.content;
             const data = activeTab === 'movies' ? moviesData : tvShowsData;
-            
-            const filtered = data.filter(item => 
+
+            const filtered = data.filter(item =>
                 item.title.toLowerCase().includes(searchTerm)
             );
-            
+
             displayMedia(filtered, activeTab);
         }
 
         // Modal functionality
         const modalOverlay = document.querySelector('.modal-overlay');
         const modalClose = document.querySelector('.modal-close');
-        
-		// Function to open modal with media details
-		function openModal(item, type) {
-			// Set poster image
-			const posterPath = type === 'movies' ? 
-				`data/posters/movies/${item.id}.jpg` : 
-				`data/posters/tvshows/${item.id}.jpg`;
-			
+
+        // Function to open modal with media details
+        function openModal(item, type) {
+            // Set poster image
+            const posterPath = type === 'movies' ?
+                `data/posters/movies/${item.id}.jpg` :
+                `data/posters/tvshows/${item.id}.jpg`;
+
             const posterContainer = document.querySelector('.modal-poster');
             posterContainer.innerHTML = ''; // Clear existing content
-            
+
             const posterImg = document.createElement('img');
             posterImg.src = posterPath;
             posterImg.alt = item.title;
             posterContainer.appendChild(posterImg);
-            
-            posterImg.onerror = function() {
+
+            posterImg.onerror = function () {
                 // Remove the failed image
                 this.remove();
-                
+
                 // Create a large text placeholder
                 const placeholder = document.createElement('div');
                 placeholder.className = 'text-placeholder large';
-               
+
                 placeholder.innerHTML = `
                     <div class="media-name">${item.title}</div>
                 `;
-                
+
                 posterContainer.appendChild(placeholder);
             };
-			
-			// Set backdrop image
-			const backdropPath = type === 'movies' ? 
-				`data/backdrops/movies/${item.id}.jpg` : 
-				`data/backdrops/tvshows/${item.id}.jpg`;
-			
-			const backdropElement = document.querySelector('.modal-backdrop');
+
+            // Set backdrop image
+            const backdropPath = type === 'movies' ?
+                `data/backdrops/movies/${item.id}.jpg` :
+                `data/backdrops/tvshows/${item.id}.jpg`;
+
+            const backdropElement = document.querySelector('.modal-backdrop');
             backdropElement.innerHTML = ''; // Clear any existing content
-			backdropElement.style.backgroundImage = `url(${backdropPath})`;
-			
-			// Add error handling for backdrop
-			const testImage = new Image();
-			testImage.onload = function() {
-				// Image loaded successfully, keep the backdrop
-			};
-			testImage.onerror = function() {
-				// Image failed to load, remove background image
-				backdropElement.style.backgroundImage = 'none';
-                
+            backdropElement.style.backgroundImage = `url(${backdropPath})`;
+
+            // Add error handling for backdrop
+            const testImage = new Image();
+            testImage.onload = function () {
+                // Image loaded successfully, keep the backdrop
+            };
+            testImage.onerror = function () {
+                // Image failed to load, remove background image
+                backdropElement.style.backgroundImage = 'none';
+
                 // Add text-based placeholder
                 const backdropPlaceholder = document.createElement('div');
                 backdropPlaceholder.className = 'backdrop-text-placeholder';
-                
+
                 if (type === 'movies') {
                     backdropPlaceholder.textContent = 'Movie';
                 } else {
                     backdropPlaceholder.textContent = 'TV Show';
                 }
-                
+
                 backdropElement.appendChild(backdropPlaceholder);
-			};
-			testImage.src = backdropPath;
-			
-			// Set title and year
-			document.querySelector('.modal-title').textContent = item.title;
-			document.querySelector('.modal-year').textContent = item.year || '';
-			
-			// Set metadata
-			const ratingElem = document.getElementById('modal-rating');
-			const durationElem = document.getElementById('modal-duration');
-			
-			// Handle content rating
-			if (item.contentRating) {
-				ratingElem.textContent = item.contentRating;
-				ratingElem.style.display = 'block';
-			} else {
-				ratingElem.style.display = 'none';
-			}
-			
-			// Handle duration (for movies) or episode/season count (for TV shows)
-			if (type === 'movies' && item.duration) {
-				// For movies, show duration in minutes
-				const minutes = Math.floor(item.duration / 60000);
-				durationElem.textContent = `${minutes} min`;
-				durationElem.style.display = 'block';
-				
-				// Hide seasons element (in case it was visible from previous TV show)
-				const seasonsElem = document.getElementById('modal-seasons');
-				if (seasonsElem) {
-					seasonsElem.style.display = 'none';
-				}
-				
-				// Hide episodes element (in case it was visible from previous TV show)
-				const episodesElem = document.getElementById('modal-episodes');
-				if (episodesElem) {
-					episodesElem.style.display = 'none';
-				}
-			} else if (type === 'tvshows') {
-				// For TV shows, show seasons and episodes in separate containers
-				
-				// First, ensure the seasons element exists
-				let seasonsElem = document.getElementById('modal-seasons');
-				if (!seasonsElem) {
-					// Create a new element for seasons if it doesn't exist
-					seasonsElem = document.createElement('div');
-					seasonsElem.className = 'metadata-item';
-					seasonsElem.id = 'modal-seasons';
-					
-					// Insert it before the duration element
-					durationElem.parentNode.insertBefore(seasonsElem, durationElem);
-				}
-				
-				// Create or get the episodes element
-				let episodesElem = document.getElementById('modal-episodes');
-				if (!episodesElem) {
-					// Create a new element for episodes if it doesn't exist
-					episodesElem = document.createElement('div');
-					episodesElem.className = 'metadata-item';
-					episodesElem.id = 'modal-episodes';
-					
-					// Insert it after the seasons element
-					seasonsElem.parentNode.insertBefore(episodesElem, seasonsElem.nextSibling);
-				}
-				
-				// Hide the duration element for TV shows
-				durationElem.style.display = 'none';
-				
-				// Handle season count
-				if (item.childCount) {
-					seasonsElem.textContent = `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
-					seasonsElem.style.display = 'block';
-				} else {
-					seasonsElem.style.display = 'none';
-				}
-				
-				// Handle episode count
-				if (item.leafCount) {
-					episodesElem.textContent = `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
-					episodesElem.style.display = 'block';
-				} else {
-					episodesElem.style.display = 'none';
-				}
-			} else {
-				// Default case - hide all elements
-				durationElem.style.display = 'none';
-				
-				const seasonsElem = document.getElementById('modal-seasons');
-				if (seasonsElem) {
-					seasonsElem.style.display = 'none';
-				}
-				
-				const episodesElem = document.getElementById('modal-episodes');
-				if (episodesElem) {
-					episodesElem.style.display = 'none';
-				}
-			}
-			
-			// Set summary
-			document.getElementById('modal-summary').textContent = item.summary || 'No summary available.';
-			
-			// Set genres
-			const genresContainer = document.getElementById('modal-genres');
-			genresContainer.innerHTML = '';
-			
-			if (item.genres && item.genres.length > 0) {
-				item.genres.forEach(genre => {
-				    const genreElement = document.createElement('div');
-				    genreElement.className = 'genre-tag';
-				    genreElement.textContent = genre;
-				    genresContainer.appendChild(genreElement);
-				});
-			} else {
-				genresContainer.innerHTML = '<div>No genres available</div>';
-			}
-			
-			// Set cast
-			const castContainer = document.getElementById('modal-cast');
-			castContainer.innerHTML = '';
-			
-			if (item.actors && item.actors.length > 0) {
-				item.actors.forEach(actor => {
-				    const actorElement = document.createElement('div');
-				    actorElement.className = 'cast-item';
-				    actorElement.innerHTML = `
+            };
+            testImage.src = backdropPath;
+
+            // Set title and year
+            document.querySelector('.modal-title').textContent = item.title;
+            document.querySelector('.modal-year').textContent = item.year || '';
+
+            // Set metadata
+            const ratingElem = document.getElementById('modal-rating');
+            const durationElem = document.getElementById('modal-duration');
+
+            // Handle content rating
+            if (item.contentRating) {
+                ratingElem.textContent = item.contentRating;
+                ratingElem.style.display = 'block';
+            } else {
+                ratingElem.style.display = 'none';
+            }
+
+            // Handle duration (for movies) or episode/season count (for TV shows)
+            if (type === 'movies' && item.duration) {
+                // For movies, show duration in minutes
+                const minutes = Math.floor(item.duration / 60000);
+                durationElem.textContent = `${minutes} min`;
+                durationElem.style.display = 'block';
+
+                // Hide seasons element (in case it was visible from previous TV show)
+                const seasonsElem = document.getElementById('modal-seasons');
+                if (seasonsElem) {
+                    seasonsElem.style.display = 'none';
+                }
+
+                // Hide episodes element (in case it was visible from previous TV show)
+                const episodesElem = document.getElementById('modal-episodes');
+                if (episodesElem) {
+                    episodesElem.style.display = 'none';
+                }
+            } else if (type === 'tvshows') {
+                // For TV shows, show seasons and episodes in separate containers
+
+                // First, ensure the seasons element exists
+                let seasonsElem = document.getElementById('modal-seasons');
+                if (!seasonsElem) {
+                    // Create a new element for seasons if it doesn't exist
+                    seasonsElem = document.createElement('div');
+                    seasonsElem.className = 'metadata-item';
+                    seasonsElem.id = 'modal-seasons';
+
+                    // Insert it before the duration element
+                    durationElem.parentNode.insertBefore(seasonsElem, durationElem);
+                }
+
+                // Create or get the episodes element
+                let episodesElem = document.getElementById('modal-episodes');
+                if (!episodesElem) {
+                    // Create a new element for episodes if it doesn't exist
+                    episodesElem = document.createElement('div');
+                    episodesElem.className = 'metadata-item';
+                    episodesElem.id = 'modal-episodes';
+
+                    // Insert it after the seasons element
+                    seasonsElem.parentNode.insertBefore(episodesElem, seasonsElem.nextSibling);
+                }
+
+                // Hide the duration element for TV shows
+                durationElem.style.display = 'none';
+
+                // Handle season count
+                if (item.childCount) {
+                    seasonsElem.textContent = `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
+                    seasonsElem.style.display = 'block';
+                } else {
+                    seasonsElem.style.display = 'none';
+                }
+
+                // Handle episode count
+                if (item.leafCount) {
+                    episodesElem.textContent = `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
+                    episodesElem.style.display = 'block';
+                } else {
+                    episodesElem.style.display = 'none';
+                }
+            } else {
+                // Default case - hide all elements
+                durationElem.style.display = 'none';
+
+                const seasonsElem = document.getElementById('modal-seasons');
+                if (seasonsElem) {
+                    seasonsElem.style.display = 'none';
+                }
+
+                const episodesElem = document.getElementById('modal-episodes');
+                if (episodesElem) {
+                    episodesElem.style.display = 'none';
+                }
+            }
+
+            // Set summary
+            document.getElementById('modal-summary').textContent = item.summary || 'No summary available.';
+
+            // Set genres
+            const genresContainer = document.getElementById('modal-genres');
+            genresContainer.innerHTML = '';
+
+            if (item.genres && item.genres.length > 0) {
+                item.genres.forEach(genre => {
+                    const genreElement = document.createElement('div');
+                    genreElement.className = 'genre-tag';
+                    genreElement.textContent = genre;
+                    genresContainer.appendChild(genreElement);
+                });
+            } else {
+                genresContainer.innerHTML = '<div>No genres available</div>';
+            }
+
+            // Set cast
+            const castContainer = document.getElementById('modal-cast');
+            castContainer.innerHTML = '';
+
+            if (item.actors && item.actors.length > 0) {
+                item.actors.forEach(actor => {
+                    const actorElement = document.createElement('div');
+                    actorElement.className = 'cast-item';
+                    actorElement.innerHTML = `
 				        <div class="cast-name">${actor.name}</div>
 				        <div class="cast-role">${actor.role || ''}</div>
 				    `;
-				    castContainer.appendChild(actorElement);
-				});
-			} else {
-				castContainer.innerHTML = '<div>No cast information available</div>';
-			}
-			
-			// Make sure any previous modal content is reset before showing new modal
-			const modalBody = document.querySelector('.modal-body');
-			modalBody.scrollTop = 0;
-			
-			// Show modal with animation
-			document.body.style.overflow = 'hidden'; // Prevent background scrolling
-			modalOverlay.classList.add('active');
-			
-			// Double attempt to reset scroll after modal is visible
-			// This addresses timing issues on mobile devices
-			setTimeout(() => {
-				// First reset
-				modalBody.scrollTop = 0;
-				
-				// Second delayed reset with forced reflow (critical for mobile browsers)
-				setTimeout(() => {
-				    modalBody.scrollTop = 0;
-				    // Force layout recalculation on mobile
-				    void modalBody.offsetHeight;
-				}, 50);
-			}, 10);
-		}
-        
+                    castContainer.appendChild(actorElement);
+                });
+            } else {
+                castContainer.innerHTML = '<div>No cast information available</div>';
+            }
+
+            // Make sure any previous modal content is reset before showing new modal
+            const modalBody = document.querySelector('.modal-body');
+            modalBody.scrollTop = 0;
+
+            // Show modal with animation
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            modalOverlay.classList.add('active');
+
+            // Double attempt to reset scroll after modal is visible
+            // This addresses timing issues on mobile devices
+            setTimeout(() => {
+                // First reset
+                modalBody.scrollTop = 0;
+
+                // Second delayed reset with forced reflow (critical for mobile browsers)
+                setTimeout(() => {
+                    modalBody.scrollTop = 0;
+                    // Force layout recalculation on mobile
+                    void modalBody.offsetHeight;
+                }, 50);
+            }, 10);
+        }
+
         // Close modal functionality
-        modalClose.addEventListener('click', function(e) {
+        modalClose.addEventListener('click', function (e) {
             e.preventDefault(); // Prevent event propagation
             e.stopPropagation(); // Stop event bubbling
             closeModal();
         });
-        
+
         // Close modal when clicking outside
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) {
                 closeModal();
             }
         });
-        
+
         // Close modal with escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
                 closeModal();
             }
         });
-        
+
         // Function to close the modal
         function closeModal() {
             modalOverlay.classList.remove('active');
             document.body.style.overflow = ''; // Restore scrolling
         }
-        
+
         // Initialize on page load
         loadMedia();
-        
+
         // Enhanced scroll to top button functionality
         const scrollToTopButton = document.querySelector('.scroll-to-top');
-        
+
         window.addEventListener('scroll', () => {
             if (window.pageYOffset > 300) {
                 scrollToTopButton.classList.add('visible');
@@ -1735,37 +1757,37 @@
                 scrollToTopButton.classList.remove('visible');
             }
         });
-        
+
         scrollToTopButton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
         });
-        
+
         // Header scroll effect - shrink on scroll
         const header = document.querySelector('.header');
         let lastScrollTop = 0;
-        
+
         window.addEventListener('scroll', () => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
+
             if (scrollTop > 100) {
                 header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.3)';
             } else {
                 header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
             }
-            
+
             lastScrollTop = scrollTop;
         });
 
         // ==========================================
         // SWIPE FUNCTIONALITY FOR MOBILE
         // ==========================================
-        
+
         // Check if device is mobile
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-        
+
         if (isMobile) {
             // Variables to track swipe
             let touchStartX = 0;
@@ -1774,73 +1796,73 @@
             let touchEndY = 0;
             let swipeThreshold = 100; // Minimum distance to be considered a swipe
             let swipeAngleThreshold = 30; // Maximum angle in degrees to be considered a horizontal swipe
-            
+
             // Get swipe indicator element
             const swipeIndicator = document.querySelector('.swipe-indicator');
-            
+
             // Show swipe tip on first load for mobile users
             setTimeout(() => {
                 swipeIndicator.textContent = 'Swipe left or right to switch between Movies and TV Shows';
                 swipeIndicator.style.opacity = '1';
-                
+
                 // Hide the tip after 3 seconds
                 setTimeout(() => {
                     swipeIndicator.style.opacity = '0';
                 }, 3000);
             }, 2000);
-            
+
             // Add touch event listeners to the container
             const container = document.querySelector('.container');
-            
+
             container.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
             }, false);
-            
+
             container.addEventListener('touchmove', (e) => {
                 // Prevent default only if we detect a significant horizontal movement
                 // This allows vertical scrolling to continue working normally
                 const currentX = e.touches[0].clientX;
                 const currentY = e.touches[0].clientY;
-                
+
                 const diffX = touchStartX - currentX;
                 const diffY = touchStartY - currentY;
-                
+
                 // If horizontal movement is greater than vertical and exceeds threshold
                 if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
                     e.preventDefault();
                 }
             }, { passive: false });
-            
+
             container.addEventListener('touchend', (e) => {
                 touchEndX = e.changedTouches[0].clientX;
                 touchEndY = e.changedTouches[0].clientY;
                 handleSwipe();
             }, false);
-            
+
             // Handle swipe gesture
             function handleSwipe() {
                 // Calculate distances and angle
                 const diffX = touchStartX - touchEndX;
                 const diffY = touchStartY - touchEndY;
                 const angle = Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180 / Math.PI;
-                
+
                 // Check if swipe is horizontal enough (angle less than threshold)
                 if (angle < swipeAngleThreshold) {
                     // Don't process swipes when modal is open
                     if (modalOverlay.classList.contains('active')) {
                         return;
                     }
-                    
+
                     // Get current active tab
                     const activeTab = document.querySelector('.tab.active').dataset.content;
-                    
+
                     // Calculate swipe distance and direction
                     const distance = Math.abs(diffX);
-                    
+
                     if (distance > swipeThreshold) {
                         let switched = false;
-                        
+
                         if (diffX > 0) {
                             // Swiped left, show TV Shows
                             if (activeTab === 'movies') {
@@ -1856,11 +1878,11 @@
                                 switchTab('movies');
                             }
                         }
-                        
+
                         // Only show the indicator if we actually switched tabs
                         if (switched) {
                             swipeIndicator.style.opacity = '0.9';
-                            
+
                             // Hide indicator after 1.5 seconds
                             setTimeout(() => {
                                 swipeIndicator.style.opacity = '0';
@@ -1871,62 +1893,62 @@
             }
         }
     </script>
-    
-	<script>
-		if ('serviceWorker' in navigator) {
-		    window.addEventListener('load', () => {
-		        navigator.serviceWorker.register('/sw.js')
-		            .then(registration => {
-		                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-		            })
-		            .catch(error => {
-		                console.log('ServiceWorker registration failed: ', error);
-		            });
-		    });
-		}
 
-		// Add install prompt
-		let deferredPrompt;
-		const installButton = document.createElement('button');
-		installButton.style.display = 'none';
-		installButton.classList.add('install-button');
-		installButton.textContent = 'Install App';
-		
-		window.addEventListener('beforeinstallprompt', (e) => {
-		    // Prevent Chrome 67 and earlier from automatically showing the prompt
-		    e.preventDefault();
-		    // Stash the event so it can be triggered later
-		    deferredPrompt = e;
-		    
-		    // Create and show the install button - position after the H1
-		    installButton.style.display = 'block';
-		    
-		    // Get the logo section and h1 element
-		    const logoSection = document.querySelector('.logo-section');
-		    
-		    // Insert the button right after the h1 element inside the logo section
-		    logoSection.appendChild(installButton);
-		    
-		    installButton.addEventListener('click', (e) => {
-		        // Hide the install button
-		        installButton.style.display = 'none';
-		        // Show the install prompt
-		        deferredPrompt.prompt();
-		        // Wait for the user to respond to the prompt
-		        deferredPrompt.userChoice.then((choiceResult) => {
-		            if (choiceResult.outcome === 'accepted') {
-		                console.log('User accepted the install prompt');
-		            } else {
-		                console.log('User dismissed the install prompt');
-		            }
-		            deferredPrompt = null;
-		        });
-		    });
-		});
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
 
-		// Add styles for the install button
-		const style = document.createElement('style');
-		style.textContent = `
+        // Add install prompt
+        let deferredPrompt;
+        const installButton = document.createElement('button');
+        installButton.style.display = 'none';
+        installButton.classList.add('install-button');
+        installButton.textContent = 'Install App';
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+
+            // Create and show the install button - position after the H1
+            installButton.style.display = 'block';
+
+            // Get the logo section and h1 element
+            const logoSection = document.querySelector('.logo-section');
+
+            // Insert the button right after the h1 element inside the logo section
+            logoSection.appendChild(installButton);
+
+            installButton.addEventListener('click', (e) => {
+                // Hide the install button
+                installButton.style.display = 'none';
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        // Add styles for the install button
+        const style = document.createElement('style');
+        style.textContent = `
 		    .install-button {
 		        background-color: var(--primary-color);
 		        color: #000;
@@ -1955,7 +1977,8 @@
 		        }
 		    }
 		`;
-		document.head.appendChild(style);
-	</script>
+        document.head.appendChild(style);
+    </script>
 </body>
+
 </html>
