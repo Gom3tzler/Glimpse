@@ -1431,6 +1431,12 @@
 
                 // Close mobile menu if open
                 mobileMenu.classList.remove('open');
+
+                // Scroll to top when sort method changes
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         });
 
