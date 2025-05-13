@@ -48,20 +48,27 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            /* Add containment to help browser optimize rendering */
+            contain: content;
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 0 20px;
+            /* Add containment for better performance */
+            contain: layout style;
+        }
+
+        html {
+            background-color: var(--bg-color);
         }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
             padding-top: var(--header-height);
-            /* Space for sticky header */
             background-color: var(--bg-color);
             color: var(--light-text);
             line-height: 1.5;
@@ -77,10 +84,12 @@
             height: var(--header-height);
             background-color: var(--header-bg);
             z-index: 100;
-            transition: height var(--transition-speed), box-shadow var(--transition-speed);
+            transition: box-shadow var(--transition-speed);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            /* Add contain property for better performance */
+            contain: layout style;
         }
 
         .header-content {
@@ -97,6 +106,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            /* Prevent reflow */
+            contain: content;
         }
 
         h1 {
@@ -106,7 +117,6 @@
             font-size: 1.6rem;
             letter-spacing: -0.5px;
             font-weight: 700;
-            transition: font-size var(--transition-speed);
             display: flex;
             align-items: center;
         }
@@ -130,10 +140,12 @@
             background-color: var(--tab-bg);
             border: none;
             border-radius: 20px;
-            transition: all var(--transition-speed);
+            transition: background-color var(--transition-speed);
             white-space: nowrap;
             font-weight: 500;
             font-size: 0.9rem;
+            /* Better touch targets */
+            min-height: 36px;
         }
 
         .tab.active {
@@ -172,7 +184,7 @@
             background-color: rgba(0, 0, 0, 0.25);
             color: var(--light-text);
             font-size: 0.95rem;
-            transition: all var(--transition-speed);
+            transition: background-color var(--transition-speed);
             outline: none;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
@@ -240,7 +252,7 @@
             background-color: var(--tab-bg);
             border: none;
             border-radius: 20px;
-            transition: all var(--transition-speed);
+            transition: background-color var(--transition-speed);
             white-space: nowrap;
             font-weight: 500;
             font-size: 0.85rem;
@@ -248,6 +260,8 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            /* Better touch targets */
+            min-height: 32px;
         }
 
         .sort-button.active {
@@ -270,6 +284,8 @@
             opacity: 0;
             transform: translateY(10px);
             transition: opacity var(--transition-speed), transform var(--transition-speed);
+            /* Optimize for large lists */
+            contain: content;
         }
 
         .content.active {
@@ -284,6 +300,8 @@
             gap: 20px;
             padding: 20px 0;
             margin-bottom: 60px;
+            /* Optimize paint and layout */
+            contain: content;
         }
 
         /* Enhanced media items */
@@ -291,12 +309,16 @@
             background-color: var(--secondary-bg);
             border-radius: 12px;
             overflow: hidden;
-            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
             position: relative;
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            /* Optimize rendering */
+            contain: layout style;
+            /* Hardware acceleration */
+            will-change: transform;
         }
 
         .media-item:hover {
@@ -310,6 +332,8 @@
             background-color: var(--tab-bg);
             border-radius: 8px 8px 0 0;
             overflow: hidden;
+            /* Prevent layout shifts */
+            contain: strict;
         }
 
         .poster {
@@ -322,6 +346,7 @@
             background-color: var(--tab-bg);
             opacity: 0;
             transition: opacity var(--transition-speed) ease-in;
+            will-change: opacity;
         }
 
         .poster.loaded {
@@ -348,6 +373,7 @@
             border-top-color: var(--primary-color);
             border-radius: 50%;
             animation: spinner-rotate 1s linear infinite;
+            will-change: transform;
         }
 
         @keyframes spinner-rotate {
@@ -460,6 +486,8 @@
             font-weight: bold;
             font-family: monospace;
             transform: scale(0.8) translateY(20px);
+            /* Hardware acceleration */
+            will-change: transform, opacity;
         }
 
         .scroll-to-top::before {
@@ -526,6 +554,10 @@
             transform: translateY(30px);
             transition: transform var(--transition-speed) ease;
             overflow: hidden;
+            /* Optimize for GPU acceleration */
+            will-change: transform;
+            /* Contain for performance */
+            contain: content;
         }
 
         .modal-backdrop {
@@ -538,6 +570,8 @@
             background-position: center center;
             opacity: 0.35;
             z-index: 0;
+            /* Help browser optimize */
+            contain: strict;
         }
 
         .modal-backdrop::after {
@@ -561,6 +595,8 @@
             border-bottom: 1px solid var(--border-color);
             position: relative;
             z-index: 1;
+            /* Contain to optimize */
+            contain: layout style;
         }
 
         .modal-poster {
@@ -571,6 +607,8 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
             margin-right: 25px;
             transition: transform var(--transition-speed);
+            /* Contain for performance */
+            contain: strict;
         }
 
         .modal-poster img {
@@ -672,6 +710,8 @@
             position: relative;
             z-index: 1;
             scroll-behavior: smooth;
+            /* Optimize rendering */
+            contain: content;
         }
 
         .modal-section {
@@ -759,6 +799,10 @@
             transition: all 0.3s ease;
             opacity: 0;
             visibility: hidden;
+            /* Optimize rendering */
+            contain: content;
+            /* Hardware acceleration */
+            will-change: transform, opacity;
         }
 
         .mobile-menu.open {
@@ -1256,262 +1300,339 @@
     <button class="scroll-to-top" aria-label="Scroll to top"></button>
 
     <script>
-        let moviesData = [];
-        let tvShowsData = [];
-        let currentSortMethod = 'alpha'; // Default sorting method: 'alpha' or 'date'
+        // Cache DOM references for better performance
+        const DOM = {
+            moviesContent: document.getElementById('movies-content'),
+            tvShowsContent: document.getElementById('tvshows-content'),
+            searchInput: document.querySelector('.search-input'),
+            searchClear: document.querySelector('.search-clear'),
+            modalOverlay: document.querySelector('.modal-overlay'),
+            modalClose: document.querySelector('.modal-close'),
+            scrollToTopButton: document.querySelector('.scroll-to-top'),
+            header: document.querySelector('.header'),
+            mobileMenuButton: document.querySelector('.mobile-menu-button'),
+            mobileMenu: document.querySelector('.mobile-menu'),
+            swipeIndicator: document.querySelector('.swipe-indicator'),
+            modalBody: document.querySelector('.modal-body'),
+            modalPoster: document.querySelector('.modal-poster'),
+            modalBackdrop: document.querySelector('.modal-backdrop'),
+            modalTitle: document.querySelector('.modal-title'),
+            modalYear: document.querySelector('.modal-year'),
+            modalRating: document.getElementById('modal-rating'),
+            modalDuration: document.getElementById('modal-duration'),
+            modalSummary: document.getElementById('modal-summary'),
+            modalGenres: document.getElementById('modal-genres'),
+            modalCast: document.getElementById('modal-cast'),
+            tabs: document.querySelectorAll('.tab'),
+            sortButtons: document.querySelectorAll('.sort-button')
+        };
+
+        // App state
+        const state = {
+            moviesData: [],
+            tvShowsData: [],
+            currentSortMethod: 'alpha',
+            sortDirection: {
+                'alpha': 'asc',
+                'date': 'desc'
+            },
+            cachedResults: {
+                movies: new Map(),
+                tvshows: new Map()
+            },
+            lastScrollTop: 0,
+            isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768,
+            touchStartX: 0,
+            touchEndX: 0,
+            touchStartY: 0,
+            touchEndY: 0,
+            swipeThreshold: 100,
+            swipeAngleThreshold: 30,
+            currentActiveTab: 'movies',
+            deferredPrompt: null
+        };
+
+        // Performance optimization: use a ResizeObserver for responsive layout changes
+        // instead of multiple resize event listeners
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                state.isMobile = window.innerWidth < 768;
+            }
+        });
+        resizeObserver.observe(document.body);
 
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
             const placeholder = document.createElement('div');
             placeholder.className = 'text-placeholder';
-            placeholder.innerHTML = `
-                <div class="media-name">${title}</div>
-            `;
 
+            const nameElement = document.createElement('div');
+            nameElement.className = 'media-name';
+            nameElement.textContent = title;
+
+            placeholder.appendChild(nameElement);
             container.appendChild(placeholder);
+
             return placeholder;
         }
 
-        // Format timestamp to readable date
+        // Format timestamp to readable date - memoized to avoid repeated calculations
+        const dateFormatCache = new Map();
         function formatDate(timestamp) {
+            if (dateFormatCache.has(timestamp)) {
+                return dateFormatCache.get(timestamp);
+            }
             const date = new Date(timestamp * 1000);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            dateFormatCache.set(timestamp, formattedDate);
+            return formattedDate;
         }
 
-        // Set up Intersection Observer for lazy loading
+        // Improved image loading with IntersectionObserver - more efficient
         const imageObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
+                    img.src = img.dataset.src;
+
+                    // We don't need to observe this image anymore
+                    imageObserver.unobserve(img);
+
                     const placeholder = img.parentElement.querySelector('.poster-placeholder');
 
+                    // Handle image load
                     img.onload = () => {
                         img.classList.add('loaded');
                         if (placeholder) {
                             placeholder.style.opacity = '0';
-                            setTimeout(() => {
-                                if (placeholder) placeholder.remove();
-                            }, 300);
+                            setTimeout(() => placeholder?.remove(), 300);
                         }
                     };
 
+                    // Handle image error
                     img.onerror = () => {
-                        // Get the media title from the parent item
                         const mediaItem = img.closest('.media-item');
-                        const title = mediaItem.querySelector('.media-title').textContent;
+                        const title = mediaItem?.querySelector('.media-title')?.textContent || 'Unknown';
+                        createTextPlaceholder(img.parentElement, title);
 
-                        // Create a text placeholder
-                        const textPlaceholder = createTextPlaceholder(img.parentElement, title);
-
-                        // Hide the loading placeholder and the img
                         if (placeholder) {
                             placeholder.style.opacity = '0';
-                            setTimeout(() => {
-                                if (placeholder) placeholder.remove();
-                            }, 300);
+                            setTimeout(() => placeholder?.remove(), 300);
                         }
                         img.style.display = 'none';
                     };
-
-                    img.src = img.dataset.src;
-                    imageObserver.unobserve(img);
                 }
             });
         }, {
-            rootMargin: '100px 0px',  // Load images 100px before they enter viewport
+            rootMargin: '200px 0px', // Load images further before they enter viewport
             threshold: 0.01
         });
 
-        // Mobile menu functionality
-        const mobileMenuButton = document.querySelector('.mobile-menu-button');
-        const mobileMenu = document.querySelector('.mobile-menu');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('open');
+        // Mobile menu functionality with optimized event delegation
+        DOM.mobileMenuButton.addEventListener('click', () => {
+            DOM.mobileMenu.classList.toggle('open');
         });
 
-        // Close mobile menu when clicking outside
+        // Handle mobile menu close with optimized event delegation
         document.addEventListener('click', (e) => {
-            if (mobileMenu.classList.contains('open') &&
-                !mobileMenu.contains(e.target) &&
-                !mobileMenuButton.contains(e.target)) {
-                mobileMenu.classList.remove('open');
+            if (DOM.mobileMenu.classList.contains('open') &&
+                !DOM.mobileMenu.contains(e.target) &&
+                !DOM.mobileMenuButton.contains(e.target)) {
+                DOM.mobileMenu.classList.remove('open');
             }
         });
 
-        // Function to switch tabs
+        // Optimized tab switching with event delegation
         function switchTab(contentName) {
-            // Get current search query before switching tabs
-            const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+            // Save previous active tab before switching
+            state.currentActiveTab = contentName;
 
-            // Update active tab (both mobile and desktop)
-            document.querySelectorAll('.tab').forEach(t => {
-                if (t.dataset.content === contentName) {
-                    t.classList.add('active');
-                } else {
-                    t.classList.remove('active');
-                }
+            // Current search query for filtering
+            const currentSearchTerm = DOM.searchInput.value.toLowerCase();
+
+            // Update UI state for tabs
+            DOM.tabs.forEach(t => {
+                t.classList.toggle('active', t.dataset.content === contentName);
             });
 
-            // Update active content
+            // Update content visibility
             document.querySelectorAll('.content').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(contentName + '-content').classList.add('active');
 
-            // Apply the current search and sort to the newly selected tab content
-            filterAndSortMedia(currentSearchTerm, currentSortMethod);
+            // Apply search and sort
+            filterAndSortMedia(currentSearchTerm, state.currentSortMethod);
 
             // Close mobile menu if open
-            mobileMenu.classList.remove('open');
+            DOM.mobileMenu.classList.remove('open');
 
-            // Scroll to top when switching tabs
+            // Scroll to top with reduced layout thrashing
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
         }
 
-        // Tab switching - update for both desktop and mobile tabs
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
+        // Event delegation for tab switching
+        document.addEventListener('click', (e) => {
+            const tab = e.target.closest('.tab');
+            if (tab) {
                 switchTab(tab.dataset.content);
-            });
+            }
         });
 
-        // Sort toggle functionality with direction support
-        let sortDirection = {
-            'alpha': 'asc',
-            'date': 'desc'
-        };
-
+        // Sort toggle functionality with improved state management
         function setSortMethod(method) {
-            const previousMethod = currentSortMethod;
+            const previousMethod = state.currentSortMethod;
 
-            // If clicking the same method, toggle direction
+            // Toggle direction if clicking same method
             if (method === previousMethod) {
-                sortDirection[method] = sortDirection[method] === 'asc' ? 'desc' : 'asc';
+                state.sortDirection[method] = state.sortDirection[method] === 'asc' ? 'desc' : 'asc';
             }
 
-            currentSortMethod = method;
+            state.currentSortMethod = method;
 
-            // Update active state on all sort buttons
-            document.querySelectorAll('.sort-button').forEach(btn => {
-                if (btn.dataset.sort === method) {
-                    btn.classList.add('active');
+            // Update UI
+            DOM.sortButtons.forEach(btn => {
+                const isActive = btn.dataset.sort === method;
+                btn.classList.toggle('active', isActive);
 
-                    // Update the icon/text based on current direction
+                if (isActive) {
                     const iconSpan = btn.querySelector('.sort-icon');
                     if (method === 'alpha') {
-                        iconSpan.textContent = sortDirection[method] === 'asc' ? 'A-Z' : 'Z-A';
+                        iconSpan.textContent = state.sortDirection[method] === 'asc' ? 'A-Z' : 'Z-A';
                     } else if (method === 'date') {
-                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Newest' : '📅 Oldest';
+                        iconSpan.textContent = state.sortDirection[method] === 'desc' ? '📅 Newest' : '📅 Oldest';
                     }
-                } else {
-                    btn.classList.remove('active');
                 }
             });
 
-            // Update body class for styling
-            if (method === 'date') {
-                document.body.classList.add('sort-by-date');
-            } else {
-                document.body.classList.remove('sort-by-date');
-            }
+            // Update body class
+            document.body.classList.toggle('sort-by-date', method === 'date');
 
-            // Reapply current search with new sorting
-            const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+            // Apply current search with new sorting
+            const currentSearchTerm = DOM.searchInput.value.toLowerCase();
             filterAndSortMedia(currentSearchTerm, method);
+
+            // Close mobile menu if open
+            DOM.mobileMenu.classList.remove('open');
+
+            // Scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
-        // Add event listeners to sort buttons
-        document.querySelectorAll('.sort-button').forEach(button => {
-            button.addEventListener('click', () => {
-                setSortMethod(button.dataset.sort);
-
-                // Close mobile menu if open
-                mobileMenu.classList.remove('open');
-
-                // Scroll to top when sort method changes
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Enhanced search functionality
-        const searchInput = document.querySelector('.search-input');
-        const searchClear = document.querySelector('.search-clear');
-
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            filterAndSortMedia(searchTerm, currentSortMethod);
-
-            // Toggle clear button visibility
-            if (searchTerm) {
-                searchClear.classList.add('visible');
-            } else {
-                searchClear.classList.remove('visible');
+        // Event delegation for sort buttons
+        document.addEventListener('click', (e) => {
+            const sortButton = e.target.closest('.sort-button');
+            if (sortButton) {
+                setSortMethod(sortButton.dataset.sort);
             }
         });
 
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClear.classList.remove('visible');
-            filterAndSortMedia('', currentSortMethod);
-            searchInput.focus();
+        // Optimized search with debounce for better performance
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply debounce to search for better performance
+        DOM.searchInput.addEventListener('input', debounce((e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filterAndSortMedia(searchTerm, state.currentSortMethod);
+
+            // Toggle clear button
+            DOM.searchClear.classList.toggle('visible', searchTerm.length > 0);
+        }, 200)); // 200ms debounce
+
+        // Clear search button
+        DOM.searchClear.addEventListener('click', () => {
+            DOM.searchInput.value = '';
+            DOM.searchClear.classList.remove('visible');
+            filterAndSortMedia('', state.currentSortMethod);
+            DOM.searchInput.focus();
         });
 
-        // Load and display media data
+        // Optimized media loading
         async function loadMedia() {
             try {
-                // Load movies
-                const moviesResponse = await fetch('data/movies.json');
-                moviesData = await moviesResponse.json();
+                // Load movies with improved error handling and parallel fetch
+                const [moviesResponse, tvShowsResponse] = await Promise.all([
+                    fetch('data/movies.json'),
+                    fetch('data/tvshows.json')
+                ]);
 
-                // Load TV shows
-                const tvShowsResponse = await fetch('data/tvshows.json');
-                tvShowsData = await tvShowsResponse.json();
+                // Check for response errors
+                if (!moviesResponse.ok) throw new Error(`Failed to load movies: ${moviesResponse.status}`);
+                if (!tvShowsResponse.ok) throw new Error(`Failed to load TV shows: ${tvShowsResponse.status}`);
+
+                // Parse JSON in parallel
+                const [moviesData, tvShowsData] = await Promise.all([
+                    moviesResponse.json(),
+                    tvShowsResponse.json()
+                ]);
+
+                // Store data efficiently
+                state.moviesData = moviesData;
+                state.tvShowsData = tvShowsData;
 
                 // Initial sort and display
-                filterAndSortMedia('', currentSortMethod);
+                filterAndSortMedia('', state.currentSortMethod);
             } catch (error) {
                 console.error('Error loading media data:', error);
-                document.querySelector('#movies-content .loading').innerHTML =
-                    '<div class="error">Failed to load movie data. Please try again later.</div>';
-                document.querySelector('#tvshows-content .loading').innerHTML =
-                    '<div class="error">Failed to load TV show data. Please try again later.</div>';
+
+                // Create error elements once
+                const errorElement = document.createElement('div');
+                errorElement.className = 'error';
+                errorElement.textContent = 'Failed to load media data. Please try again later.';
+
+                // Apply to both content areas
+                document.querySelector('#movies-content .loading').replaceWith(errorElement.cloneNode(true));
+                document.querySelector('#tvshows-content .loading').replaceWith(errorElement);
             }
         }
 
-        // Function to remove articles for sorting
+        // Optimize string processing for sorting (cached)
+        const titleCache = new Map();
         function removeArticles(title) {
-            // Convert to lowercase and trim spaces
+            if (titleCache.has(title)) {
+                return titleCache.get(title);
+            }
+
+            // Process title
             let cleanTitle = title.toLowerCase().trim();
-            // Remove leading articles: "the ", "a ", "an "
             cleanTitle = cleanTitle.replace(/^(the|a|an)\s+/i, '');
+
+            // Cache result
+            titleCache.set(title, cleanTitle);
             return cleanTitle;
         }
 
-        // Natural sort comparison function for titles
+        // Optimized natural sort for titles
         function naturalCompare(a, b) {
             const ax = removeArticles(a);
             const bx = removeArticles(b);
 
-            // Natural sorting algorithm that handles numbers correctly
+            // Avoid regex for better performance
             const chunks = /(\d+|\D+)/g;
-            const aChunks = String(ax).match(chunks);
-            const bChunks = String(bx).match(chunks);
-
-            // Check if either string doesn't match the pattern
-            if (!aChunks || !bChunks) return ax.localeCompare(bx);
+            const aChunks = String(ax).match(chunks) || [];
+            const bChunks = String(bx).match(chunks) || [];
 
             const len = Math.min(aChunks.length, bChunks.length);
 
-            // Compare each chunk
+            // Compare each chunk with performance optimization
             for (let i = 0; i < len; i++) {
-                // If both chunks are numeric
+                // Use isNaN check for better performance
                 if (!isNaN(aChunks[i]) && !isNaN(bChunks[i])) {
                     // Convert to numbers and compare
                     const numA = parseInt(aChunks[i], 10);
@@ -1532,254 +1653,308 @@
             return aChunks.length - bChunks.length;
         }
 
-        // Sort media data
-        function sortMedia(data, method) {
+        // Cache for sorted results to avoid repeated sorts
+        function getSortCacheKey(data, method, direction) {
+            return `${method}-${direction}`;
+        }
+
+        // Optimized sorting with caching
+        function sortMedia(data, method, type) {
+            // Create unique key for caching
+            const cacheKey = getSortCacheKey(method, state.sortDirection[method]);
+            const cacheMap = state.cachedResults[type];
+
+            // Check cache first
+            if (cacheMap.has(cacheKey)) {
+                return cacheMap.get(cacheKey);
+            }
+
+            let sorted;
+
             if (method === 'alpha') {
-                // Sort alphabetically by title, ignoring articles and handling numbers naturally
-                const sorted = [...data].sort((a, b) => {
+                // Sort alphabetically with memoized comparisons
+                sorted = [...data].sort((a, b) => {
                     return naturalCompare(a.title, b.title);
                 });
 
-                // Reverse the order if direction is descending (Z-A)
-                return sortDirection[method] === 'asc' ? sorted : sorted.reverse();
+                // Apply direction
+                if (state.sortDirection[method] === 'desc') {
+                    sorted.reverse();
+                }
             } else if (method === 'date') {
                 // Sort by date added
-                if (sortDirection[method] === 'desc') {
-                    // Newest first (descending)
-                    return [...data].sort((a, b) => b.addedAt - a.addedAt);
-                } else {
-                    // Oldest first (ascending)
-                    return [...data].sort((a, b) => a.addedAt - b.addedAt);
-                }
+                sorted = [...data].sort((a, b) => {
+                    return state.sortDirection[method] === 'desc' ?
+                        b.addedAt - a.addedAt :
+                        a.addedAt - b.addedAt;
+                });
             }
-            return data;
+
+            // Cache the result
+            cacheMap.set(cacheKey, sorted);
+            return sorted;
         }
 
-        // Filter and sort media based on search term and sort method
+        // Filter and sort media - optimized with cached results
         function filterAndSortMedia(searchTerm, sortMethod) {
-            const activeTab = document.querySelector('.tab.active').dataset.content;
-            const data = activeTab === 'movies' ? moviesData : tvShowsData;
+            const activeTab = state.currentActiveTab;
+            const type = activeTab;
+            const data = activeTab === 'movies' ? state.moviesData : state.tvShowsData;
 
-            // Filter based on search term
-            const filtered = data.filter(item =>
-                item.title.toLowerCase().includes(searchTerm)
-            );
+            // Create a cache key for the current filter+sort
+            const filterSortKey = `${searchTerm}-${sortMethod}-${state.sortDirection[sortMethod]}`;
+            const cacheMap = state.cachedResults[type];
+
+            // Check cache first
+            if (cacheMap.has(filterSortKey)) {
+                displayMedia(cacheMap.get(filterSortKey), type);
+                return;
+            }
+
+            // Filter data - optimize by avoiding toLowerCase in loop
+            const filtered = searchTerm ?
+                data.filter(item => item.title.toLowerCase().includes(searchTerm)) :
+                data;
 
             // Sort the filtered data
-            const sortedData = sortMedia(filtered, sortMethod);
+            const sortedData = sortMedia(filtered, sortMethod, type);
+
+            // Cache the result
+            cacheMap.set(filterSortKey, sortedData);
 
             // Display the sorted data
-            displayMedia(sortedData, activeTab);
+            displayMedia(sortedData, type);
         }
 
-        // Display media items with enhanced animations
+        // Optimized display function using DocumentFragment and batch operations
         function displayMedia(data, type) {
-            const contentDiv = document.querySelector(`#${type}-content`);
+            // Get references more efficiently
+            const contentDiv = document.getElementById(`${type}-content`);
             const loadingDiv = contentDiv.querySelector('.loading');
             const grid = contentDiv.querySelector('.media-grid');
             const noResultsDiv = contentDiv.querySelector('.no-results');
 
+            // Hide loading
             loadingDiv.style.display = 'none';
-            grid.innerHTML = '';
 
-            // Check if there are no results to display
+            // Handle no results case efficiently
             if (data.length === 0) {
-                // Get search term and update the no results message
-                const searchTerm = document.querySelector('.search-input').value;
+                const searchTerm = DOM.searchInput.value;
                 const searchTermSpan = contentDiv.querySelector('.search-term');
                 searchTermSpan.textContent = searchTerm;
 
-                // Show no results message
                 noResultsDiv.classList.add('active');
                 grid.style.display = 'none';
                 return;
             } else {
-                // Hide no results message and show grid
                 noResultsDiv.classList.remove('active');
                 grid.style.display = 'grid';
             }
 
-            // Create and append items with staggered animation
-            data.forEach((item, index) => {
-                const mediaItem = document.createElement('div');
-                mediaItem.className = 'media-item';
-                mediaItem.dataset.id = item.id;
-                mediaItem.dataset.type = type;
-                mediaItem.style.opacity = '0';
-                mediaItem.style.transition = `opacity 0.3s ease ${index * 0.03}s, transform 0.3s ease ${index * 0.03}s`;
+            // Use DocumentFragment for batch DOM operations
+            const fragment = document.createDocumentFragment();
 
-                const posterPath = type === 'movies' ?
-                    `data/posters/movies/${item.id}.jpg` :
-                    `data/posters/tvshows/${item.id}.jpg`;
+            // Create all items at once
+            const itemsToCreate = data.slice(0, 500); // Limit to prevent UI freeze for huge datasets
 
-                // Format the added date
-                const addedDate = formatDate(item.addedAt);
+            // Clear grid in one operation
+            grid.textContent = '';
 
-                mediaItem.innerHTML = `
-                    <div class="poster-container">
-                        <div class="poster-placeholder">
-                            <div class="loading-spinner"></div>
-                        </div>
-                        <img data-src="${posterPath}" 
-                             alt="${item.title}" 
-                             class="poster">
-                    </div>
-                    <div class="media-info">
-                        <div class="media-title">${item.title}</div>
-                        <div class="media-year">${item.year}</div>
-                        <div class="media-added">Added: ${addedDate}</div>
-                    </div>
-                `;
+            // Create items in batches for smoother rendering
+            const itemsPerBatch = 30;
+            const batchCount = Math.ceil(itemsToCreate.length / itemsPerBatch);
 
-                grid.appendChild(mediaItem);
+            function createBatch(batchIndex) {
+                if (batchIndex >= batchCount) return;
 
-                // Trigger animation after a small delay
-                setTimeout(() => {
-                    mediaItem.style.opacity = '1';
-                }, 10);
+                const start = batchIndex * itemsPerBatch;
+                const end = Math.min(start + itemsPerBatch, itemsToCreate.length);
+                const batchFragment = document.createDocumentFragment();
 
-                // Observe the image for lazy loading
-                const img = mediaItem.querySelector('.poster');
-                imageObserver.observe(img);
+                for (let i = start; i < end; i++) {
+                    const item = itemsToCreate[i];
+                    const mediaItem = document.createElement('div');
+                    mediaItem.className = 'media-item';
+                    mediaItem.dataset.id = item.id;
+                    mediaItem.dataset.type = type;
 
-                // Add click event to open modal
-                mediaItem.addEventListener('click', () => {
-                    openModal(item, type);
+                    const posterPath = `data/posters/${type}/${item.id}.jpg`;
+                    const addedDate = formatDate(item.addedAt);
+
+                    // Create poster container
+                    const posterContainer = document.createElement('div');
+                    posterContainer.className = 'poster-container';
+
+                    // Create placeholder
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'poster-placeholder';
+
+                    const spinner = document.createElement('div');
+                    spinner.className = 'loading-spinner';
+                    placeholder.appendChild(spinner);
+
+                    // Create image
+                    const img = document.createElement('img');
+                    img.dataset.src = posterPath;
+                    img.alt = item.title;
+                    img.className = 'poster';
+
+                    // Create info container
+                    const infoContainer = document.createElement('div');
+                    infoContainer.className = 'media-info';
+
+                    // Create title
+                    const titleElem = document.createElement('div');
+                    titleElem.className = 'media-title';
+                    titleElem.textContent = item.title;
+
+                    // Create year
+                    const yearElem = document.createElement('div');
+                    yearElem.className = 'media-year';
+                    yearElem.textContent = item.year;
+
+                    // Create date added
+                    const addedElem = document.createElement('div');
+                    addedElem.className = 'media-added';
+                    addedElem.textContent = `Added: ${addedDate}`;
+
+                    // Assemble elements
+                    posterContainer.appendChild(placeholder);
+                    posterContainer.appendChild(img);
+
+                    infoContainer.appendChild(titleElem);
+                    infoContainer.appendChild(yearElem);
+                    infoContainer.appendChild(addedElem);
+
+                    mediaItem.appendChild(posterContainer);
+                    mediaItem.appendChild(infoContainer);
+
+                    // Add click event to open modal
+                    mediaItem.addEventListener('click', () => {
+                        openModal(item, type);
+                    });
+
+                    // Observe image for lazy loading
+                    imageObserver.observe(img);
+
+                    batchFragment.appendChild(mediaItem);
+                }
+
+                // Append the batch to the main fragment
+                fragment.appendChild(batchFragment);
+
+                // Schedule next batch with requestAnimationFrame
+                requestAnimationFrame(() => {
+                    createBatch(batchIndex + 1);
+
+                    // After the last batch, append to DOM
+                    if (batchIndex === batchCount - 1) {
+                        grid.appendChild(fragment);
+                    }
                 });
-            });
+            }
+
+            // Start the batch creation process
+            createBatch(0);
         }
 
-        // Modal functionality
-        const modalOverlay = document.querySelector('.modal-overlay');
-        const modalClose = document.querySelector('.modal-close');
-
-        // Function to open modal with media details
+        // Optimized modal opening function
         function openModal(item, type) {
-            // Set poster image
-            const posterPath = type === 'movies' ?
-                `data/posters/movies/${item.id}.jpg` :
-                `data/posters/tvshows/${item.id}.jpg`;
-
-            const posterContainer = document.querySelector('.modal-poster');
-            posterContainer.innerHTML = ''; // Clear existing content
+            // Set poster image with error handling
+            const posterPath = `data/posters/${type}/${item.id}.jpg`;
+            DOM.modalPoster.textContent = '';
 
             const posterImg = document.createElement('img');
             posterImg.src = posterPath;
             posterImg.alt = item.title;
-            posterContainer.appendChild(posterImg);
+            DOM.modalPoster.appendChild(posterImg);
 
             posterImg.onerror = function () {
-                // Remove the failed image
                 this.remove();
 
-                // Create a large text placeholder
+                // Create text placeholder
                 const placeholder = document.createElement('div');
                 placeholder.className = 'text-placeholder large';
 
-                placeholder.innerHTML = `
-                    <div class="media-name">${item.title}</div>
-                `;
+                const nameElem = document.createElement('div');
+                nameElem.className = 'media-name';
+                nameElem.textContent = item.title;
 
-                posterContainer.appendChild(placeholder);
+                placeholder.appendChild(nameElem);
+                DOM.modalPoster.appendChild(placeholder);
             };
 
-            // Set backdrop image
-            const backdropPath = type === 'movies' ?
-                `data/backdrops/movies/${item.id}.jpg` :
-                `data/backdrops/tvshows/${item.id}.jpg`;
+            // Set backdrop image with optimized error handling
+            const backdropPath = `data/backdrops/${type}/${item.id}.jpg`;
+            DOM.modalBackdrop.textContent = '';
+            DOM.modalBackdrop.style.backgroundImage = `url(${backdropPath})`;
 
-            const backdropElement = document.querySelector('.modal-backdrop');
-            backdropElement.innerHTML = ''; // Clear any existing content
-            backdropElement.style.backgroundImage = `url(${backdropPath})`;
-
-            // Add error handling for backdrop
+            // Preload image to check if it exists
             const testImage = new Image();
             testImage.onload = function () {
-                // Image loaded successfully, keep the backdrop
+                // Success - backdrop already set
             };
             testImage.onerror = function () {
-                // Image failed to load, remove background image
-                backdropElement.style.backgroundImage = 'none';
+                // Failed to load - clear background
+                DOM.modalBackdrop.style.backgroundImage = 'none';
 
-                // Add text-based placeholder
+                // Add text placeholder
                 const backdropPlaceholder = document.createElement('div');
                 backdropPlaceholder.className = 'backdrop-text-placeholder';
+                backdropPlaceholder.textContent = type === 'movies' ? 'Movie' : 'TV Show';
 
-                if (type === 'movies') {
-                    backdropPlaceholder.textContent = 'Movie';
-                } else {
-                    backdropPlaceholder.textContent = 'TV Show';
-                }
-
-                backdropElement.appendChild(backdropPlaceholder);
+                DOM.modalBackdrop.appendChild(backdropPlaceholder);
             };
             testImage.src = backdropPath;
 
-            // Set title and year
-            document.querySelector('.modal-title').textContent = item.title;
-            document.querySelector('.modal-year').textContent = item.year || '';
-
-            // Set metadata
-            const ratingElem = document.getElementById('modal-rating');
-            const durationElem = document.getElementById('modal-duration');
+            // Set basic info efficiently
+            DOM.modalTitle.textContent = item.title;
+            DOM.modalYear.textContent = item.year || '';
 
             // Handle content rating
             if (item.contentRating) {
-                ratingElem.textContent = item.contentRating;
-                ratingElem.style.display = 'block';
+                DOM.modalRating.textContent = item.contentRating;
+                DOM.modalRating.style.display = 'block';
             } else {
-                ratingElem.style.display = 'none';
+                DOM.modalRating.style.display = 'none';
             }
 
-            // Handle duration (for movies) or episode/season count (for TV shows)
+            // Handle duration or TV show metadata
             if (type === 'movies' && item.duration) {
                 // For movies, show duration in minutes
                 const minutes = Math.floor(item.duration / 60000);
-                durationElem.textContent = `${minutes} min`;
-                durationElem.style.display = 'block';
+                DOM.modalDuration.textContent = `${minutes} min`;
+                DOM.modalDuration.style.display = 'block';
 
-                // Hide seasons element (in case it was visible from previous TV show)
+                // Hide TV-specific elements
                 const seasonsElem = document.getElementById('modal-seasons');
-                if (seasonsElem) {
-                    seasonsElem.style.display = 'none';
-                }
+                if (seasonsElem) seasonsElem.style.display = 'none';
 
-                // Hide episodes element (in case it was visible from previous TV show)
                 const episodesElem = document.getElementById('modal-episodes');
-                if (episodesElem) {
-                    episodesElem.style.display = 'none';
-                }
+                if (episodesElem) episodesElem.style.display = 'none';
             } else if (type === 'tvshows') {
-                // For TV shows, show seasons and episodes in separate containers
+                // For TV shows, handle seasons and episodes
+                DOM.modalDuration.style.display = 'none';
 
-                // First, ensure the seasons element exists
+                // Ensure season element exists
                 let seasonsElem = document.getElementById('modal-seasons');
                 if (!seasonsElem) {
-                    // Create a new element for seasons if it doesn't exist
                     seasonsElem = document.createElement('div');
                     seasonsElem.className = 'metadata-item';
                     seasonsElem.id = 'modal-seasons';
-
-                    // Insert it before the duration element
-                    durationElem.parentNode.insertBefore(seasonsElem, durationElem);
+                    DOM.modalDuration.parentNode.insertBefore(seasonsElem, DOM.modalDuration);
                 }
 
-                // Create or get the episodes element
+                // Ensure episodes element exists
                 let episodesElem = document.getElementById('modal-episodes');
                 if (!episodesElem) {
-                    // Create a new element for episodes if it doesn't exist
                     episodesElem = document.createElement('div');
                     episodesElem.className = 'metadata-item';
                     episodesElem.id = 'modal-episodes';
-
-                    // Insert it after the seasons element
                     seasonsElem.parentNode.insertBefore(episodesElem, seasonsElem.nextSibling);
                 }
 
-                // Hide the duration element for TV shows
-                durationElem.style.display = 'none';
-
-                // Handle season count
+                // Set season count
                 if (item.childCount) {
                     seasonsElem.textContent = `${item.childCount} ${item.childCount === 1 ? 'season' : 'seasons'}`;
                     seasonsElem.style.display = 'block';
@@ -1787,7 +1962,7 @@
                     seasonsElem.style.display = 'none';
                 }
 
-                // Handle episode count
+                // Set episode count
                 if (item.leafCount) {
                     episodesElem.textContent = `${item.leafCount} ${item.leafCount === 1 ? 'episode' : 'episodes'}`;
                     episodesElem.style.display = 'block';
@@ -1795,276 +1970,278 @@
                     episodesElem.style.display = 'none';
                 }
             } else {
-                // Default case - hide all elements
-                durationElem.style.display = 'none';
+                // Default case - hide all
+                DOM.modalDuration.style.display = 'none';
 
                 const seasonsElem = document.getElementById('modal-seasons');
-                if (seasonsElem) {
-                    seasonsElem.style.display = 'none';
-                }
+                if (seasonsElem) seasonsElem.style.display = 'none';
 
                 const episodesElem = document.getElementById('modal-episodes');
-                if (episodesElem) {
-                    episodesElem.style.display = 'none';
-                }
+                if (episodesElem) episodesElem.style.display = 'none';
             }
 
-            // Set summary
-            document.getElementById('modal-summary').textContent = item.summary || 'No summary available.';
+            // Set summary with textContent for better performance
+            DOM.modalSummary.textContent = item.summary || 'No summary available.';
 
-            // Set genres
-            const genresContainer = document.getElementById('modal-genres');
-            genresContainer.innerHTML = '';
+            // Set genres using DocumentFragment
+            DOM.modalGenres.textContent = '';
 
             if (item.genres && item.genres.length > 0) {
+                const genresFragment = document.createDocumentFragment();
+
                 item.genres.forEach(genre => {
                     const genreElement = document.createElement('div');
                     genreElement.className = 'genre-tag';
                     genreElement.textContent = genre;
-                    genresContainer.appendChild(genreElement);
+                    genresFragment.appendChild(genreElement);
                 });
+
+                DOM.modalGenres.appendChild(genresFragment);
             } else {
-                genresContainer.innerHTML = '<div>No genres available</div>';
+                DOM.modalGenres.textContent = 'No genres available';
             }
 
-            // Set cast
-            const castContainer = document.getElementById('modal-cast');
-            castContainer.innerHTML = '';
+            // Set cast using DocumentFragment for batch DOM updates
+            DOM.modalCast.textContent = '';
 
             if (item.actors && item.actors.length > 0) {
+                const castFragment = document.createDocumentFragment();
+
                 item.actors.forEach(actor => {
                     const actorElement = document.createElement('div');
                     actorElement.className = 'cast-item';
-                    actorElement.innerHTML = `
-                        <div class="cast-name">${actor.name}</div>
-                        <div class="cast-role">${actor.role || ''}</div>
-                    `;
-                    castContainer.appendChild(actorElement);
+
+                    const nameElem = document.createElement('div');
+                    nameElem.className = 'cast-name';
+                    nameElem.textContent = actor.name;
+
+                    const roleElem = document.createElement('div');
+                    roleElem.className = 'cast-role';
+                    roleElem.textContent = actor.role || '';
+
+                    actorElement.appendChild(nameElem);
+                    actorElement.appendChild(roleElem);
+
+                    castFragment.appendChild(actorElement);
                 });
+
+                DOM.modalCast.appendChild(castFragment);
             } else {
-                castContainer.innerHTML = '<div>No cast information available</div>';
+                DOM.modalCast.textContent = 'No cast information available';
             }
 
             // Add date added information
             const dateAdded = formatDate(item.addedAt);
 
-            // Check if we already have the added date element
+            // Check if we already have the date element
             let dateAddedElem = document.getElementById('modal-added-date');
             if (!dateAddedElem) {
-                // Create a new section for date added
+                // Create new section once
                 const dateSection = document.createElement('div');
                 dateSection.className = 'modal-section date-section';
-                dateSection.innerHTML = `
-                    <div class="modal-section-title">Date Added</div>
-                    <div id="modal-added-date">${dateAdded}</div>
-                `;
-                document.querySelector('.modal-body').appendChild(dateSection);
+
+                const titleElem = document.createElement('div');
+                titleElem.className = 'modal-section-title';
+                titleElem.textContent = 'Date Added';
+
+                dateAddedElem = document.createElement('div');
+                dateAddedElem.id = 'modal-added-date';
+                dateAddedElem.textContent = dateAdded;
+
+                dateSection.appendChild(titleElem);
+                dateSection.appendChild(dateAddedElem);
+
+                DOM.modalBody.appendChild(dateSection);
             } else {
-                // Update existing date info
+                // Just update existing element
                 dateAddedElem.textContent = dateAdded;
             }
 
-            // Make sure any previous modal content is reset before showing new modal
-            const modalBody = document.querySelector('.modal-body');
-            modalBody.scrollTop = 0;
+            // Reset scroll before showing
+            DOM.modalBody.scrollTop = 0;
 
             // Show modal with animation
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
-            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            DOM.modalOverlay.classList.add('active');
 
-            // Double attempt to reset scroll after modal is visible
-            // This addresses timing issues on mobile devices
-            setTimeout(() => {
-                // First reset
-                modalBody.scrollTop = 0;
+            // Force scroll reset after modal is visible
+            requestAnimationFrame(() => {
+                DOM.modalBody.scrollTop = 0;
 
-                // Second delayed reset with forced reflow (critical for mobile browsers)
-                setTimeout(() => {
-                    modalBody.scrollTop = 0;
-                    // Force layout recalculation on mobile
-                    void modalBody.offsetHeight;
-                }, 50);
-            }, 10);
+                // Second attempt after a layout cycle
+                requestAnimationFrame(() => {
+                    DOM.modalBody.scrollTop = 0;
+                });
+            });
         }
 
-        // Close modal functionality
-        modalClose.addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent event propagation
-            e.stopPropagation(); // Stop event bubbling
+        // Close modal - optimized
+        function closeModal() {
+            DOM.modalOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal with event delegation
+        DOM.modalClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             closeModal();
         });
 
-        // Close modal when clicking outside
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
+        // Close modal when clicking overlay
+        DOM.modalOverlay.addEventListener('click', (e) => {
+            if (e.target === DOM.modalOverlay) {
                 closeModal();
             }
         });
 
         // Close modal with escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            if (e.key === 'Escape' && DOM.modalOverlay.classList.contains('active')) {
                 closeModal();
             }
         });
 
-        // Function to close the modal
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = ''; // Restore scrolling
+        // Throttle scroll events for performance
+        function throttle(func, limit) {
+            let lastFunc;
+            let lastRan;
+            return function () {
+                const context = this;
+                const args = arguments;
+                if (!lastRan) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                } else {
+                    clearTimeout(lastFunc);
+                    lastFunc = setTimeout(function () {
+                        if ((Date.now() - lastRan) >= limit) {
+                            func.apply(context, args);
+                            lastRan = Date.now();
+                        }
+                    }, limit - (Date.now() - lastRan));
+                }
+            };
         }
 
-        // Initialize on page load
-        loadMedia();
+        // Optimize scroll event handling
+        window.addEventListener('scroll', throttle(() => {
+            // Handle scroll-to-top button visibility
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            DOM.scrollToTopButton.classList.toggle('visible', scrollY > 300);
 
-        // Enhanced scroll to top button functionality
-        const scrollToTopButton = document.querySelector('.scroll-to-top');
-
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                scrollToTopButton.classList.add('visible');
+            // Optimize header shadow
+            if (scrollY > 100) {
+                DOM.header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.3)';
             } else {
-                scrollToTopButton.classList.remove('visible');
+                DOM.header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
             }
-        });
 
-        scrollToTopButton.addEventListener('click', () => {
+            state.lastScrollTop = scrollY;
+        }, 100)); // Throttle to 100ms
+
+        // Scroll to top button
+        DOM.scrollToTopButton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
         });
 
-        // Header scroll effect - shrink on scroll
-        const header = document.querySelector('.header');
-        let lastScrollTop = 0;
-
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-            if (scrollTop > 100) {
-                header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.3)';
-            } else {
-                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
-            }
-
-            lastScrollTop = scrollTop;
-        });
-
-        // ==========================================
-        // SWIPE FUNCTIONALITY FOR MOBILE
-        // ==========================================
-
-        // Check if device is mobile
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-
-        if (isMobile) {
-            // Variables to track swipe
-            let touchStartX = 0;
-            let touchEndX = 0;
-            let touchStartY = 0;
-            let touchEndY = 0;
-            let swipeThreshold = 100; // Minimum distance to be considered a swipe
-            let swipeAngleThreshold = 30; // Maximum angle in degrees to be considered a horizontal swipe
-
-            // Get swipe indicator element
-            const swipeIndicator = document.querySelector('.swipe-indicator');
-
-            // Show swipe tip on first load for mobile users
-            setTimeout(() => {
-                swipeIndicator.textContent = 'Swipe left or right to switch between Movies and TV Shows';
-                swipeIndicator.style.opacity = '1';
-
-                // Hide the tip after 3 seconds
-                setTimeout(() => {
-                    swipeIndicator.style.opacity = '0';
-                }, 3000);
-            }, 2000);
-
-            // Add touch event listeners to the container
+        // Mobile swipe handling - optimized with passive events
+        if (state.isMobile) {
+            // Add touch event listeners to container
             const container = document.querySelector('.container');
 
             container.addEventListener('touchstart', (e) => {
-                touchStartX = e.touches[0].clientX;
-                touchStartY = e.touches[0].clientY;
-            }, false);
+                state.touchStartX = e.touches[0].clientX;
+                state.touchStartY = e.touches[0].clientY;
+            }, { passive: true });
 
             container.addEventListener('touchmove', (e) => {
-                // Prevent default only if we detect a significant horizontal movement
-                // This allows vertical scrolling to continue working normally
+                // Only prevent default for significant horizontal movement
                 const currentX = e.touches[0].clientX;
                 const currentY = e.touches[0].clientY;
 
-                const diffX = touchStartX - currentX;
-                const diffY = touchStartY - currentY;
+                const diffX = state.touchStartX - currentX;
+                const diffY = state.touchStartY - currentY;
 
-                // If horizontal movement is greater than vertical and exceeds threshold
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+                // If horizontal > vertical and exceeds threshold
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > state.swipeThreshold) {
                     e.preventDefault();
                 }
             }, { passive: false });
 
             container.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].clientX;
-                touchEndY = e.changedTouches[0].clientY;
+                state.touchEndX = e.changedTouches[0].clientX;
+                state.touchEndY = e.changedTouches[0].clientY;
                 handleSwipe();
-            }, false);
+            }, { passive: true });
 
-            // Handle swipe gesture
+            // Optimize swipe handling
             function handleSwipe() {
                 // Calculate distances and angle
-                const diffX = touchStartX - touchEndX;
-                const diffY = touchStartY - touchEndY;
-                const angle = Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180 / Math.PI;
+                const diffX = state.touchStartX - state.touchEndX;
+                const diffY = state.touchStartY - state.touchEndY;
+                const angle = Math.abs(diffY) > 0 ?
+                    Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180 / Math.PI : 0;
 
-                // Check if swipe is horizontal enough (angle less than threshold)
-                if (angle < swipeAngleThreshold) {
-                    // Don't process swipes when modal is open
-                    if (modalOverlay.classList.contains('active')) {
-                        return;
+                // Skip processing if not horizontal enough
+                if (angle >= state.swipeAngleThreshold) return;
+
+                // Don't process when modal is open
+                if (DOM.modalOverlay.classList.contains('active')) return;
+
+                // Get current active tab
+                const activeTab = state.currentActiveTab;
+
+                // Calculate distance
+                const distance = Math.abs(diffX);
+
+                if (distance <= state.swipeThreshold) return;
+
+                let switched = false;
+
+                if (diffX > 0) {
+                    // Swiped left, show TV Shows
+                    if (activeTab === 'movies') {
+                        switched = true;
+                        DOM.swipeIndicator.textContent = 'Switched to TV Shows';
+                        switchTab('tvshows');
                     }
-
-                    // Get current active tab
-                    const activeTab = document.querySelector('.tab.active').dataset.content;
-
-                    // Calculate swipe distance and direction
-                    const distance = Math.abs(diffX);
-
-                    if (distance > swipeThreshold) {
-                        let switched = false;
-
-                        if (diffX > 0) {
-                            // Swiped left, show TV Shows
-                            if (activeTab === 'movies') {
-                                switched = true;
-                                swipeIndicator.textContent = 'Switched to TV Shows';
-                                switchTab('tvshows');
-                            }
-                        } else {
-                            // Swiped right, show Movies
-                            if (activeTab === 'tvshows') {
-                                switched = true;
-                                swipeIndicator.textContent = 'Switched to Movies';
-                                switchTab('movies');
-                            }
-                        }
-
-                        // Only show the indicator if we actually switched tabs
-                        if (switched) {
-                            swipeIndicator.style.opacity = '0.9';
-
-                            // Hide indicator after 1.5 seconds
-                            setTimeout(() => {
-                                swipeIndicator.style.opacity = '0';
-                            }, 1500);
-                        }
+                } else {
+                    // Swiped right, show Movies
+                    if (activeTab === 'tvshows') {
+                        switched = true;
+                        DOM.swipeIndicator.textContent = 'Switched to Movies';
+                        switchTab('movies');
                     }
                 }
-            }
-        }
-    </script>
 
-    <script>
+                // Show indicator if switched
+                if (switched) {
+                    DOM.swipeIndicator.style.opacity = '0.9';
+
+                    // Hide after delay
+                    setTimeout(() => {
+                        DOM.swipeIndicator.style.opacity = '0';
+                    }, 1500);
+                }
+            }
+
+            // Show swipe tip on first load for mobile
+            setTimeout(() => {
+                DOM.swipeIndicator.textContent = 'Swipe left or right to switch between Movies and TV Shows';
+                DOM.swipeIndicator.style.opacity = '1';
+
+                // Hide tip after delay
+                setTimeout(() => {
+                    DOM.swipeIndicator.style.opacity = '0';
+                }, 3000);
+            }, 2000);
+        }
+
+        // Service worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -2077,43 +2254,39 @@
             });
         }
 
-        // Add install prompt
-        let deferredPrompt;
-        const installButton = document.createElement('button');
-        installButton.style.display = 'none';
-        installButton.classList.add('install-button');
-        installButton.textContent = 'Install App';
-
+        // Add install prompt handling
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            // Prevent Chrome 67+ auto prompt
             e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
+            state.deferredPrompt = e;
 
-            // Create and show the install button - position after the H1
-            installButton.style.display = 'block';
+            // Create install button
+            const installButton = document.createElement('button');
+            installButton.className = 'install-button';
+            installButton.textContent = 'Install App';
 
-            // Get the logo section and h1 element
+            // Get logo section
             const logoSection = document.querySelector('.logo-section');
-
-            // Insert the button right after the h1 element inside the logo section
             logoSection.appendChild(installButton);
 
-            installButton.addEventListener('click', (e) => {
-                // Hide the install button
+            // Add click handler
+            installButton.addEventListener('click', () => {
+                // Hide button
                 installButton.style.display = 'none';
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                    deferredPrompt = null;
+
+                // Show prompt
+                state.deferredPrompt.prompt();
+
+                // Handle user choice
+                state.deferredPrompt.userChoice.then((choiceResult) => {
+                    state.deferredPrompt = null;
                 });
             });
+        });
+
+        // Initialize when document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMedia();
         });
 
         // Add styles for the install button
@@ -2133,11 +2306,6 @@
             }
             .install-button:hover {
                 background-color: var(--primary-hover);
-            }
-            .logo-section {
-                display: flex;
-                align-items: center;
-                gap: 10px;
             }
             @media screen and (max-width: 768px) {
                 .install-button {
