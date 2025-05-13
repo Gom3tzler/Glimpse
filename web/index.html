@@ -1205,7 +1205,7 @@
                         <span class="sort-icon">A-Z</span>
                     </button>
                     <button class="sort-button" data-sort="date">
-                        <span class="sort-icon">📅</span> Date
+                        <span class="sort-icon">📅 Newest</span>
                     </button>
                 </div>
             </div>
@@ -1225,7 +1225,7 @@
                 <span class="sort-icon">A-Z</span>
             </button>
             <button class="sort-button" data-sort="date">
-                <span class="sort-icon">📅</span> Date
+                <span class="sort-icon">📅 Newest</span>
             </button>
         </div>
     </div>
@@ -1431,14 +1431,34 @@
             });
         });
 
-        // Sort toggle functionality
+        // Sort toggle functionality with direction support
+        let sortDirection = {
+            'alpha': 'asc',
+            'date': 'desc'
+        };
+
         function setSortMethod(method) {
+            const previousMethod = currentSortMethod;
+
+            // If clicking the same method, toggle direction
+            if (method === previousMethod) {
+                sortDirection[method] = sortDirection[method] === 'asc' ? 'desc' : 'asc';
+            }
+
             currentSortMethod = method;
 
             // Update active state on all sort buttons
             document.querySelectorAll('.sort-button').forEach(btn => {
                 if (btn.dataset.sort === method) {
                     btn.classList.add('active');
+
+                    // Update the icon/text based on current direction
+                    const iconSpan = btn.querySelector('.sort-icon');
+                    if (method === 'alpha') {
+                        iconSpan.textContent = sortDirection[method] === 'asc' ? 'A-Z' : 'Z-A';
+                    } else if (method === 'date') {
+                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Newest' : '📅 Oldest';
+                    }
                 } else {
                     btn.classList.remove('active');
                 }
@@ -1562,12 +1582,21 @@
         function sortMedia(data, method) {
             if (method === 'alpha') {
                 // Sort alphabetically by title, ignoring articles and handling numbers naturally
-                return [...data].sort((a, b) => {
+                const sorted = [...data].sort((a, b) => {
                     return naturalCompare(a.title, b.title);
                 });
+
+                // Reverse the order if direction is descending (Z-A)
+                return sortDirection[method] === 'asc' ? sorted : sorted.reverse();
             } else if (method === 'date') {
-                // Sort by date added (newest first)
-                return [...data].sort((a, b) => b.addedAt - a.addedAt);
+                // Sort by date added
+                if (sortDirection[method] === 'desc') {
+                    // Newest first (descending)
+                    return [...data].sort((a, b) => b.addedAt - a.addedAt);
+                } else {
+                    // Oldest first (ascending)
+                    return [...data].sort((a, b) => a.addedAt - b.addedAt);
+                }
             }
             return data;
         }
