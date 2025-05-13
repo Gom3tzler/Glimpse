@@ -407,51 +407,6 @@
             display: block;
         }
 
-        /* Enhanced tooltip */
-        .title-tooltip {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            white-space: normal;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity var(--transition-speed) ease-in-out,
-                visibility var(--transition-speed) ease-in-out,
-                transform var(--transition-speed) ease-in-out;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-            pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            width: 180px;
-        }
-
-        .title-tooltip::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%) rotate(45deg);
-            width: 12px;
-            height: 12px;
-            background-color: rgba(0, 0, 0, 0.9);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .title-tooltip+.media-info.show-tooltip .title-tooltip {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-
         /* Loading and error states */
         .loading {
             text-align: center;
@@ -1135,13 +1090,6 @@
                 font-size: 0.75em;
             }
 
-            /* Adjust tooltip for mobile */
-            .title-tooltip {
-                width: 160px;
-                font-size: 0.9em;
-                bottom: 70px;
-            }
-
             .modal-header {
                 margin-top: 40px;
             }
@@ -1672,7 +1620,6 @@
                     </div>
                     <div class="media-info">
                         <div class="media-title">${item.title}</div>
-                        <div class="title-tooltip">${item.title}</div>
                         <div class="media-year">${item.year}</div>
                         <div class="media-added">Added: ${addedDate}</div>
                     </div>
@@ -1688,31 +1635,6 @@
                 // Observe the image for lazy loading
                 const img = mediaItem.querySelector('.poster');
                 imageObserver.observe(img);
-
-                // Add touch handling for mobile tooltips
-                const mediaInfo = mediaItem.querySelector('.media-info');
-                const title = mediaItem.querySelector('.media-title');
-
-                title.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent text selection
-                    const allMediaInfo = document.querySelectorAll('.media-info');
-
-                    // Hide all tooltips first
-                    allMediaInfo.forEach(info => info.classList.remove('show-tooltip'));
-
-                    // Show this tooltip
-                    mediaInfo.classList.add('show-tooltip');
-                });
-
-                // Hide tooltip when touching elsewhere
-                title.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-
-                    // Hide tooltip after a delay
-                    setTimeout(() => {
-                        mediaInfo.classList.remove('show-tooltip');
-                    }, 2000);
-                });
 
                 // Add click event to open modal
                 mediaItem.addEventListener('click', () => {
