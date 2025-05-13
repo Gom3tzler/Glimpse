@@ -2,20 +2,20 @@
 
 A sleek, responsive web application for browsing and viewing your Plex media library content. This dockerized solution fetches metadata and artwork from your Plex server and presents it in an elegant, user-friendly interface.
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main.png)
+![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-updated.png)
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details.png)
+![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-updated.png)
 
 ## ✨ Features
 
-* **Modern Interface**: Clean, responsive design that works on mobile and desktop
-* **Media Browsing**: View your movies and TV shows with poster art
-* **Search Capability**: Quickly find content across your libraries
-* **Detailed View**: See cast information, genres, and descriptions
-* **MD5 Checksum Verification**: Only downloads images when they've changed
-* **Dockerized**: Easy deployment with Docker and Docker Compose
-* **Customizable**: Configure update schedule, app title, and more
-* **Installable as PWA**: Access your media library like a native app on any device
+- **Modern Interface**: Clean, responsive design that works on mobile and desktop
+- **Media Browsing**: View your movies and TV shows with poster art
+- **Search Capability**: Quickly find content across your libraries
+- **Detailed View**: See cast information, genres, and descriptions
+- **MD5 Checksum Verification**: Only downloads images when they've changed
+- **Dockerized**: Easy deployment with Docker and Docker Compose
+- **Customizable**: Configure update schedule, app title, and more
+- **Installable as PWA**: Access your media library like a native app on any device
 
 ## ❤️ Support this project
 
@@ -33,16 +33,19 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 ### 1: Grab Docker Compose
 
 Create a directory for your data
+
 ```bash
 mkdir -p Glimpse/data
 ```
 
 Create a docker-compose.yml file
+
 ```bash
 curl -o Glimpse/docker-compose.yml https://raw.githubusercontent.com/jeremehancock/Glimpse/main/docker-compose.yml
 ```
 
 Change to Glimpse directory
+
 ```bash
 cd Glimpse
 ```
@@ -55,9 +58,9 @@ Edit `docker-compose.yml` to set your Plex server details:
 environment:
   - PLEX_URL=http://your-plex-server:32400
   - PLEX_TOKEN=your-plex-token
-  - CRON_SCHEDULE=0 */6 * * *  # Update every 6 hours
-  - TZ=UTC                     # Your timezone
-  - APP_TITLE=My Plex Library  # Custom app title
+  - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
+  - TZ=UTC # Your timezone
+  - APP_TITLE=My Plex Library # Custom app title
 ```
 
 ### 3. Start the Container
@@ -78,13 +81,13 @@ http://your-server:9090
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PLEX_URL` | URL of your Plex server | *Required* |
-| `PLEX_TOKEN` | Authentication token for Plex | *Required* |
+| Variable        | Description                       | Default                       |
+| --------------- | --------------------------------- | ----------------------------- |
+| `PLEX_URL`      | URL of your Plex server           | _Required_                    |
+| `PLEX_TOKEN`    | Authentication token for Plex     | _Required_                    |
 | `CRON_SCHEDULE` | When to update data (cron format) | `0 */6 * * *` (every 6 hours) |
-| `TZ` | Timezone for scheduled tasks | `UTC` |
-| `APP_TITLE` | Custom title for the application | `Glimpse` |
+| `TZ`            | Timezone for scheduled tasks      | `UTC`                         |
+| `APP_TITLE`     | Custom title for the application  | `Glimpse`                     |
 
 ### Finding Your Plex Token
 
@@ -154,10 +157,11 @@ glimpse-media-viewer/
 Modify the `CRON_SCHEDULE` environment variable in your `docker-compose.yml`:
 
 ```yaml
-- CRON_SCHEDULE=0 0 * * *  # Once a day at midnight
+- CRON_SCHEDULE=0 0 * * * # Once a day at midnight
 ```
 
 Common cron patterns:
+
 - `0 */6 * * *` - Every 6 hours
 - `0 0 * * *` - Daily at midnight
 - `0 0 * * 0` - Weekly on Sunday
@@ -169,7 +173,7 @@ Modify the `ports` section in `docker-compose.yml`:
 
 ```yaml
 ports:
-  - "9090:80"  # Change to your desired port
+  - "9090:80" # Change to your desired port
 ```
 
 ### Customizing the App Title
@@ -185,16 +189,19 @@ Set the `APP_TITLE` environment variable:
 ### Viewing Logs
 
 View all container logs
+
 ```bash
 docker-compose logs
 ```
 
 Follow logs in real-time
+
 ```bash
 docker-compose logs -f
 ```
 
 View specific service logs
+
 ```bash
 docker-compose logs glimpse-media-viewer
 ```
@@ -214,16 +221,19 @@ docker exec glimpse-media-viewer bash -c 'python /app/scripts/plex_data_fetcher.
 If you see the default Nginx welcome page, there might be an issue with the configuration:
 
 Check if the app files are present
+
 ```bash
 docker exec glimpse-media-viewer ls -la /app/web
 ```
 
 Check Nginx configuration
+
 ```bash
 docker exec glimpse-media-viewer cat /etc/nginx/conf.d/default.conf
 ```
 
 Restart Nginx
+
 ```bash
 docker exec glimpse-media-viewer nginx -s reload
 ```
