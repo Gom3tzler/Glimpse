@@ -226,6 +226,44 @@
             justify-content: center;
         }
 
+        /* Sort Toggle Styles */
+        .sort-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+        }
+
+        .sort-button {
+            padding: 6px 12px;
+            cursor: pointer;
+            background-color: var(--tab-bg);
+            border: none;
+            border-radius: 20px;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--light-text);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sort-button.active {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .sort-button:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sort-icon {
+            font-size: 1rem;
+        }
+
         /* Content area styling */
         .content {
             display: none;
@@ -354,6 +392,19 @@
             color: var(--muted-text);
             font-size: 0.85rem;
             margin-top: auto;
+        }
+
+        /* Added date indicator */
+        .media-added {
+            color: var(--muted-text);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sort-by-date .media-added {
+            opacity: 1;
         }
 
         /* Enhanced tooltip */
@@ -773,6 +824,21 @@
             border-radius: 8px;
         }
 
+        /* Sort toggle for mobile menu */
+        .mobile-menu .sort-toggle {
+            display: flex;
+            margin-top: 15px;
+            margin-left: 0;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .mobile-menu .sort-button {
+            flex: 1;
+            justify-content: center;
+            padding: 10px;
+        }
+
         /* No results message */
         .no-results {
             display: none;
@@ -925,6 +991,12 @@
         }
 
         /* Mobile responsiveness */
+        @media screen and (max-width: 992px) {
+            .sort-toggle {
+                display: none;
+            }
+        }
+
         @media screen and (max-width: 768px) {
             :root {
                 --mobile-header-height: 70px;
@@ -1059,6 +1131,10 @@
                 font-size: 0.8em;
             }
 
+            .media-added {
+                font-size: 0.75em;
+            }
+
             /* Adjust tooltip for mobile */
             .title-tooltip {
                 width: 160px;
@@ -1123,6 +1199,15 @@
             <div class="tabs">
                 <div class="tab active" data-content="movies">Movies</div>
                 <div class="tab" data-content="tvshows">TV Shows</div>
+                <!-- Sort toggle for desktop -->
+                <div class="sort-toggle">
+                    <button class="sort-button active" data-sort="alpha">
+                        <span class="sort-icon">A-Z</span>
+                    </button>
+                    <button class="sort-button" data-sort="date">
+                        <span class="sort-icon">📅</span> Date
+                    </button>
+                </div>
             </div>
             <button class="mobile-menu-button" aria-label="Menu">☰</button>
         </div>
@@ -1133,6 +1218,15 @@
         <div class="tabs">
             <div class="tab active" data-content="movies">Movies</div>
             <div class="tab" data-content="tvshows">TV Shows</div>
+        </div>
+        <!-- Sort toggle for mobile menu -->
+        <div class="sort-toggle">
+            <button class="sort-button active" data-sort="alpha">
+                <span class="sort-icon">A-Z</span>
+            </button>
+            <button class="sort-button" data-sort="date">
+                <span class="sort-icon">📅</span> Date
+            </button>
         </div>
     </div>
 
@@ -1216,11 +1310,10 @@
     <script>
         let moviesData = [];
         let tvShowsData = [];
+        let currentSortMethod = 'alpha'; // Default sorting method: 'alpha' or 'date'
 
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
-
-
             const placeholder = document.createElement('div');
             placeholder.className = 'text-placeholder';
             placeholder.innerHTML = `
@@ -1229,6 +1322,12 @@
 
             container.appendChild(placeholder);
             return placeholder;
+        }
+
+        // Format timestamp to readable date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
         // Set up Intersection Observer for lazy loading
@@ -1312,8 +1411,8 @@
             });
             document.getElementById(contentName + '-content').classList.add('active');
 
-            // Apply the current search to the newly selected tab content
-            filterMedia(currentSearchTerm);
+            // Apply the current search and sort to the newly selected tab content
+            filterAndSortMedia(currentSearchTerm, currentSortMethod);
 
             // Close mobile menu if open
             mobileMenu.classList.remove('open');
@@ -1332,13 +1431,48 @@
             });
         });
 
+        // Sort toggle functionality
+        function setSortMethod(method) {
+            currentSortMethod = method;
+
+            // Update active state on all sort buttons
+            document.querySelectorAll('.sort-button').forEach(btn => {
+                if (btn.dataset.sort === method) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update body class for styling
+            if (method === 'date') {
+                document.body.classList.add('sort-by-date');
+            } else {
+                document.body.classList.remove('sort-by-date');
+            }
+
+            // Reapply current search with new sorting
+            const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+            filterAndSortMedia(currentSearchTerm, method);
+        }
+
+        // Add event listeners to sort buttons
+        document.querySelectorAll('.sort-button').forEach(button => {
+            button.addEventListener('click', () => {
+                setSortMethod(button.dataset.sort);
+
+                // Close mobile menu if open
+                mobileMenu.classList.remove('open');
+            });
+        });
+
         // Enhanced search functionality
         const searchInput = document.querySelector('.search-input');
         const searchClear = document.querySelector('.search-clear');
 
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            filterMedia(searchTerm);
+            filterAndSortMedia(searchTerm, currentSortMethod);
 
             // Toggle clear button visibility
             if (searchTerm) {
@@ -1351,7 +1485,7 @@
         searchClear.addEventListener('click', () => {
             searchInput.value = '';
             searchClear.classList.remove('visible');
-            filterMedia('');
+            filterAndSortMedia('', currentSortMethod);
             searchInput.focus();
         });
 
@@ -1361,12 +1495,13 @@
                 // Load movies
                 const moviesResponse = await fetch('data/movies.json');
                 moviesData = await moviesResponse.json();
-                displayMedia(moviesData, 'movies');
 
                 // Load TV shows
                 const tvShowsResponse = await fetch('data/tvshows.json');
                 tvShowsData = await tvShowsResponse.json();
-                displayMedia(tvShowsData, 'tvshows');
+
+                // Initial sort and display
+                filterAndSortMedia('', currentSortMethod);
             } catch (error) {
                 console.error('Error loading media data:', error);
                 document.querySelector('#movies-content .loading').innerHTML =
@@ -1374,6 +1509,84 @@
                 document.querySelector('#tvshows-content .loading').innerHTML =
                     '<div class="error">Failed to load TV show data. Please try again later.</div>';
             }
+        }
+
+        // Function to remove articles for sorting
+        function removeArticles(title) {
+            // Convert to lowercase and trim spaces
+            let cleanTitle = title.toLowerCase().trim();
+            // Remove leading articles: "the ", "a ", "an "
+            cleanTitle = cleanTitle.replace(/^(the|a|an)\s+/i, '');
+            return cleanTitle;
+        }
+
+        // Natural sort comparison function for titles
+        function naturalCompare(a, b) {
+            const ax = removeArticles(a);
+            const bx = removeArticles(b);
+
+            // Natural sorting algorithm that handles numbers correctly
+            const chunks = /(\d+|\D+)/g;
+            const aChunks = String(ax).match(chunks);
+            const bChunks = String(bx).match(chunks);
+
+            // Check if either string doesn't match the pattern
+            if (!aChunks || !bChunks) return ax.localeCompare(bx);
+
+            const len = Math.min(aChunks.length, bChunks.length);
+
+            // Compare each chunk
+            for (let i = 0; i < len; i++) {
+                // If both chunks are numeric
+                if (!isNaN(aChunks[i]) && !isNaN(bChunks[i])) {
+                    // Convert to numbers and compare
+                    const numA = parseInt(aChunks[i], 10);
+                    const numB = parseInt(bChunks[i], 10);
+                    if (numA !== numB) {
+                        return numA - numB;
+                    }
+                } else {
+                    // Regular string comparison
+                    const stringComp = aChunks[i].localeCompare(bChunks[i]);
+                    if (stringComp !== 0) {
+                        return stringComp;
+                    }
+                }
+            }
+
+            // If all chunks were equal but strings have different lengths
+            return aChunks.length - bChunks.length;
+        }
+
+        // Sort media data
+        function sortMedia(data, method) {
+            if (method === 'alpha') {
+                // Sort alphabetically by title, ignoring articles and handling numbers naturally
+                return [...data].sort((a, b) => {
+                    return naturalCompare(a.title, b.title);
+                });
+            } else if (method === 'date') {
+                // Sort by date added (newest first)
+                return [...data].sort((a, b) => b.addedAt - a.addedAt);
+            }
+            return data;
+        }
+
+        // Filter and sort media based on search term and sort method
+        function filterAndSortMedia(searchTerm, sortMethod) {
+            const activeTab = document.querySelector('.tab.active').dataset.content;
+            const data = activeTab === 'movies' ? moviesData : tvShowsData;
+
+            // Filter based on search term
+            const filtered = data.filter(item =>
+                item.title.toLowerCase().includes(searchTerm)
+            );
+
+            // Sort the filtered data
+            const sortedData = sortMedia(filtered, sortMethod);
+
+            // Display the sorted data
+            displayMedia(sortedData, activeTab);
         }
 
         // Display media items with enhanced animations
@@ -1416,6 +1629,9 @@
                     `data/posters/movies/${item.id}.jpg` :
                     `data/posters/tvshows/${item.id}.jpg`;
 
+                // Format the added date
+                const addedDate = formatDate(item.addedAt);
+
                 mediaItem.innerHTML = `
                     <div class="poster-container">
                         <div class="poster-placeholder">
@@ -1429,6 +1645,7 @@
                         <div class="media-title">${item.title}</div>
                         <div class="title-tooltip">${item.title}</div>
                         <div class="media-year">${item.year}</div>
+                        <div class="media-added">Added: ${addedDate}</div>
                     </div>
                 `;
 
@@ -1473,18 +1690,6 @@
                     openModal(item, type);
                 });
             });
-        }
-
-        // Filter media based on search
-        function filterMedia(searchTerm) {
-            const activeTab = document.querySelector('.tab.active').dataset.content;
-            const data = activeTab === 'movies' ? moviesData : tvShowsData;
-
-            const filtered = data.filter(item =>
-                item.title.toLowerCase().includes(searchTerm)
-            );
-
-            displayMedia(filtered, activeTab);
         }
 
         // Modal functionality
@@ -1674,13 +1879,32 @@
                     const actorElement = document.createElement('div');
                     actorElement.className = 'cast-item';
                     actorElement.innerHTML = `
-				        <div class="cast-name">${actor.name}</div>
-				        <div class="cast-role">${actor.role || ''}</div>
-				    `;
+                        <div class="cast-name">${actor.name}</div>
+                        <div class="cast-role">${actor.role || ''}</div>
+                    `;
                     castContainer.appendChild(actorElement);
                 });
             } else {
                 castContainer.innerHTML = '<div>No cast information available</div>';
+            }
+
+            // Add date added information
+            const dateAdded = formatDate(item.addedAt);
+
+            // Check if we already have the added date element
+            let dateAddedElem = document.getElementById('modal-added-date');
+            if (!dateAddedElem) {
+                // Create a new section for date added
+                const dateSection = document.createElement('div');
+                dateSection.className = 'modal-section date-section';
+                dateSection.innerHTML = `
+                    <div class="modal-section-title">Date Added</div>
+                    <div id="modal-added-date">${dateAdded}</div>
+                `;
+                document.querySelector('.modal-body').appendChild(dateSection);
+            } else {
+                // Update existing date info
+                dateAddedElem.textContent = dateAdded;
             }
 
             // Make sure any previous modal content is reset before showing new modal
@@ -1938,34 +2162,34 @@
         // Add styles for the install button
         const style = document.createElement('style');
         style.textContent = `
-		    .install-button {
-		        background-color: var(--primary-color);
-		        color: #000;
-		        border: none;
-		        border-radius: 20px;
-		        padding: 8px 15px;
-		        font-weight: 600;
-		        cursor: pointer;
-		        margin-left: 15px;
-		        transition: background-color 0.3s;
-		        align-self: center;
-		    }
-		    .install-button:hover {
-		        background-color: var(--primary-hover);
-		    }
-		    .logo-section {
-		        display: flex;
-		        align-items: center;
-		        gap: 10px;
-		    }
-		    @media screen and (max-width: 768px) {
-		        .install-button {
-		            margin-left: 8px;
-		            padding: 6px 12px;
-		            font-size: 0.85rem;
-		        }
-		    }
-		`;
+            .install-button {
+                background-color: var(--primary-color);
+                color: #000;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 15px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-left: 15px;
+                transition: background-color 0.3s;
+                align-self: center;
+            }
+            .install-button:hover {
+                background-color: var(--primary-hover);
+            }
+            .logo-section {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            @media screen and (max-width: 768px) {
+                .install-button {
+                    margin-left: 8px;
+                    padding: 6px 12px;
+                    font-size: 0.85rem;
+                }
+            }
+        `;
         document.head.appendChild(style);
     </script>
 </body>
