@@ -1576,7 +1576,7 @@
             }
         });
 
-        // Function to switch tabs
+        // Function to switch tabs - UPDATED TO MAINTAIN GENRE FILTER
         function switchTab(contentName) {
             // Get current search query before switching tabs
             const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
@@ -1596,10 +1596,18 @@
             });
             document.getElementById(contentName + '-content').classList.add('active');
 
-            // Reset genre filter when switching tabs
-            currentGenre = 'all';
-            document.body.classList.remove('sort-by-genre');
-            updateGenreDrawer(contentName);
+            // Check if the current genre exists in the new tab's genres
+            if (currentGenre !== 'all' && !allGenres[contentName][currentGenre]) {
+                // Reset genre filter if the genre doesn't exist in the new tab
+                currentGenre = 'all';
+                document.body.classList.remove('sort-by-genre');
+            } else {
+                // Keep the current genre selected
+                document.body.classList.toggle('sort-by-genre', currentGenre !== 'all');
+            }
+
+            // Update the genre drawer and dropdown for the new tab
+            updateGenreUI(contentName);
 
             // Apply the current search and sort to the newly selected tab content
             filterAndSortMedia(currentSearchTerm);
