@@ -2,9 +2,9 @@
 
 A sleek, responsive web application for browsing and viewing your Plex media library content. This dockerized solution fetches metadata and artwork from your Plex server and presents it in an elegant, user-friendly interface.
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-updated.png)
+![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-updated-2.png)
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-updated.png)
+![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-updated-2.png)
 
 ## ✨ Features
 
@@ -60,7 +60,7 @@ environment:
   - PLEX_TOKEN=your-plex-token
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
-  - APP_TITLE=My Plex Library # Custom app title
+  - APP_TITLE=Glimpse # Custom app title
 ```
 
 ### 3. Start the Container

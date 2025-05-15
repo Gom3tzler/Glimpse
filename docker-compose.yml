@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   glimpse-media-viewer:
@@ -8,10 +8,11 @@ services:
       - "9090:80"
     volumes:
       - ./data:/app/data
+      # - ./logo.png:/app/web/images/logo.png # Add your logo.png file and uncomment this line to customize the logo
     environment:
       - PLEX_URL=http://your-plex-server:32400
       - PLEX_TOKEN=your-plex-token
-      - CRON_SCHEDULE=0 */6 * * *  # Default: every 6 hours
-      - TZ=UTC  # Set your timezone
-      - APP_TITLE=Glimpse  # Default app title, customize as needed
+      - CRON_SCHEDULE=0 */6 * * * # Default: every 6 hours
+      - TZ=UTC # Set your timezone
+      - APP_TITLE=Glimpse # Default app title, customize as needed
     restart: unless-stopped
