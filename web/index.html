@@ -234,7 +234,8 @@
             margin-left: 10px;
         }
 
-        .sort-button {
+        .sort-button,
+        .genre-button {
             padding: 6px 12px;
             cursor: pointer;
             background-color: var(--tab-bg);
@@ -250,18 +251,108 @@
             gap: 5px;
         }
 
-        .sort-button.active {
+        .sort-button.active,
+        .genre-button.active {
             background-color: var(--primary-color);
             color: #000;
             font-weight: 600;
         }
 
-        .sort-button:hover:not(.active) {
+        .sort-button:hover:not(.active),
+        .genre-button:hover:not(.active) {
             background-color: rgba(255, 255, 255, 0.1);
         }
 
         .sort-icon {
             font-size: 1rem;
+        }
+
+        /* Genre dropdown styles */
+        .genre-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .genre-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            /* Position from right instead of left */
+            margin-top: 5px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            z-index: 10;
+            min-width: 180px;
+            max-width: 300px;
+            /* Set a max width to prevent it from getting too large */
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* For dropdowns near the left edge of the screen */
+        .genre-dropdown:first-child .genre-menu {
+            left: 0;
+            right: auto;
+        }
+
+        .genre-menu.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .genre-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .genre-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .genre-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .genre-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: #000;
+            border-radius: 10px;
+            padding: 3px 8px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            margin-left: 5px;
+            min-width: 20px;
+        }
+
+        .selected-genre {
+            font-weight: 600;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Content area styling */
@@ -404,6 +495,19 @@
         }
 
         .sort-by-date .media-added {
+            display: block;
+        }
+
+        /* Media item genre tag */
+        .media-genre {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sort-by-genre .media-genre {
             display: block;
         }
 
@@ -786,12 +890,34 @@
             margin-left: 0;
             justify-content: center;
             width: 100%;
+            flex-wrap: wrap;
         }
 
         .mobile-menu .sort-button {
             flex: 1;
             justify-content: center;
             padding: 10px;
+            min-width: 80px;
+        }
+
+        /* Mobile genre dropdown styles */
+        .mobile-menu .genre-dropdown {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .mobile-menu .genre-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .mobile-menu .genre-menu {
+            position: relative;
+            width: 100%;
+            right: auto;
+            left: 0;
+            margin-top: 10px;
+            max-height: 200px;
         }
 
         /* No results message */
@@ -1090,6 +1216,10 @@
                 font-size: 0.75em;
             }
 
+            .media-genre {
+                font-size: 0.75em;
+            }
+
             .modal-header {
                 margin-top: 40px;
             }
@@ -1155,6 +1285,16 @@
                     <button class="sort-button" data-sort="date">
                         <span class="sort-icon">📅 Newest</span>
                     </button>
+                    <!-- Genre filter dropdown -->
+                    <div class="genre-dropdown">
+                        <button class="sort-button genre-button" data-filter="genre">
+                            <span class="sort-icon">🏷️ Genre</span>
+                        </button>
+                        <div class="genre-menu">
+                            <div class="genre-item active" data-genre="all">All Genres</div>
+                            <!-- Genre items will be populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <button class="mobile-menu-button" aria-label="Menu">☰</button>
@@ -1175,6 +1315,16 @@
             <button class="sort-button" data-sort="date">
                 <span class="sort-icon">📅 Newest</span>
             </button>
+            <!-- Mobile Genre dropdown -->
+            <div class="genre-dropdown">
+                <button class="sort-button genre-button" data-filter="genre">
+                    <span class="sort-icon">🏷️ Genre</span>
+                </button>
+                <div class="genre-menu">
+                    <div class="genre-item active" data-genre="all">All Genres</div>
+                    <!-- Genre items will be populated dynamically -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1259,6 +1409,8 @@
         let moviesData = [];
         let tvShowsData = [];
         let currentSortMethod = 'alpha'; // Default sorting method: 'alpha' or 'date'
+        let currentGenre = 'all'; // Default genre filter: 'all' or specific genre
+        let allGenres = { movies: {}, tvshows: {} }; // Store all unique genres and their counts
 
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
@@ -1359,8 +1511,13 @@
             });
             document.getElementById(contentName + '-content').classList.add('active');
 
+            // Reset genre filter when switching tabs
+            currentGenre = 'all';
+            document.body.classList.remove('sort-by-genre');
+            updateGenreDropdown(contentName);
+
             // Apply the current search and sort to the newly selected tab content
-            filterAndSortMedia(currentSearchTerm, currentSortMethod);
+            filterAndSortMedia(currentSearchTerm);
 
             // Close mobile menu if open
             mobileMenu.classList.remove('open');
@@ -1415,19 +1572,53 @@
             // Update body class for styling
             if (method === 'date') {
                 document.body.classList.add('sort-by-date');
+                document.body.classList.remove('sort-by-genre');
             } else {
                 document.body.classList.remove('sort-by-date');
             }
 
             // Reapply current search with new sorting
             const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
-            filterAndSortMedia(currentSearchTerm, method);
+            filterAndSortMedia(currentSearchTerm);
+        }
+
+        // Set the genre filter
+        function setGenreFilter(genre) {
+            currentGenre = genre;
+
+            // Update active state in dropdowns
+            document.querySelectorAll('.genre-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.genre === genre);
+            });
+
+            // Update genre button label and active state
+            document.querySelectorAll('.genre-button').forEach(button => {
+                if (genre !== 'all') {
+                    button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${genre}</span></span>`;
+                    button.classList.add('active');
+                    document.body.classList.add('sort-by-genre');
+                } else {
+                    button.innerHTML = `<span class="sort-icon">🏷️ Genre</span>`;
+                    button.classList.remove('active');
+                    document.body.classList.remove('sort-by-genre');
+                }
+            });
+
+            // Re-filter media with current search term and sort method
+            const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
+            filterAndSortMedia(currentSearchTerm);
         }
 
         // Add event listeners to sort buttons
         document.querySelectorAll('.sort-button').forEach(button => {
             button.addEventListener('click', () => {
+                // Regular sort buttons
                 setSortMethod(button.dataset.sort);
+
+                // Close all genre dropdowns
+                document.querySelectorAll('.genre-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
 
                 // Close mobile menu if open
                 mobileMenu.classList.remove('open');
@@ -1440,13 +1631,132 @@
             });
         });
 
+        // Add event listeners to genre filter buttons
+        document.querySelectorAll('.genre-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Toggle the genre dropdown
+                const dropdown = button.closest('.genre-dropdown');
+                const menu = dropdown.querySelector('.genre-menu');
+
+                // Close other dropdowns first
+                document.querySelectorAll('.genre-menu.show').forEach(m => {
+                    if (m !== menu) {
+                        m.classList.remove('show');
+                    }
+                });
+
+                // Check if dropdown would overflow the window and adjust position
+                setTimeout(() => {
+                    const menuRect = menu.getBoundingClientRect();
+                    const windowWidth = window.innerWidth;
+
+                    // Only needed as a fallback if CSS positioning doesn't work
+                    if (menuRect.right > windowWidth) {
+                        menu.style.left = 'auto';
+                        menu.style.right = '0';
+                    }
+                }, 0);
+
+                menu.classList.toggle('show');
+            });
+        });
+
+        // Close genre dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.genre-dropdown')) {
+                document.querySelectorAll('.genre-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        // Function to extract and count all unique genres from media data
+        function extractGenres(mediaData, type) {
+            const genres = {};
+
+            mediaData.forEach(item => {
+                if (item.genres && Array.isArray(item.genres)) {
+                    item.genres.forEach(genre => {
+                        if (!genres[genre]) {
+                            genres[genre] = 0;
+                        }
+                        genres[genre]++;
+                    });
+                }
+            });
+
+            // Sort genres alphabetically
+            return Object.keys(genres)
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = genres[key];
+                    return result;
+                }, {});
+        }
+
+        // Function to update genre dropdown with available genres
+        function updateGenreDropdown(type) {
+            const genres = allGenres[type];
+            const dropdowns = document.querySelectorAll('.genre-menu');
+
+            // Update all genre menus (desktop and mobile)
+            dropdowns.forEach(dropdown => {
+                // Keep the "All Genres" item
+                dropdown.innerHTML = `<div class="genre-item ${currentGenre === 'all' ? 'active' : ''}" data-genre="all">All Genres</div>`;
+
+                // Add each genre with count
+                Object.entries(genres).forEach(([genre, count]) => {
+                    const genreItem = document.createElement('div');
+                    genreItem.className = `genre-item ${currentGenre === genre ? 'active' : ''}`;
+                    genreItem.dataset.genre = genre;
+                    genreItem.innerHTML = `${genre} <span class="genre-badge">${count}</span>`;
+                    dropdown.appendChild(genreItem);
+                });
+
+                // Update genre button label if a genre is selected
+                const genreButton = dropdown.closest('.genre-dropdown').querySelector('.genre-button .sort-icon');
+                if (currentGenre !== 'all') {
+                    genreButton.innerHTML = `🏷️ <span class="selected-genre">${currentGenre}</span>`;
+                } else {
+                    genreButton.textContent = '🏷️ Genre';
+                }
+            });
+
+            // Add click event listeners to genre items
+            document.querySelectorAll('.genre-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.genre-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    document.querySelectorAll(`.genre-item[data-genre="${item.dataset.genre}"]`).forEach(i => {
+                        i.classList.add('active');
+                    });
+
+                    // Set current genre and update UI
+                    setGenreFilter(item.dataset.genre);
+
+                    // Close dropdown
+                    document.querySelectorAll('.genre-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+
+                    // Scroll to top
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        }
+
         // Enhanced search functionality
         const searchInput = document.querySelector('.search-input');
         const searchClear = document.querySelector('.search-clear');
 
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            filterAndSortMedia(searchTerm, currentSortMethod);
+            filterAndSortMedia(searchTerm);
 
             // Toggle clear button visibility
             if (searchTerm) {
@@ -1459,7 +1769,7 @@
         searchClear.addEventListener('click', () => {
             searchInput.value = '';
             searchClear.classList.remove('visible');
-            filterAndSortMedia('', currentSortMethod);
+            filterAndSortMedia('');
             searchInput.focus();
         });
 
@@ -1474,8 +1784,15 @@
                 const tvShowsResponse = await fetch('data/tvshows.json');
                 tvShowsData = await tvShowsResponse.json();
 
+                // Extract genres
+                allGenres.movies = extractGenres(moviesData, 'movies');
+                allGenres.tvshows = extractGenres(tvShowsData, 'tvshows');
+
+                // Initialize genre dropdowns
+                updateGenreDropdown('movies');
+
                 // Initial sort and display
-                filterAndSortMedia('', currentSortMethod);
+                filterAndSortMedia('');
             } catch (error) {
                 console.error('Error loading media data:', error);
                 document.querySelector('#movies-content .loading').innerHTML =
@@ -1556,17 +1873,24 @@
         }
 
         // Filter and sort media based on search term and sort method
-        function filterAndSortMedia(searchTerm, sortMethod) {
+        function filterAndSortMedia(searchTerm) {
             const activeTab = document.querySelector('.tab.active').dataset.content;
             const data = activeTab === 'movies' ? moviesData : tvShowsData;
 
-            // Filter based on search term
-            const filtered = data.filter(item =>
+            // First filter by search term
+            let filtered = data.filter(item =>
                 item.title.toLowerCase().includes(searchTerm)
             );
 
-            // Sort the filtered data
-            const sortedData = sortMedia(filtered, sortMethod);
+            // Then filter by genre if necessary
+            if (currentGenre !== 'all') {
+                filtered = filtered.filter(item =>
+                    item.genres && item.genres.includes(currentGenre)
+                );
+            }
+
+            // Sort the filtered data using the current sort method
+            const sortedData = sortMedia(filtered, currentSortMethod);
 
             // Display the sorted data
             displayMedia(sortedData, activeTab);
@@ -1588,6 +1912,17 @@
                 const searchTerm = document.querySelector('.search-input').value;
                 const searchTermSpan = contentDiv.querySelector('.search-term');
                 searchTermSpan.textContent = searchTerm;
+
+                // Update message for genre filtering
+                if (currentGenre !== 'all') {
+                    contentDiv.querySelector('.no-results-message').innerHTML =
+                        `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
+                         in the "${currentGenre}" genre${searchTerm ? ` matching "${searchTerm}"` : ''}`;
+                } else {
+                    contentDiv.querySelector('.no-results-message').innerHTML =
+                        `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
+                         matching "${searchTerm}"`;
+                }
 
                 // Show no results message
                 noResultsDiv.classList.add('active');
@@ -1615,6 +1950,9 @@
                 // Format the added date
                 const addedDate = formatDate(item.addedAt);
 
+                // Get primary genre if available
+                const primaryGenre = item.genres && item.genres.length > 0 ? item.genres[0] : 'Unknown';
+
                 mediaItem.innerHTML = `
                     <div class="poster-container">
                         <div class="poster-placeholder">
@@ -1628,6 +1966,7 @@
                         <div class="media-title">${item.title}</div>
                         <div class="media-year">${item.year}</div>
                         <div class="media-added">Added: ${addedDate}</div>
+                        <div class="media-genre">${primaryGenre}</div>
                     </div>
                 `;
 
@@ -1821,6 +2160,15 @@
                     const genreElement = document.createElement('div');
                     genreElement.className = 'genre-tag';
                     genreElement.textContent = genre;
+
+                    // Add click event to filter by this genre when clicked
+                    genreElement.addEventListener('click', () => {
+                        setGenreFilter(genre);
+
+                        // Close modal
+                        closeModal();
+                    });
+
                     genresContainer.appendChild(genreElement);
                 });
             } else {
