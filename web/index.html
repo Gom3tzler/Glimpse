@@ -1351,7 +1351,7 @@
     <div class="header">
         <div class="header-content">
             <div class="logo-section">
-                <h1><span class="logo-icon"><img srce="images/logo.png" /></span>Glimpse</h1>
+                <h1><span class="logo-icon"><img src="images/logo.png" /></span>Glimpse</h1>
             </div>
             <div class="search-box">
                 <div class="search-container">
@@ -2119,36 +2119,43 @@
             const grid = contentDiv.querySelector('.media-grid');
             const noResultsDiv = contentDiv.querySelector('.no-results');
 
+            // Hide loading spinner
             loadingDiv.style.display = 'none';
+
+            // Always start with an empty grid
             grid.innerHTML = '';
 
             // Check if there are no results to display
             if (data.length === 0) {
-                // Get search term and update the no results message
+                // Get the current search term
                 const searchTerm = document.querySelector('.search-input').value;
-                const searchTermSpan = contentDiv.querySelector('.search-term');
-                searchTermSpan.textContent = searchTerm;
 
-                // Update message for genre filtering
+                // Update the no results message content first
                 if (currentGenre !== 'all') {
                     contentDiv.querySelector('.no-results-message').innerHTML =
                         `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                         in the "${currentGenre}" genre${searchTerm ? ` matching "${searchTerm}"` : ''}`;
+                         in the "${currentGenre}" genre${searchTerm ? ` matching "<span class="search-term">${searchTerm}</span>"` : ''}`;
                 } else {
                     contentDiv.querySelector('.no-results-message').innerHTML =
                         `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                         matching "${searchTerm}"`;
+                         matching "<span class="search-term">${searchTerm}</span>"`;
                 }
 
-                // Show no results message
+                // Show no results message and hide the grid
                 noResultsDiv.classList.add('active');
                 grid.style.display = 'none';
+
+                // Make sure genre dropdown or drawer gets closed when showing no results
+                document.querySelectorAll('.genre-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+
                 return;
-            } else {
-                // Hide no results message and show grid
-                noResultsDiv.classList.remove('active');
-                grid.style.display = 'grid';
             }
+
+            // We have results to display
+            noResultsDiv.classList.remove('active');
+            grid.style.display = 'grid';
 
             // Create and append items with staggered animation
             data.forEach((item, index) => {
