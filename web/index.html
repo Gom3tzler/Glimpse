@@ -1564,7 +1564,7 @@
                     } else if (method === 'date') {
                         iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Newest' : '📅 Oldest';
                     }
-                } else {
+                } else if (!btn.classList.contains('genre-button')) {
                     btn.classList.remove('active');
                 }
             });
@@ -1604,6 +1604,16 @@
                 }
             });
 
+            // Maintain the current sort method - keep Sort buttons active status
+            // This is what was missing - we need to ensure sort buttons remain active
+            document.querySelectorAll('.sort-button').forEach(btn => {
+                if (btn.dataset.sort === currentSortMethod) {
+                    btn.classList.add('active');
+                } else if (!btn.classList.contains('genre-button')) {
+                    btn.classList.remove('active');
+                }
+            });
+
             // Re-filter media with current search term and sort method
             const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
             filterAndSortMedia(currentSearchTerm);
@@ -1613,7 +1623,9 @@
         document.querySelectorAll('.sort-button').forEach(button => {
             button.addEventListener('click', () => {
                 // Regular sort buttons
-                setSortMethod(button.dataset.sort);
+                if (button.dataset.sort) {
+                    setSortMethod(button.dataset.sort);
+                }
 
                 // Close all genre dropdowns
                 document.querySelectorAll('.genre-menu').forEach(menu => {
@@ -1747,6 +1759,15 @@
                         behavior: 'smooth'
                     });
                 });
+            });
+
+            // Make sure sort buttons reflect the current sort method
+            document.querySelectorAll('.sort-button').forEach(btn => {
+                if (btn.dataset.sort === currentSortMethod) {
+                    btn.classList.add('active');
+                } else if (!btn.classList.contains('genre-button')) {
+                    btn.classList.remove('active');
+                }
             });
         }
 
