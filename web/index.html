@@ -1368,7 +1368,7 @@
                         <span class="sort-icon">A-Z</span>
                     </button>
                     <button class="sort-button" data-sort="date">
-                        <span class="sort-icon">📅 Newest</span>
+                        <span class="sort-icon">📅 Date Added ▼</span>
                     </button>
                     <!-- Genre filter dropdown -->
                     <div class="genre-dropdown">
@@ -1399,7 +1399,7 @@
                     <span class="sort-icon">A-Z</span>
                 </button>
                 <button class="sort-button" data-sort="date">
-                    <span class="sort-icon">📅 Newest</span>
+                    <span class="sort-icon">📅 Date Added ▼</span>
                 </button>
             </div>
             <!-- Mobile Genre button - now triggers drawer -->
@@ -1675,7 +1675,7 @@
                     if (method === 'alpha') {
                         iconSpan.textContent = sortDirection[method] === 'asc' ? 'A-Z' : 'Z-A';
                     } else if (method === 'date') {
-                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Newest' : '📅 Oldest';
+                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Date Added ▼' : '📅 Date Added ▲';
                     }
                 } else if (!btn.classList.contains('genre-button')) {
                     btn.classList.remove('active');
