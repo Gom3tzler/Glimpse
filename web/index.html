@@ -877,8 +877,15 @@
             margin-left: 0;
             justify-content: center;
             width: 100%;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
+        }
+
+        .mobile-menu .sort-row {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            justify-content: center;
         }
 
         .mobile-menu .sort-button {
@@ -886,6 +893,11 @@
             justify-content: center;
             padding: 10px;
             min-width: 80px;
+        }
+
+        .mobile-menu #mobile-genre-button {
+            width: 100%;
+            margin-top: 5px;
         }
 
         /* NEW MOBILE GENRE DRAWER */
@@ -1117,10 +1129,6 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-            }
-
-            .content {
-                height: 100vh;
             }
         }
 
@@ -1380,12 +1388,14 @@
         </div>
         <!-- Sort toggle for mobile menu -->
         <div class="sort-toggle">
-            <button class="sort-button active" data-sort="alpha">
-                <span class="sort-icon">A-Z</span>
-            </button>
-            <button class="sort-button" data-sort="date">
-                <span class="sort-icon">📅 Newest</span>
-            </button>
+            <div class="sort-row">
+                <button class="sort-button active" data-sort="alpha">
+                    <span class="sort-icon">A-Z</span>
+                </button>
+                <button class="sort-button" data-sort="date">
+                    <span class="sort-icon">📅 Newest</span>
+                </button>
+            </div>
             <!-- Mobile Genre button - now triggers drawer -->
             <button class="sort-button genre-button" id="mobile-genre-button">
                 <span class="sort-icon">🏷️ Genre</span>
