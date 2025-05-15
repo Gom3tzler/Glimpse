@@ -267,7 +267,7 @@
             font-size: 1rem;
         }
 
-        /* Genre dropdown styles */
+        /* Desktop Genre dropdown styles */
         .genre-dropdown {
             position: relative;
             display: inline-block;
@@ -495,19 +495,6 @@
         }
 
         .sort-by-date .media-added {
-            display: block;
-        }
-
-        /* Media item genre tag */
-        .media-genre {
-            color: var(--primary-color);
-            font-size: 0.8rem;
-            margin-top: 5px;
-            display: none;
-            transition: opacity var(--transition-speed);
-        }
-
-        .sort-by-genre .media-genre {
             display: block;
         }
 
@@ -891,6 +878,7 @@
             justify-content: center;
             width: 100%;
             flex-wrap: wrap;
+            gap: 10px;
         }
 
         .mobile-menu .sort-button {
@@ -900,24 +888,107 @@
             min-width: 80px;
         }
 
-        /* Mobile genre dropdown styles */
-        .mobile-menu .genre-dropdown {
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .mobile-menu .genre-button {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .mobile-menu .genre-menu {
-            position: relative;
-            width: 100%;
-            right: auto;
+        /* NEW MOBILE GENRE DRAWER */
+        .genre-drawer-overlay {
+            position: fixed;
+            top: 0;
             left: 0;
-            margin-top: 10px;
-            max-height: 200px;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .genre-drawer-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+
+        .genre-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-bg);
+            border-radius: 16px 16px 0 0;
+            z-index: 1002;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .genre-drawer.open {
+            transform: translateY(0);
+        }
+
+        .genre-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .genre-drawer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light-text);
+            flex: 1;
+            text-align: center;
+        }
+
+        .genre-drawer-close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: none;
+            border-radius: 50%;
+            color: var(--light-text);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .genre-drawer-content {
+            overflow-y: auto;
+            padding: 10px 0;
+            max-height: calc(70vh - 70px);
+        }
+
+        .genre-drawer .genre-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .genre-drawer .genre-item:last-child {
+            border-bottom: none;
+        }
+
+        .genre-drawer .genre-item.active {
+            background-color: var(--primary-light);
+        }
+
+        /* Apply drawer to mobile genre buttons */
+        @media screen and (max-width: 992px) {
+            .sort-toggle .genre-dropdown .genre-menu {
+                display: none !important;
+                /* Never show dropdown menu on mobile */
+            }
         }
 
         /* No results message */
@@ -1216,10 +1287,6 @@
                 font-size: 0.75em;
             }
 
-            .media-genre {
-                font-size: 0.75em;
-            }
-
             .modal-header {
                 margin-top: 40px;
             }
@@ -1315,15 +1382,23 @@
             <button class="sort-button" data-sort="date">
                 <span class="sort-icon">📅 Newest</span>
             </button>
-            <!-- Mobile Genre dropdown -->
-            <div class="genre-dropdown">
-                <button class="sort-button genre-button" data-filter="genre">
-                    <span class="sort-icon">🏷️ Genre</span>
-                </button>
-                <div class="genre-menu">
-                    <div class="genre-item active" data-genre="all">All Genres</div>
-                    <!-- Genre items will be populated dynamically -->
-                </div>
+            <!-- Mobile Genre button - now triggers drawer -->
+            <button class="sort-button genre-button" id="mobile-genre-button">
+                <span class="sort-icon">🏷️ Genre</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW MOBILE GENRE DRAWER -->
+    <div class="genre-drawer-overlay">
+        <div class="genre-drawer">
+            <div class="genre-drawer-header">
+                <div class="genre-drawer-title">Select Genre</div>
+                <button class="genre-drawer-close">×</button>
+            </div>
+            <div class="genre-drawer-content">
+                <!-- Genre items will be populated dynamically -->
+                <div class="genre-item active" data-genre="all">All Genres</div>
             </div>
         </div>
     </div>
@@ -1411,6 +1486,16 @@
         let currentSortMethod = 'alpha'; // Default sorting method: 'alpha' or 'date'
         let currentGenre = 'all'; // Default genre filter: 'all' or specific genre
         let allGenres = { movies: {}, tvshows: {} }; // Store all unique genres and their counts
+        let isMobileView = window.innerWidth < 992; // Track if we're in mobile view
+
+        // Function to check if device is mobile/tablet
+        function checkMobileView() {
+            isMobileView = window.innerWidth < 992;
+            return isMobileView;
+        }
+
+        // Update on resize
+        window.addEventListener('resize', checkMobileView);
 
         // Function to create text placeholders for missing images
         function createTextPlaceholder(container, title) {
@@ -1514,7 +1599,7 @@
             // Reset genre filter when switching tabs
             currentGenre = 'all';
             document.body.classList.remove('sort-by-genre');
-            updateGenreDropdown(contentName);
+            updateGenreDrawer(contentName);
 
             // Apply the current search and sort to the newly selected tab content
             filterAndSortMedia(currentSearchTerm);
@@ -1586,15 +1671,20 @@
         function setGenreFilter(genre) {
             currentGenre = genre;
 
-            // Update active state in dropdowns
+            // Update active state in drawers and dropdowns
             document.querySelectorAll('.genre-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.genre === genre);
             });
 
-            // Update genre button label and active state
+            // Update genre button label and active state - for both desktop and mobile
             document.querySelectorAll('.genre-button').forEach(button => {
                 if (genre !== 'all') {
-                    button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${genre}</span></span>`;
+                    // Don't update the text of the mobile drawer button - it's always just "Genre"
+                    if (button.id !== 'mobile-genre-button') {
+                        button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${genre}</span></span>`;
+                    } else {
+                        button.innerHTML = `<span class="sort-icon">🏷️ ${genre}</span>`;
+                    }
                     button.classList.add('active');
                     document.body.classList.add('sort-by-genre');
                 } else {
@@ -1605,7 +1695,6 @@
             });
 
             // Maintain the current sort method - keep Sort buttons active status
-            // This is what was missing - we need to ensure sort buttons remain active
             document.querySelectorAll('.sort-button').forEach(btn => {
                 if (btn.dataset.sort === currentSortMethod) {
                     btn.classList.add('active');
@@ -1617,36 +1706,38 @@
             // Re-filter media with current search term and sort method
             const currentSearchTerm = document.querySelector('.search-input').value.toLowerCase();
             filterAndSortMedia(currentSearchTerm);
+
+            // Close genre drawer if it's open
+            closeGenreDrawer();
         }
 
         // Add event listeners to sort buttons
         document.querySelectorAll('.sort-button').forEach(button => {
-            button.addEventListener('click', () => {
-                // Regular sort buttons
-                if (button.dataset.sort) {
+            if (button.dataset.sort) {  // Only for actual sort buttons, not genre buttons
+                button.addEventListener('click', () => {
                     setSortMethod(button.dataset.sort);
-                }
 
-                // Close all genre dropdowns
-                document.querySelectorAll('.genre-menu').forEach(menu => {
-                    menu.classList.remove('show');
+                    // Close mobile menu if open
+                    mobileMenu.classList.remove('open');
+
+                    // Scroll to top when sort method changes
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
                 });
-
-                // Close mobile menu if open
-                mobileMenu.classList.remove('open');
-
-                // Scroll to top when sort method changes
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
+            }
         });
 
-        // Add event listeners to genre filter buttons
-        document.querySelectorAll('.genre-button').forEach(button => {
-            button.addEventListener('click', () => {
-                // Toggle the genre dropdown
+        // Handle desktop genre dropdown button clicks
+        document.querySelectorAll('.genre-dropdown .genre-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (checkMobileView()) {
+                    // On mobile, we'll use the drawer instead
+                    return;
+                }
+
+                // Toggle the desktop genre dropdown
                 const dropdown = button.closest('.genre-dropdown');
                 const menu = dropdown.querySelector('.genre-menu');
 
@@ -1670,10 +1761,53 @@
                 }, 0);
 
                 menu.classList.toggle('show');
+                e.stopPropagation(); // Prevent the document click handler from immediately closing it
             });
         });
 
-        // Close genre dropdown when clicking outside
+        // Mobile genre drawer functionality
+        const genreDrawerOverlay = document.querySelector('.genre-drawer-overlay');
+        const genreDrawer = document.querySelector('.genre-drawer');
+        const mobileGenreButton = document.getElementById('mobile-genre-button');
+        const genreDrawerClose = document.querySelector('.genre-drawer-close');
+
+        // Open genre drawer on mobile
+        mobileGenreButton.addEventListener('click', () => {
+            openGenreDrawer();
+
+            // Close mobile menu if open
+            mobileMenu.classList.remove('open');
+        });
+
+        // Close genre drawer when clicking the close button
+        genreDrawerClose.addEventListener('click', closeGenreDrawer);
+
+        // Close genre drawer when clicking the overlay
+        genreDrawerOverlay.addEventListener('click', (e) => {
+            if (e.target === genreDrawerOverlay) {
+                closeGenreDrawer();
+            }
+        });
+
+        // Function to open the genre drawer
+        function openGenreDrawer() {
+            // Make sure drawer content is up to date
+            const activeTab = document.querySelector('.tab.active').dataset.content;
+            updateGenreDrawer(activeTab);
+
+            genreDrawerOverlay.classList.add('open');
+            genreDrawer.classList.add('open');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        // Function to close the genre drawer
+        function closeGenreDrawer() {
+            genreDrawerOverlay.classList.remove('open');
+            genreDrawer.classList.remove('open');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close desktop genre dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.genre-dropdown')) {
                 document.querySelectorAll('.genre-menu').forEach(menu => {
@@ -1706,12 +1840,12 @@
                 }, {});
         }
 
-        // Function to update genre dropdown with available genres
+        // Function to update desktop genre dropdown with available genres
         function updateGenreDropdown(type) {
             const genres = allGenres[type];
             const dropdowns = document.querySelectorAll('.genre-menu');
 
-            // Update all genre menus (desktop and mobile)
+            // Update genre menus (desktop only)
             dropdowns.forEach(dropdown => {
                 // Keep the "All Genres" item
                 dropdown.innerHTML = `<div class="genre-item ${currentGenre === 'all' ? 'active' : ''}" data-genre="all">All Genres</div>`;
@@ -1724,28 +1858,11 @@
                     genreItem.innerHTML = `${genre} <span class="genre-badge">${count}</span>`;
                     dropdown.appendChild(genreItem);
                 });
-
-                // Update genre button label if a genre is selected
-                const genreButton = dropdown.closest('.genre-dropdown').querySelector('.genre-button .sort-icon');
-                if (currentGenre !== 'all') {
-                    genreButton.innerHTML = `🏷️ <span class="selected-genre">${currentGenre}</span>`;
-                } else {
-                    genreButton.textContent = '🏷️ Genre';
-                }
             });
 
-            // Add click event listeners to genre items
-            document.querySelectorAll('.genre-item').forEach(item => {
+            // Add click event listeners to desktop genre items
+            document.querySelectorAll('.genre-menu .genre-item').forEach(item => {
                 item.addEventListener('click', () => {
-                    // Update active state
-                    document.querySelectorAll('.genre-item').forEach(i => {
-                        i.classList.remove('active');
-                    });
-                    document.querySelectorAll(`.genre-item[data-genre="${item.dataset.genre}"]`).forEach(i => {
-                        i.classList.add('active');
-                    });
-
-                    // Set current genre and update UI
                     setGenreFilter(item.dataset.genre);
 
                     // Close dropdown
@@ -1761,14 +1878,62 @@
                 });
             });
 
-            // Make sure sort buttons reflect the current sort method
-            document.querySelectorAll('.sort-button').forEach(btn => {
-                if (btn.dataset.sort === currentSortMethod) {
-                    btn.classList.add('active');
-                } else if (!btn.classList.contains('genre-button')) {
-                    btn.classList.remove('active');
+            // Set button text based on current selection
+            document.querySelectorAll('.genre-button').forEach(button => {
+                if (currentGenre !== 'all' && button.id !== 'mobile-genre-button') {
+                    button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${currentGenre}</span></span>`;
+                    button.classList.add('active');
+                } else {
+                    button.innerHTML = `<span class="sort-icon">🏷️ Genre</span>`;
+                    if (currentGenre === 'all') {
+                        button.classList.remove('active');
+                    } else {
+                        button.classList.add('active');
+                    }
                 }
             });
+        }
+
+        // Function to update mobile genre drawer with available genres
+        function updateGenreDrawer(type) {
+            const genres = allGenres[type];
+            const drawerContent = document.querySelector('.genre-drawer-content');
+
+            // Clear current content
+            drawerContent.innerHTML = '';
+
+            // Add "All Genres" item
+            const allGenresItem = document.createElement('div');
+            allGenresItem.className = `genre-item ${currentGenre === 'all' ? 'active' : ''}`;
+            allGenresItem.dataset.genre = 'all';
+            allGenresItem.innerHTML = 'All Genres';
+            drawerContent.appendChild(allGenresItem);
+
+            // Add each genre with count
+            Object.entries(genres).forEach(([genre, count]) => {
+                const genreItem = document.createElement('div');
+                genreItem.className = `genre-item ${currentGenre === genre ? 'active' : ''}`;
+                genreItem.dataset.genre = genre;
+                genreItem.innerHTML = `${genre} <span class="genre-badge">${count}</span>`;
+                drawerContent.appendChild(genreItem);
+            });
+
+            // Update drawer title
+            const drawerTitle = document.querySelector('.genre-drawer-title');
+            drawerTitle.textContent = `${type === 'movies' ? 'Movie' : 'TV Show'} Genres`;
+
+            // Add click event listeners to drawer genre items
+            document.querySelectorAll('.genre-drawer-content .genre-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    setGenreFilter(item.dataset.genre);
+                });
+            });
+        }
+
+        // Combined function to update both genre UI components
+        function updateGenreUI(type) {
+            updateGenreDropdown(type);
+            updateGenreDrawer(type);
         }
 
         // Enhanced search functionality
@@ -1809,8 +1974,8 @@
                 allGenres.movies = extractGenres(moviesData, 'movies');
                 allGenres.tvshows = extractGenres(tvShowsData, 'tvshows');
 
-                // Initialize genre dropdowns
-                updateGenreDropdown('movies');
+                // Initialize genre UI for both desktop and mobile
+                updateGenreUI('movies');
 
                 // Initial sort and display
                 filterAndSortMedia('');
@@ -1987,7 +2152,6 @@
                         <div class="media-title">${item.title}</div>
                         <div class="media-year">${item.year}</div>
                         <div class="media-added">Added: ${addedDate}</div>
-                        <div class="media-genre">${primaryGenre}</div>
                     </div>
                 `;
 
