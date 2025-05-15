@@ -24,7 +24,7 @@ if [ -f /app/web/index.html ]; then
     # Replace title tag content
     sed -i "s/<title>.*<\/title>/<title>$APP_TITLE<\/title>/" /app/web/index.html
     # Replace h1 content (preserve the logo icon span)
-    sed -i "s/<h1>.*<\/h1>/<h1><span class=\"logo-icon\">🎬<\/span>$APP_TITLE<\/h1>/" /app/web/index.html
+    sed -i "s/<h1>.*<\/h1>/<h1><span class=\"logo-icon\"><img src=\"images\/logo.png\" \/><\/span>$APP_TITLE<\/h1>/" /app/web/index.html
     echo "Title updated successfully"
 else
     echo "Warning: index.html not found in /app/web/"
