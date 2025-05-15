@@ -1902,16 +1902,18 @@
 
             // Set button text based on current selection
             document.querySelectorAll('.genre-button').forEach(button => {
-                if (currentGenre !== 'all' && button.id !== 'mobile-genre-button') {
-                    button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${currentGenre}</span></span>`;
+                if (currentGenre !== 'all') {
+                    if (button.id === 'mobile-genre-button') {
+                        // For mobile button, show genre name directly
+                        button.innerHTML = `<span class="sort-icon">🏷️ ${currentGenre}</span>`;
+                    } else {
+                        // Desktop buttons get the nested span structure
+                        button.innerHTML = `<span class="sort-icon">🏷️ <span class="selected-genre">${currentGenre}</span></span>`;
+                    }
                     button.classList.add('active');
                 } else {
                     button.innerHTML = `<span class="sort-icon">🏷️ Genre</span>`;
-                    if (currentGenre === 'all') {
-                        button.classList.remove('active');
-                    } else {
-                        button.classList.add('active');
-                    }
+                    button.classList.remove('active');
                 }
             });
         }
