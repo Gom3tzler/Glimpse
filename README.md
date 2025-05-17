@@ -9,10 +9,11 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 ## ✨ Features
 
 - **Modern Interface**: Clean, responsive design that works on mobile and desktop
-- **Media Browsing**: View your movies and TV shows with poster art
+- **Media Browsing**: View your Movies and TV Shows with poster art
 - **Search Capability**: Quickly find content across your libraries
 - **Detailed View**: See cast information, genres, and descriptions
 - **Watch Movie Trailers**: Preview content directly from the interface
+- **Random Content Selection**: "Roll the Dice" feature for discovering random Movies or TV Shows
 - **Genre Filters**: Easily filter media by genre
 - **Sort A–Z / Z–A**: Alphabetical sorting
 - **Sort by Date Added (Ascending / Descending)**: Sort media by when it was added
