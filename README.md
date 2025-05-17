@@ -12,6 +12,10 @@ A sleek, responsive web application for browsing and viewing your Plex media lib
 - **Media Browsing**: View your movies and TV shows with poster art
 - **Search Capability**: Quickly find content across your libraries
 - **Detailed View**: See cast information, genres, and descriptions
+- **Watch Movie Trailers**: Preview content directly from the interface
+- **Genre Filters**: Easily filter media by genre
+- **Sort A–Z / Z–A**: Alphabetical sorting
+- **Sort by Date Added (Ascending / Descending)**: Sort media by when it was added
 - **MD5 Checksum Verification**: Only downloads images when they've changed
 - **Dockerized**: Easy deployment with Docker and Docker Compose
 - **Customizable**: Configure update schedule, app title, and more
