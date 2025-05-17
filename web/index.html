@@ -2764,8 +2764,17 @@
         }
 
         .trailer-icon {
-            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        .play-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
 
         /* Trailer Modal */
         .trailer-modal-overlay {
@@ -2920,9 +2929,18 @@
             const modalActions = document.createElement('div');
             modalActions.className = 'modal-actions';
             modalActions.innerHTML = `
-        <button class="watch-trailer-btn">
-            <span class="trailer-icon">▶</span> Watch Trailer
-        </button>
+            <button class="watch-trailer-btn">
+            <span class="trailer-icon" aria-hidden="true">
+                <svg
+                class="play-icon"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                >
+                <path d="M8 5v14l11-7L8 5z" />
+                </svg>
+            </span>
+            Watch Trailer
+            </button>
     `;
             modalTitleSection.appendChild(modalActions);
 
