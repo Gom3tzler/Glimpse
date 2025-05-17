@@ -1,7 +1,7 @@
 // Service Worker for Glimpse Media Viewer
 
-const CACHE_NAME = "glimpse-media-viewer-v6.4";
-const DYNAMIC_CACHE = "glimpse-media-dynamic-v6.4";
+const CACHE_NAME = "glimpse-media-viewer-v6.5";
+const DYNAMIC_CACHE = "glimpse-media-dynamic-v6.5";
 
 // Assets to cache on install
 const STATIC_ASSETS = ["/", "/index.html", "/manifest.json", "/test.html"];
