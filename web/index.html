@@ -2711,7 +2711,8 @@
             }
             @media screen and (max-width: 768px) {
                 .install-button {
-                    margin-left: 8px;
+                    margin-left: 15px;
+                    margin-right: -15px;
                     padding: 6px 12px;
                     font-size: 0.85rem;
                 }
@@ -2929,19 +2930,19 @@
             const modalActions = document.createElement('div');
             modalActions.className = 'modal-actions';
             modalActions.innerHTML = `
-            <button class="watch-trailer-btn">
-            <span class="trailer-icon" aria-hidden="true">
-                <svg
-                class="play-icon"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                >
-                <path d="M8 5v14l11-7L8 5z" />
-                </svg>
-            </span>
-            Watch Trailer
-            </button>
-    `;
+        <button class="watch-trailer-btn">
+        <span class="trailer-icon" aria-hidden="true">
+            <svg
+            class="play-icon"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            >
+            <path d="M8 5v14l11-7L8 5z" />
+            </svg>
+        </span>
+        Watch Trailer
+        </button>
+`;
             modalTitleSection.appendChild(modalActions);
 
             // Get trailer modal elements
@@ -2954,8 +2955,8 @@
             // Check if we're on a mobile device
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-            // Function to open trailer modal with the correct title
-            function openTrailerModal(title) {
+            // Function to open trailer modal with the correct title and year
+            function openTrailerModal(title, year) {
                 // Show the loading indicator
                 trailerLoading.classList.remove('hidden');
 
@@ -2969,10 +2970,10 @@
                 document.body.style.overflow = 'hidden'; // Prevent background scrolling
                 trailerModalOverlay.classList.add('active');
 
-                // Create iframe with the movie title
+                // Create iframe with the movie title AND year
                 const encodedTitle = encodeURIComponent(title);
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://tvtime.dev/glimpse?title=${encodedTitle}&embed=true&autoplay=true`;
+                iframe.src = `https://tvtime.dev/glimpse?title=${encodedTitle}&year=${year}&embed=true&autoplay=true`;
                 iframe.setAttribute('frameborder', '0');
                 iframe.setAttribute('allowfullscreen', 'true');
 
@@ -2996,10 +2997,10 @@
                 iframe.onerror = function () {
                     // Update loading indicator to show error
                     trailerLoading.innerHTML = `
-                <div class="trailer-loading-text" style="color: #ff4444;">
-                    Failed to load trailer. Please try again later.
-                </div>
-            `;
+            <div class="trailer-loading-text" style="color: #ff4444;">
+                Failed to load trailer. Please try again later.
+            </div>
+        `;
                 };
 
                 // Add the new iframe
@@ -3028,9 +3029,9 @@
                         // Reset the loading indicator for next time
                         trailerLoading.classList.remove('hidden');
                         trailerLoading.innerHTML = `
-                    <div class="trailer-spinner"></div>
-                    <div class="trailer-loading-text">Loading trailer...</div>
-                `;
+                <div class="trailer-spinner"></div>
+                <div class="trailer-loading-text">Loading trailer...</div>
+            `;
 
                         // Remove the iframe to stop playback
                         const existingIframe = trailerContainer.querySelector('iframe');
@@ -3077,9 +3078,9 @@
                 if (type === 'movies') {
                     trailerBtn.style.display = 'flex';
 
-                    // Add click event to open trailer
+                    // Add click event to open trailer with both title and year
                     trailerBtn.onclick = () => {
-                        openTrailerModal(item.title);
+                        openTrailerModal(item.title, item.year);
                     };
                 } else {
                     trailerBtn.style.display = 'none';
@@ -3097,6 +3098,574 @@
                 // Also close trailer modal if it's open
                 if (trailerModalOverlay.classList.contains('active')) {
                     closeTrailerModal();
+                }
+            };
+        });
+    </script>
+
+    <!-- Roulette Button HTML will be injected into the header -->
+
+    <!-- Roulette Modal Overlay -->
+    <div class="roulette-overlay">
+        <div class="roulette-modal">
+            <div class="roulette-spinner-container">
+                <div class="roulette-spinner">
+                    <div class="spinner-item"></div>
+                    <div class="spinner-item"></div>
+                    <div class="spinner-item"></div>
+                </div>
+                <div class="finding-text">Finding something for you...</div>
+            </div>
+            <!-- Error buttons only shown when needed -->
+            <div class="roulette-error-buttons" style="display: none;">
+                <button class="roulette-close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Roulette Button Styles */
+        .roulette-button {
+            background-color: var(--primary-color);
+            color: #000;
+            border-radius: 30px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            height: 36px;
+        }
+
+        .roulette-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .roulette-icon {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile styling */
+        @media screen and (max-width: 768px) {
+            .roulette-text {
+                display: none;
+            }
+
+            .roulette-button {
+                padding: 8px;
+                width: 36px;
+                height: 36px;
+                justify-content: center;
+                margin-left: 15px;
+            }
+
+            /* Position inside search box */
+            .search-box {
+                display: flex !important;
+                align-items: center;
+            }
+
+            .search-container {
+                flex: 1;
+            }
+        }
+
+        /* Roulette Overlay Styles */
+        .roulette-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .roulette-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .roulette-modal {
+            background-color: var(--secondary-bg);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(30px);
+            transition: transform 0.3s ease;
+        }
+
+        .roulette-overlay.active .roulette-modal {
+            transform: translateY(0);
+        }
+
+        /* Spinner Animation */
+        .roulette-spinner-container {
+            margin-bottom: 20px;
+        }
+
+        .roulette-spinner {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .spinner-item {
+            width: 18px;
+            height: 18px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .spinner-item:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .spinner-item:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .finding-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light-text);
+            margin-top: 10px;
+        }
+
+        /* Button Styles */
+        .roulette-error-buttons {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .roulette-close-btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: var(--primary-color);
+            color: #000;
+        }
+
+        .roulette-close-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .roulette-modal {
+                width: 95%;
+                padding: 25px 15px;
+            }
+
+            .finding-text {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .roulette-modal {
+                width: 95%;
+                padding: 20px 10px;
+            }
+        }
+
+        /* Hide when modal is open */
+        .modal-overlay.active~.roulette-button,
+        .trailer-modal-overlay.active~.roulette-button,
+        .roulette-overlay.active~.roulette-button {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get elements
+            const rouletteOverlay = document.querySelector('.roulette-overlay');
+            const rouletteModal = document.querySelector('.roulette-modal');
+            const errorButtons = document.querySelector('.roulette-error-buttons');
+            const findingText = document.querySelector('.finding-text');
+
+            // Create and add the roulette button to the header
+            function createRouletteButton() {
+                // Create the button element
+                const rouletteButton = document.createElement('div');
+                rouletteButton.className = 'roulette-button';
+                rouletteButton.innerHTML = `
+                <div class="roulette-icon">🎲</div>
+                <span class="roulette-text">Roll the Dice</span>
+            `;
+
+                // Find the right place to insert it in the header
+                const headerContent = document.querySelector('.header-content');
+                const searchBox = document.querySelector('.search-box');
+                const mobileMenuButton = document.querySelector('.mobile-menu-button');
+
+                // On mobile, insert the button inside the search box after the search container
+                if (window.innerWidth <= 768) {
+                    const searchContainer = searchBox.querySelector('.search-container');
+                    searchBox.appendChild(rouletteButton);
+                } else {
+                    // On desktop, insert before the mobile menu button if it exists, otherwise at the end
+                    if (mobileMenuButton) {
+                        headerContent.insertBefore(rouletteButton, mobileMenuButton);
+                    } else {
+                        headerContent.appendChild(rouletteButton);
+                    }
+                }
+
+                // Add click event listener
+                rouletteButton.addEventListener('click', openRoulette);
+
+                // Handle window resize to reposition the button as needed
+                window.addEventListener('resize', handleResize);
+
+                function handleResize() {
+                    const isMobile = window.innerWidth <= 768;
+
+                    // Reposition button based on screen size
+                    if (isMobile && !searchBox.contains(rouletteButton)) {
+                        // Move to search box for mobile
+                        searchBox.appendChild(rouletteButton);
+                    } else if (!isMobile && searchBox.contains(rouletteButton)) {
+                        // Move back to header for desktop
+                        if (mobileMenuButton) {
+                            headerContent.insertBefore(rouletteButton, mobileMenuButton);
+                        } else {
+                            headerContent.appendChild(rouletteButton);
+                        }
+                    }
+                }
+
+                return rouletteButton;
+            }
+
+            // Create the button
+            const rouletteButton = createRouletteButton();
+
+            // Array to store filtered items based on current view
+            let filteredItems = [];
+            // Track already selected items to avoid repeats
+            let selectedIndices = new Set();
+            // Current content type (movies or tvshows)
+            let currentContentType = '';
+            // Last selected item
+            let lastSelectedItem = null;
+            // Flag to track if the modal was opened via random selection
+            let modalOpenedViaRoulette = false;
+
+            // Messages for the animation
+            const messages = [
+                "Finding something for you...",
+                "Searching for the perfect match...",
+                "How about this one?",
+                "This might be interesting...",
+                "Let's try this one...",
+                "Picking something special...",
+                "Spinning the wheel of entertainment...",
+                "Discovering hidden gems..."
+            ];
+
+            // Function to open the roulette overlay
+            function openRoulette() {
+                // Determine current content type
+                const activeTab = document.querySelector('.tab.active');
+                currentContentType = activeTab ? activeTab.dataset.content : 'movies';
+
+                // Get current filtered data
+                if (currentContentType === 'movies') {
+                    // Get currently visible movies (respecting filters)
+                    const visibleItems = getVisibleItems();
+                    filteredItems = visibleItems.length > 0 ? visibleItems : moviesData;
+                } else {
+                    // Get currently visible TV shows (respecting filters)
+                    const visibleItems = getVisibleItems();
+                    filteredItems = visibleItems.length > 0 ? visibleItems : tvShowsData;
+                }
+
+                // Reset the set if we've seen most of the items
+                if (selectedIndices.size >= filteredItems.length * 0.7) {
+                    selectedIndices.clear();
+                }
+
+                // Show the overlay
+                rouletteOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+
+                // Start the roulette animation
+                startRouletteAnimation();
+            }
+
+            // Function to get visible items in the current view
+            function getVisibleItems() {
+                const visibleItems = [];
+                const mediaItems = document.querySelectorAll('.media-item');
+
+                // Check which grid is currently active
+                const activeContent = document.querySelector('.content.active');
+                if (!activeContent) return [];
+
+                // Get all visible media items in the active grid
+                activeContent.querySelectorAll('.media-item').forEach(item => {
+                    // Only consider visible items
+                    if (getComputedStyle(item).display !== 'none') {
+                        const itemId = item.dataset.id;
+                        const itemType = item.dataset.type;
+
+                        // Find the item in the dataset
+                        const mediaArray = itemType === 'movies' ? moviesData : tvShowsData;
+                        const mediaItem = mediaArray.find(m => m.id === itemId);
+
+                        if (mediaItem) {
+                            visibleItems.push(mediaItem);
+                        }
+                    }
+                });
+
+                return visibleItems;
+            }
+
+            // Function to select a random item
+            function selectRandomItem() {
+                if (filteredItems.length === 0) return null;
+
+                // Find an index we haven't used recently
+                let randomIndex;
+                let attempts = 0;
+                const maxAttempts = filteredItems.length;
+
+                do {
+                    randomIndex = Math.floor(Math.random() * filteredItems.length);
+                    attempts++;
+
+                    // If we've tried too many times, just use any index
+                    if (attempts >= maxAttempts) break;
+                } while (selectedIndices.has(randomIndex));
+
+                // Add this index to our set of used indices
+                selectedIndices.add(randomIndex);
+
+                return filteredItems[randomIndex];
+            }
+
+            // Function to start the roulette animation
+            function startRouletteAnimation() {
+                // Reset the finding text
+                updateFindingText();
+
+                // Start the message changing animation
+                let messageIndex = 0;
+                const messageInterval = setInterval(() => {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                    findingText.textContent = messages[messageIndex];
+                }, 1500);
+
+                // After animation delay, select and show the item
+                setTimeout(() => {
+                    clearInterval(messageInterval);
+
+                    // Select a random item
+                    const selectedItem = selectRandomItem();
+                    lastSelectedItem = selectedItem;
+
+                    if (selectedItem) {
+                        // Close the roulette overlay
+                        closeRoulette();
+
+                        // Set the flag to true before opening the modal
+                        modalOpenedViaRoulette = true;
+
+                        // Use the existing modal to display the selected item
+                        openModal(selectedItem, currentContentType);
+                    } else {
+                        // If no item could be selected, show an error message
+                        findingText.textContent = "No items available to select";
+
+                        // Show the error button
+                        errorButtons.style.display = 'flex';
+                        const closeBtn = document.querySelector('.roulette-close-btn');
+
+                        // Add event listener to close button
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', closeRoulette);
+                        }
+                    }
+                }, 2500); // Animation runs for 2.5 seconds
+            }
+
+            // Function to update the finding text randomly
+            function updateFindingText() {
+                findingText.textContent = messages[Math.floor(Math.random() * messages.length)];
+            }
+
+            // Function to close the roulette overlay
+            function closeRoulette() {
+                rouletteOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+
+                // Hide error buttons if they were shown
+                errorButtons.style.display = 'none';
+            }
+
+            // Button click event listeners
+            // Note: the button click event is now added during button creation
+
+            // Close on overlay click
+            rouletteOverlay.addEventListener('click', function (e) {
+                if (e.target === rouletteOverlay) {
+                    closeRoulette();
+                }
+            });
+
+            // Close with Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && rouletteOverlay.classList.contains('active')) {
+                    closeRoulette();
+                }
+            });
+
+            // Add a button to the modal to try again
+            function addTryAgainToModal() {
+                // Only add the button if the modal was opened via roulette
+                if (!modalOpenedViaRoulette) return;
+
+                // Check if we already added the button
+                if (document.querySelector('.modal-try-again-btn')) return;
+
+                // Create the style for the new button
+                const style = document.createElement('style');
+                style.textContent = `
+                .modal-actions {
+                    display: flex;
+                    margin-top: 15px;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+                
+                .modal-try-again-btn {
+                    background-color: var(--tab-bg);
+                    color: var(--light-text);
+                    border: none;
+                    border-radius: 20px;
+                    padding: 8px 16px;
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    cursor: pointer;
+                    transition: background-color var(--transition-speed);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                /* Fix for mobile layout */
+                @media (max-width: 480px) {
+                    .modal-actions {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                    
+                    .modal-try-again-btn,
+                    .watch-trailer-btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+                
+                .modal-try-again-btn:hover {
+                    background-color: rgba(255, 255, 255, 0.15);
+                }
+                
+                .dice-icon {
+                    font-size: 1.1rem;
+                }
+            `;
+                document.head.appendChild(style);
+
+                // Create the button and add it to the modal actions
+                const tryAgainBtn = document.createElement('button');
+                tryAgainBtn.className = 'modal-try-again-btn';
+                tryAgainBtn.innerHTML = '<span class="dice-icon">🎲</span> Roll Again';
+
+                // Add the event listener
+                tryAgainBtn.addEventListener('click', function () {
+                    // Close the current modal
+                    closeModal();
+
+                    // Open the roulette overlay and start a new selection
+                    setTimeout(() => {
+                        openRoulette();
+                    }, 300);
+                });
+
+                // Add the button to the modal actions
+                const modalActions = document.querySelector('.modal-actions');
+                if (modalActions) {
+                    modalActions.appendChild(tryAgainBtn);
+                }
+            }
+
+            // Override the openModal function to conditionally show the try again button
+            const originalOpenModal = window.openModal;
+            window.openModal = function (item, type) {
+                // Call the original function
+                originalOpenModal(item, type);
+
+                // Only add the button if the modal was opened via roulette
+                if (modalOpenedViaRoulette) {
+                    setTimeout(addTryAgainToModal, 10);
+                }
+            };
+
+            // Override the closeModal function to reset the flag
+            const originalCloseModal = window.closeModal;
+            window.closeModal = function () {
+                // Call the original function
+                originalCloseModal();
+
+                // Reset the flag when the modal is closed
+                modalOpenedViaRoulette = false;
+
+                // Remove the try again button if it exists
+                const tryAgainBtn = document.querySelector('.modal-try-again-btn');
+                if (tryAgainBtn) {
+                    tryAgainBtn.remove();
                 }
             };
         });
