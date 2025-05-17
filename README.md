@@ -65,13 +65,14 @@ environment:
   - PLEX_TOKEN=your-plex-token
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
-  - APP_TITLE=Glimpse # Custom app title
+  - APP_TITLE=Glimpse # Set app title
+  - SORT_BY_DATE_ADDED=false # Sort by date instead of title
 ```
 
 ### 3. Start the Container
 
 ```bash
-docker-compose up -d
+docker-compose up -
 ```
 
 ### 4. Access the Web Interface
