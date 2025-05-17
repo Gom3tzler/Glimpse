@@ -10,6 +10,9 @@ APP_TITLE=${APP_TITLE:-"Glimpse"}
 echo "Using application title: $APP_TITLE"
 # Set default cron schedule if not provided
 CRON_SCHEDULE=${CRON_SCHEDULE:-"0 */6 * * *"}
+# Set default sort method
+SORT_BY_DATE_ADDED=${SORT_BY_DATE_ADDED:-"false"}
+echo "Default sort by date added: $SORT_BY_DATE_ADDED"
 # Find Python path
 PYTHON_PATH=$(which python)
 echo "Python path: $PYTHON_PATH"
@@ -25,7 +28,15 @@ if [ -f /app/web/index.html ]; then
     sed -i "s/<title>.*<\/title>/<title>$APP_TITLE<\/title>/" /app/web/index.html
     # Replace h1 content (preserve the logo icon span)
     sed -i "s/<h1>.*<\/h1>/<h1><span class=\"logo-icon\"><img src=\"images\/logo.png\" \/><\/span>$APP_TITLE<\/h1>/" /app/web/index.html
-    echo "Title updated successfully"
+
+    # Update the default sort method in the JavaScript
+    if [ "$SORT_BY_DATE_ADDED" = "true" ]; then
+        echo "Setting default sort method to date added"
+        # Replace the default sort method in the JavaScript
+        sed -i "s/let currentSortMethod = 'alpha';/let currentSortMethod = 'date';/" /app/web/index.html
+    fi
+
+    echo "Configuration updated successfully"
 else
     echo "Warning: index.html not found in /app/web/"
 fi

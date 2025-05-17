@@ -14,5 +14,6 @@ services:
       - PLEX_TOKEN=your-plex-token
       - CRON_SCHEDULE=0 */6 * * * # Default: every 6 hours
       - TZ=UTC # Set your timezone
-      - APP_TITLE=Glimpse # Default app title, customize as needed
+      - APP_TITLE=Glimpse # Set app title
+      - SORT_BY_DATE_ADDED=false # Sort by date instead of title
     restart: unless-stopped

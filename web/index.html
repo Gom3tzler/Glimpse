@@ -3670,6 +3670,49 @@
             };
         });
     </script>
+
+    <script>
+
+        // Code to add to ensure date sort is properly applied when set as default
+        function applyDefaultSortStyles() {
+            // If current sort method is 'date', update all UI elements accordingly
+            if (currentSortMethod === 'date') {
+                // Add body class for showing added dates
+                document.body.classList.add('sort-by-date');
+
+                // Update all sort buttons to reflect 'date' as the active sort
+                document.querySelectorAll('.sort-button').forEach(btn => {
+                    if (btn.dataset.sort === 'date') {
+                        btn.classList.add('active');
+                        // Update the icon/text
+                        const iconSpan = btn.querySelector('.sort-icon');
+                        if (iconSpan) {
+                            iconSpan.textContent = sortDirection['date'] === 'desc'
+                                ? '📅 Date Added ▼'
+                                : '📅 Date Added ▲';
+                        }
+                    } else if (btn.dataset.sort === 'alpha' && !btn.classList.contains('genre-button')) {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // We need to apply the sort styles early, before data is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Apply default sort styles right after DOM content is loaded
+            setTimeout(applyDefaultSortStyles, 0);
+        });
+
+        // Also maintain the function hook for after media is loaded
+        const originalLoadMedia = loadMedia;
+        loadMedia = async function () {
+            await originalLoadMedia();
+            // Apply styles again after data is loaded to ensure everything is in sync
+            applyDefaultSortStyles();
+        };
+    </script>
+
 </body>
 
 </html>

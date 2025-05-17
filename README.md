@@ -86,13 +86,14 @@ http://your-server:9090
 
 ### Environment Variables
 
-| Variable        | Description                       | Default                       |
-| --------------- | --------------------------------- | ----------------------------- |
-| `PLEX_URL`      | URL of your Plex server           | _Required_                    |
-| `PLEX_TOKEN`    | Authentication token for Plex     | _Required_                    |
-| `CRON_SCHEDULE` | When to update data (cron format) | `0 */6 * * *` (every 6 hours) |
-| `TZ`            | Timezone for scheduled tasks      | `UTC`                         |
-| `APP_TITLE`     | Custom title for the application  | `Glimpse`                     |
+| Variable             | Description                               | Default                       |
+| -------------------- | ----------------------------------------- | ----------------------------- |
+| `PLEX_URL`           | URL of your Plex server                   | _Required_                    |
+| `PLEX_TOKEN`         | Authentication token for Plex             | _Required_                    |
+| `CRON_SCHEDULE`      | When to update data (cron format)         | `0 */6 * * *` (every 6 hours) |
+| `TZ`                 | Timezone for scheduled tasks              | `UTC`                         |
+| `APP_TITLE`          | Custom title for the application          | `Glimpse`                     |
+| `SORT_BY_DATE_ADDED` | Sort items by date added instead of title | `false`                       |
 
 ### Finding Your Plex Token
 
