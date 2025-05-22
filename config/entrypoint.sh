@@ -303,9 +303,9 @@ create_themed_manifest() {
         # Jellyfin themed manifest
         cat >/app/web/manifest.json <<EOF
 {
-  "name": "Glimpse Media Viewer",
-  "short_name": "Glimpse",
-  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "name": "$app_title",
+  "short_name": "$app_title",
+  "description": "A sleek, responsive web application for browsing your Jellyfin media library",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101010",
@@ -330,9 +330,9 @@ EOF
         # Plex themed manifest (default)
         cat >/app/web/manifest.json <<EOF
 {
-  "name": "Glimpse Media Viewer",
-  "short_name": "Glimpse",
-  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "name": "$app_title",
+  "short_name": "$app_title",
+  "description": "A sleek, responsive web application for browsing your Plex media library",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
@@ -400,6 +400,15 @@ apply_jellyfin_theme() {
     # Update manifest.json path if it exists
     sed -i 's|href="/manifest\.json"|href="/manifest-jellyfin.json"|g' "$index_file"
     sed -i 's|href="../manifest\.json"|href="../manifest-jellyfin.json"|g' "$index_file"
+
+    # Update title for main index files (primary server gets indicator too)
+    if [[ "$index_file" == "/app/web/index.html" ]]; then
+        # This is the main index, add Jellyfin indicator
+        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Jellyfin</title>|" "$index_file"
+        echo "Updated main index title to: $clean_title - Jellyfin"
+    fi
 
     # Create temporary file with Jellyfin CSS overrides
     cat >/tmp/jellyfin_theme.css <<'EOF'
@@ -637,17 +646,13 @@ apply_plex_theme() {
     sed -i 's|images/jellyfin/|images/|g' "$index_file"
     sed -i 's|../images/jellyfin/|../images/|g' "$index_file"
 
-    # Fix title - remove any server indicators completely for primary, add only for secondary routes
-    current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-    # Remove any existing server indicators
-    clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
-
-    if [[ "$index_file" == *"/plex/index.html" ]]; then
-        # This is a secondary Plex route, add Plex indicator
-        sed -i "s/<title>.*<\/title>/<title>$clean_title - Plex<\/title>/" "$index_file"
-    else
-        # This is main index or primary server, no server indicator
-        sed -i "s/<title>.*<\/title>/<title>$clean_title<\/title>/" "$index_file"
+    # Update title for main index files (primary server gets indicator too)
+    if [[ "$index_file" == "/app/web/index.html" ]]; then
+        # This is the main index, add Plex indicator
+        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Plex</title>|" "$index_file"
+        echo "Updated main index title to: $clean_title - Plex"
     fi
 
     # Add comprehensive Plex theme CSS to ensure all elements use Plex colors
@@ -873,8 +878,25 @@ create_server_index() {
     local data_path=$2
     local output_file=$3
 
+    echo "Creating server index for $server_type at $output_file"
+
     # Copy the main index.html as a template
     cp /app/web/index.html "$output_file"
+
+    # Set the title immediately based on the route type
+    if [[ "$output_file" == *"/plex/index.html" ]]; then
+        # This is a Plex secondary route
+        current_title=$(grep -o '<title>[^<]*</title>' "$output_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Plex</title>|" "$output_file"
+        echo "Set Plex secondary route title: $clean_title - Plex"
+    elif [[ "$output_file" == *"/jellyfin/index.html" ]]; then
+        # This is a Jellyfin secondary route
+        current_title=$(grep -o '<title>[^<]*</title>' "$output_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Jellyfin</title>|" "$output_file"
+        echo "Set Jellyfin secondary route title: $clean_title - Jellyfin"
+    fi
 
     # For sub-directory routes, we need to use relative paths from the sub-directory
     if [ "$output_file" != "/app/web/index.html" ]; then
