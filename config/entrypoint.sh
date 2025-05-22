@@ -50,6 +50,57 @@ fi
 # Apply cron job
 crontab /etc/cron.d/media-cron
 
+# Migrate existing data to new structure for backward compatibility
+migrate_existing_data() {
+    echo "Checking for existing data to migrate..."
+
+    # Check if there are files directly in /app/data that should be moved to /app/data/plex
+    if [ -f "/app/data/movies.json" ] || [ -f "/app/data/tvshows.json" ] || [ -d "/app/data/posters" ] || [ -d "/app/data/backdrops" ]; then
+        echo "Found existing Plex data in /app/data - migrating to /app/data/plex/"
+
+        # Create plex directory if it doesn't exist
+        mkdir -p /app/data/plex
+
+        # Move JSON files
+        if [ -f "/app/data/movies.json" ]; then
+            echo "Moving movies.json to plex directory"
+            mv /app/data/movies.json /app/data/plex/
+        fi
+
+        if [ -f "/app/data/tvshows.json" ]; then
+            echo "Moving tvshows.json to plex directory"
+            mv /app/data/tvshows.json /app/data/plex/
+        fi
+
+        # Move image directories
+        if [ -d "/app/data/posters" ]; then
+            echo "Moving posters directory to plex directory"
+            mv /app/data/posters /app/data/plex/
+        fi
+
+        if [ -d "/app/data/backdrops" ]; then
+            echo "Moving backdrops directory to plex directory"
+            mv /app/data/backdrops /app/data/plex/
+        fi
+
+        # Move checksums file if it exists
+        if [ -f "/app/data/checksums.pkl" ]; then
+            echo "Moving checksums.pkl to plex directory"
+            mv /app/data/checksums.pkl /app/data/plex/
+        fi
+
+        echo "Migration completed successfully"
+
+        # Set permissions on moved files
+        chown -R www-data:www-data /app/data/plex/ 2>/dev/null || echo "Note: Could not set permissions on migrated files"
+    else
+        echo "No existing data found to migrate"
+    fi
+}
+
+# Run migration before setting up new structure
+migrate_existing_data
+
 # Create directory structure for both servers
 mkdir -p /app/web/plex
 mkdir -p /app/web/jellyfin
