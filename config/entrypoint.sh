@@ -141,8 +141,12 @@ remove_server_toggle() {
     local index_file=$1
     echo "Removing server toggle from $index_file"
 
-    # Remove the server toggle div and its contents
+    # Remove the desktop server toggle div and its contents
     sed -i '/<div class="server-toggle">/,/<\/div>/d' "$index_file"
+
+    # Remove the mobile server toggle button
+    sed -i '/<!-- Mobile Server Toggle/,/>/d' "$index_file"
+    sed -i '/<button class="sort-button server-toggle-button"/d' "$index_file"
 
     # Remove the server toggle CSS
     sed -i '/\/\* Server Toggle Styles \*\//,/}/d' "$index_file"

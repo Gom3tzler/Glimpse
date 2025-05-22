@@ -1387,14 +1387,37 @@
                 font-size: 0.8rem;
             }
 
-            .server-text {
+            /* Hide text for DESKTOP mobile toggle, but show for mobile menu */
+            .server-toggle .server-text {
                 display: none;
+            }
+
+            /* Show text for mobile menu toggle */
+            .mobile-menu .server-toggle-button .server-text {
+                display: inline !important;
+            }
+
+            .mobile-menu .server-toggle-button {
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+                padding: 10px;
             }
         }
 
         @media screen and (max-width: 480px) {
             .server-toggle-button {
                 padding: 6px 8px;
+            }
+        }
+
+        /* Mobile server toggle styling */
+        @media screen and (max-width: 768px) {
+            .mobile-menu .server-toggle-button {
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+                padding: 10px;
             }
         }
     </style>
@@ -1465,6 +1488,12 @@
             <!-- Mobile Genre button - now triggers drawer -->
             <button class="sort-button genre-button" id="mobile-genre-button">
                 <span class="sort-icon">🏷️ Genre</span>
+            </button>
+            <!-- Mobile Server Toggle (only shows when both servers configured) -->
+            <button class="sort-button server-toggle-button"
+                onclick="toggleServer(); mobileMenu.classList.remove('open');">
+                <span class="server-icon">🔄</span>
+                <span class="server-text">Switch to SERVER_NAME</span>
             </button>
         </div>
     </div>
