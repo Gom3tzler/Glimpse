@@ -4,21 +4,52 @@ set -e
 # Set default primary server
 PRIMARY_SERVER=${PRIMARY_SERVER:-"plex"}
 
-# Check for required environment variables based on primary server
+# Smart primary server detection based on available credentials
+original_primary_server="$PRIMARY_SERVER"
+
+# Auto-detect and correct PRIMARY_SERVER based on available credentials
 if [ "$PRIMARY_SERVER" = "plex" ]; then
     if [ -z "$PLEX_URL" ] || [ -z "$PLEX_TOKEN" ]; then
-        echo "Error: PLEX_URL and PLEX_TOKEN environment variables must be set when PRIMARY_SERVER=plex"
-        exit 1
+        if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'plex' but only Jellyfin credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'jellyfin'"
+            PRIMARY_SERVER="jellyfin"
+        else
+            echo "Error: PRIMARY_SERVER=plex but no valid credentials provided for any server"
+            exit 1
+        fi
     fi
 elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
     if [ -z "$JELLYFIN_URL" ] || [ -z "$JELLYFIN_TOKEN" ]; then
-        echo "Error: JELLYFIN_URL and JELLYFIN_TOKEN environment variables must be set when PRIMARY_SERVER=jellyfin"
-        exit 1
+        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'jellyfin' but only Plex credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'plex'"
+            PRIMARY_SERVER="plex"
+        else
+            echo "Error: PRIMARY_SERVER=jellyfin but no valid credentials provided for any server"
+            exit 1
+        fi
     fi
 else
-    echo "Error: PRIMARY_SERVER must be either 'plex' or 'jellyfin'"
-    exit 1
+    # If PRIMARY_SERVER is not set or invalid, auto-detect
+    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+        echo "PRIMARY_SERVER not set or invalid, defaulting to 'plex' based on available credentials"
+        PRIMARY_SERVER="plex"
+    elif [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        echo "PRIMARY_SERVER not set or invalid, defaulting to 'jellyfin' based on available credentials"
+        PRIMARY_SERVER="jellyfin"
+    else
+        echo "Error: No valid credentials provided for any media server"
+        echo "Please set PLEX_URL/PLEX_TOKEN or JELLYFIN_URL/JELLYFIN_TOKEN"
+        exit 1
+    fi
 fi
+
+# Log the final decision
+if [ "$original_primary_server" != "$PRIMARY_SERVER" ]; then
+    echo "PRIMARY_SERVER changed from '$original_primary_server' to '$PRIMARY_SERVER'"
+fi
+echo "Using PRIMARY_SERVER: $PRIMARY_SERVER"
 
 # Set default app title if not provided
 APP_TITLE=${APP_TITLE:-"Glimpse"}
