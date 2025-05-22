@@ -181,14 +181,16 @@ apply_jellyfin_theme() {
         .tab:hover:not(.active),
         .sort-button:hover:not(.active),
         .genre-button:hover:not(.active),
-        .server-toggle-button:hover {
+        .server-toggle-button:hover,
+        .roulette-button:hover,
+        .modal-try-again-btn:hover {
             background-color: rgba(0, 164, 220, 0.2) !important;
         }
         
-        /* Jellyfin media item hover */
+        /* Jellyfin media item hover - remove glow */
         .media-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 164, 220, 0.3) !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
         }
         
         /* Jellyfin scroll indicators */
@@ -205,6 +207,60 @@ apply_jellyfin_theme() {
         .header {
             background-color: #141414 !important;
             border-bottom: 1px solid rgba(0, 164, 220, 0.2);
+        }
+        
+        /* Jellyfin search input styling */
+        .search-input {
+            background-color: rgba(24, 24, 24, 0.8) !important;
+            border: 1px solid rgba(0, 164, 220, 0.3) !important;
+            color: #ffffff !important;
+        }
+        
+        .search-input:focus {
+            background-color: rgba(24, 24, 24, 0.9) !important;
+            box-shadow: 0 0 0 2px rgba(0, 164, 220, 0.4) !important;
+            border-color: rgba(0, 164, 220, 0.6) !important;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        
+        .search-clear {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        
+        .search-clear:hover {
+            color: #00a4dc !important;
+            background-color: rgba(0, 164, 220, 0.1) !important;
+        }
+        
+        /* Jellyfin genre styling */
+        .genre-tag {
+            background-color: rgba(0, 164, 220, 0.15) !important;
+            border: 1px solid rgba(0, 164, 220, 0.3) !important;
+            color: #00a4dc !important;
+        }
+        
+        .genre-tag:hover {
+            background-color: rgba(0, 164, 220, 0.25) !important;
+            border-color: rgba(0, 164, 220, 0.5) !important;
+        }
+        
+        /* Jellyfin genre dropdown/drawer styling */
+        .genre-menu,
+        .genre-drawer {
+            background-color: #181818 !important;
+            border: 1px solid rgba(0, 164, 220, 0.2) !important;
+        }
+        
+        .genre-item:hover {
+            background-color: rgba(0, 164, 220, 0.15) !important;
+        }
+        
+        .genre-item.active {
+            background-color: rgba(0, 164, 220, 0.2) !important;
+            color: #00a4dc !important;
         }
 EOF
 
