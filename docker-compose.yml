@@ -10,8 +10,18 @@ services:
       - ./data:/app/data
       # - ./logo.png:/app/web/images/logo.png # Add your logo.png file and uncomment this line to customize the logo
     environment:
+      # Primary Media Server Configuration
+      - PRIMARY_SERVER=plex # Options: plex, jellyfin
+
+      # Plex Configuration
       - PLEX_URL=http://your-plex-server:32400
       - PLEX_TOKEN=your-plex-token
+
+      # Jellyfin Configuration
+      - JELLYFIN_URL=http://your-jellyfin-server:8096
+      - JELLYFIN_TOKEN=your-jellyfin-api-token
+
+      # General Configuration
       - CRON_SCHEDULE=0 */6 * * * # Default: every 6 hours
       - TZ=UTC # Set your timezone
       - APP_TITLE=Glimpse # Set app title
