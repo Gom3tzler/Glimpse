@@ -136,6 +136,45 @@ migrate_existing_data
 mkdir -p /app/web/plex
 mkdir -p /app/web/jellyfin
 
+# Function to remove server toggle if not needed
+remove_server_toggle() {
+    local index_file=$1
+    echo "Removing server toggle from $index_file"
+
+    # Remove the server toggle div and its contents
+    sed -i '/<div class="server-toggle">/,/<\/div>/d' "$index_file"
+
+    # Remove the server toggle CSS
+    sed -i '/\/\* Server Toggle Styles \*\//,/}/d' "$index_file"
+
+    # Remove the server toggle JavaScript function
+    sed -i '/\/\/ Server toggle functionality/,/}/d' "$index_file"
+}
+
+# Function to update server toggle text and path
+update_server_toggle() {
+    local index_file=$1
+    local switch_to_server=$2
+    local switch_to_path=$3
+
+    echo "Updating server toggle in $index_file: Switch to $switch_to_server"
+
+    # First, reset any existing toggle text back to placeholders
+    sed -i 's/Switch to Plex/Switch to SERVER_NAME/g' "$index_file"
+    sed -i 's/Switch to Jellyfin/Switch to SERVER_NAME/g' "$index_file"
+
+    # Reset ONLY the toggle button path, not the data paths
+    # Look for the specific pattern in the toggleServer function
+    sed -i 's/newPath = "[^"]*";/newPath = "SERVER_PATH\/";/g' "$index_file"
+
+    # Now update with the correct values
+    sed -i "s/Switch to SERVER_NAME/Switch to $switch_to_server/g" "$index_file"
+
+    # Update the path - escape forward slashes to avoid sed delimiter issues
+    local escaped_path=$(echo "$switch_to_path" | sed 's/\//\\\//g')
+    sed -i "s/SERVER_PATH/$escaped_path/g" "$index_file"
+}
+
 # Function to create index.html for a specific server
 create_server_index() {
     local server_type=$1
@@ -226,15 +265,51 @@ if [ -f /app/web/index.html ]; then
         sed -i "s|data/backdrops/|data/jellyfin/backdrops/|g" /app/web/index.html
     fi
 
-    # Create secondary server index files - always point to their specific directories
+    # Handle server toggle based on configuration
+    # Check if both servers are configured
+    both_servers_configured=false
+    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ] && [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        both_servers_configured=true
+        echo "Both servers configured - keeping server toggle functionality"
+
+        # Update the toggle button text based on primary server for main index
+        if [ "$PRIMARY_SERVER" = "plex" ]; then
+            # Main index shows Plex, so switch to Jellyfin
+            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin"
+        else
+            # Main index shows Jellyfin, so switch to Plex
+            update_server_toggle "/app/web/index.html" "Plex" "plex"
+        fi
+    else
+        echo "Only one server configured - removing server toggle functionality"
+        remove_server_toggle "/app/web/index.html"
+    fi
+
+    # Create secondary server index files
     # Plex route always points to data/plex/
     if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
         create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+
+        # Update toggle for plex route if both servers configured
+        if [ "$both_servers_configured" = true ]; then
+            # When viewing Plex, show "Switch to Jellyfin"
+            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../jellyfin"
+        else
+            remove_server_toggle "/app/web/plex/index.html"
+        fi
     fi
 
     # Jellyfin route always points to data/jellyfin/
     if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
         create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+
+        # Update toggle for jellyfin route if both servers configured
+        if [ "$both_servers_configured" = true ]; then
+            # When viewing Jellyfin, show "Switch to Plex"
+            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../plex"
+        else
+            remove_server_toggle "/app/web/jellyfin/index.html"
+        fi
     fi
 
     echo "Configuration updated successfully"

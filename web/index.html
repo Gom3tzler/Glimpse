@@ -1344,6 +1344,59 @@
             border-radius: 20%;
             margin-top: 15px;
         }
+
+        /* Server Toggle Styles */
+        .server-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .server-toggle-button {
+            background-color: var(--tab-bg);
+            color: var(--light-text);
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .server-toggle-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .server-icon {
+            font-size: 1rem;
+        }
+
+        @media screen and (max-width: 768px) {
+            .server-toggle {
+                margin-left: 10px;
+            }
+
+            .server-toggle-button {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .server-text {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .server-toggle-button {
+                padding: 6px 8px;
+            }
+        }
     </style>
 </head>
 
@@ -1379,6 +1432,13 @@
                             <div class="genre-item active" data-genre="all">All Genres</div>
                             <!-- Genre items will be populated dynamically -->
                         </div>
+                    </div>
+                    <!-- Server Toggle (only shows when both servers configured) -->
+                    <div class="server-toggle">
+                        <button class="server-toggle-button" onclick="toggleServer()">
+                            <span class="server-icon">🔄</span>
+                            <span class="server-text">Switch to SERVER_NAME</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2632,6 +2692,25 @@
                 }
             }
         }
+
+        // Server toggle functionality
+        function toggleServer() {
+            const currentPath = window.location.pathname;
+            let newPath;
+
+            if (currentPath === "/" || currentPath === "/index.html") {
+                newPath = "SERVER_PATH/";
+            } else if (currentPath.startsWith("/plex/")) {
+                newPath = "/jellyfin/";
+            } else if (currentPath.startsWith("/jellyfin/")) {
+                newPath = "/plex/";
+            } else {
+                newPath = "SERVER_PATH/";
+            }
+
+            window.location.href = newPath;
+        }
+
     </script>
 
     <script>
