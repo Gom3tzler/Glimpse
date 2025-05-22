@@ -136,7 +136,110 @@ migrate_existing_data
 mkdir -p /app/web/plex
 mkdir -p /app/web/jellyfin
 
-# Function to remove server toggle if not needed
+# Function to apply Jellyfin theme to index file
+apply_jellyfin_theme() {
+    local index_file=$1
+    echo "Applying Jellyfin theme to $index_file"
+
+    # Create temporary file with Jellyfin CSS overrides
+    cat >/tmp/jellyfin_theme.css <<'EOF'
+
+        /* Jellyfin Theme Overrides */
+        :root {
+            --primary-color: #00a4dc;
+            --primary-hover: #0288c2;
+            --primary-light: rgba(0, 164, 220, 0.1);
+            --bg-color: #101010;
+            --secondary-bg: #181818;
+            --header-bg: #141414;
+            --tab-bg: #252525;
+        }
+        
+        /* Ensure full screen coverage without affecting layout */
+        html {
+            min-height: 100vh;
+        }
+        
+        /* Jellyfin gradient background */
+        body {
+            background: linear-gradient(135deg, #101010 0%, #181818 50%, #1a1a2e 100%) !important;
+            background-attachment: fixed !important;
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh;
+        }
+        
+        /* Jellyfin accent color for active elements */
+        .tab.active,
+        .sort-button.active,
+        .genre-button.active {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+            color: white !important;
+        }
+        
+        /* Jellyfin hover effects */
+        .tab:hover:not(.active),
+        .sort-button:hover:not(.active),
+        .genre-button:hover:not(.active),
+        .server-toggle-button:hover {
+            background-color: rgba(0, 164, 220, 0.2) !important;
+        }
+        
+        /* Jellyfin media item hover */
+        .media-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 164, 220, 0.3) !important;
+        }
+        
+        /* Jellyfin scroll indicators */
+        .scroll-to-top {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+        }
+        
+        /* Jellyfin modal backdrop */
+        .modal-backdrop::after {
+            background: linear-gradient(to bottom, rgba(16, 16, 16, 0.3) 0%, #101010 100%) !important;
+        }
+        
+        /* Jellyfin header styling */
+        .header {
+            background-color: #141414 !important;
+            border-bottom: 1px solid rgba(0, 164, 220, 0.2);
+        }
+EOF
+
+    # Insert Jellyfin theme CSS after the existing styles but before closing </style>
+    sed -i '/<\/style>/e cat /tmp/jellyfin_theme.css' "$index_file"
+
+    # Update the app title in browser tab if we're theming the main index
+    if [[ "$index_file" == *"/index.html" ]] && [[ "$index_file" != *"/jellyfin/index.html" ]]; then
+        # Get current title and add Jellyfin indicator
+        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        if [[ "$current_title" != *"Jellyfin"* ]]; then
+            sed -i "s/<title>$current_title<\/title>/<title>$current_title - Jellyfin<\/title>/" "$index_file"
+        fi
+    fi
+
+    # Clean up temporary file
+    rm -f /tmp/jellyfin_theme.css
+}
+
+# Function to apply Plex theme (default/existing theme)
+apply_plex_theme() {
+    local index_file=$1
+    echo "Applying Plex theme to $index_file (default colors)"
+
+    # Update the app title in browser tab if we're theming the main index
+    if [[ "$index_file" == *"/index.html" ]] && [[ "$index_file" != *"/plex/index.html" ]]; then
+        # Get current title and add Plex indicator
+        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        if [[ "$current_title" != *"Plex"* ]]; then
+            sed -i "s/<title>$current_title<\/title>/<title>$current_title - Plex<\/title>/" "$index_file"
+        fi
+    fi
+
+    # Plex uses the default theme, so no additional CSS needed
+}
 remove_server_toggle() {
     local index_file=$1
     echo "Removing server toggle from $index_file"
@@ -303,17 +406,26 @@ if [ -f /app/web/index.html ]; then
         both_servers_configured=true
         echo "Both servers configured - keeping server toggle functionality"
 
-        # Update the toggle button for main index (always switches to secondary server)
+        # Update the toggle button for main index and apply theme
         if [ "$PRIMARY_SERVER" = "plex" ]; then
             # Main index shows Plex, so switch to Jellyfin (secondary)
             update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
+            apply_plex_theme "/app/web/index.html"
         else
             # Main index shows Jellyfin, so switch to Plex (secondary)
             update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
+            apply_jellyfin_theme "/app/web/index.html"
         fi
     else
         echo "Only one server configured - removing server toggle functionality"
         remove_server_toggle "/app/web/index.html"
+
+        # Apply theme based on single server type
+        if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
+            apply_jellyfin_theme "/app/web/index.html"
+        else
+            apply_plex_theme "/app/web/index.html"
+        fi
     fi
 
     # Create route ONLY for secondary servers
@@ -324,12 +436,14 @@ if [ -f /app/web/index.html ]; then
             create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
             # When viewing secondary Jellyfin, switch back to primary (root)
             update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
+            apply_jellyfin_theme "/app/web/jellyfin/index.html"
         else
             # Jellyfin is primary, so create Plex route only
             echo "Creating secondary server route: /plex/"
             create_server_index "plex" "data/plex" "/app/web/plex/index.html"
             # When viewing secondary Plex, switch back to primary (root)
             update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
+            apply_plex_theme "/app/web/plex/index.html"
         fi
     else
         # Single server setup - no secondary routes needed
