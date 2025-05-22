@@ -2722,8 +2722,8 @@
             }
         }
 
-        // Server toggle functionality
-        function toggleServer() {
+        // Server toggle functionality with cache clearing
+        async function toggleServer() {
             const currentPath = window.location.pathname;
             let newPath;
 
@@ -2737,6 +2737,28 @@
                 newPath = "SERVER_PATH/";
             }
 
+            // Clear themed cache in service worker before navigating
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                try {
+                    // Create a message channel to communicate with the service worker
+                    const messageChannel = new MessageChannel();
+
+                    // Send message to clear themed cache
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'CLEAR_THEMED_CACHE' },
+                        [messageChannel.port2]
+                    );
+
+                    // Wait for confirmation (optional, but good practice)
+                    messageChannel.port1.onmessage = (event) => {
+                        console.log('Service Worker cache cleared:', event.data);
+                    };
+                } catch (error) {
+                    console.log('Could not clear service worker cache:', error);
+                }
+            }
+
+            // Navigate to the new path
             window.location.href = newPath;
         }
 

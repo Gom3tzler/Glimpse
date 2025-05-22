@@ -136,23 +136,283 @@ migrate_existing_data
 mkdir -p /app/web/plex
 mkdir -p /app/web/jellyfin
 
-# Function to apply Jellyfin theme to index file
+# Function to create themed offline.html
+create_themed_offline() {
+    local server_type=$1
+    local app_title=$2
+
+    echo "Creating $server_type themed offline.html"
+
+    if [ "$server_type" = "jellyfin" ]; then
+        # Jellyfin themed offline page
+        cat >/app/web/offline.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - REPLACE_APP_TITLE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #101010 0%, #181818 50%, #1a1a2e 100%);
+            background-attachment: fixed;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+        }
+        h1 {
+            color: #00a4dc;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 30px;
+            filter: hue-rotate(200deg);
+        }
+        button {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 164, 220, 0.3);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #0288c2, #6a5acd);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 164, 220, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📶</div>
+        <h1>You're Offline</h1>
+        <p>It looks like you're not connected to the internet. REPLACE_APP_TITLE needs a connection to show your Jellyfin content.</p>
+        <button onclick="window.location.reload()">Try Again</button>
+    </div>
+</body>
+</html>
+EOF
+    else
+        # Plex themed offline page (default)
+        cat >/app/web/offline.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - REPLACE_APP_TITLE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+        }
+        h1 {
+            color: #e5a00d;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #e5a00d;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #f1b020;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📶</div>
+        <h1>You're Offline</h1>
+        <p>It looks like you're not connected to the internet. REPLACE_APP_TITLE needs a connection to show your Plex content.</p>
+        <button onclick="window.location.reload()">Try Again</button>
+    </div>
+</body>
+</html>
+EOF
+    fi
+
+    # Replace the app title placeholder
+    sed -i "s/REPLACE_APP_TITLE/$app_title/g" /app/web/offline.html
+
+    # Set proper permissions
+    chown www-data:www-data /app/web/offline.html 2>/dev/null || echo "Note: Could not set permissions on offline.html"
+}
+
+create_themed_manifest() {
+    local server_type=$1
+    local app_title=$2
+
+    echo "Creating $server_type themed manifest.json"
+
+    if [ "$server_type" = "jellyfin" ]; then
+        # Jellyfin themed manifest
+        cat >/app/web/manifest.json <<EOF
+{
+  "name": "Glimpse Media Viewer",
+  "short_name": "Glimpse",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#101010",
+  "theme_color": "#00a4dc",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/jellyfin/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/jellyfin/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+EOF
+    else
+        # Plex themed manifest (default)
+        cat >/app/web/manifest.json <<EOF
+{
+  "name": "Glimpse Media Viewer",
+  "short_name": "Glimpse",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#e5a00d",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+EOF
+    fi
+
+    # Set proper permissions
+    chown www-data:www-data /app/web/manifest.json 2>/dev/null || echo "Note: Could not set permissions on manifest.json"
+
+    # Also update the HTML meta theme-color tag
+    if [ -f /app/web/index.html ]; then
+        if [ "$server_type" = "jellyfin" ]; then
+            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#00a4dc">/' /app/web/index.html
+        else
+            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#e5a00d">/' /app/web/index.html
+        fi
+    fi
+}
+
 apply_jellyfin_theme() {
     local index_file=$1
     echo "Applying Jellyfin theme to $index_file"
+
+    # Update image paths to point to jellyfin directory
+    echo "Updating image paths to use jellyfin directory"
+
+    # Update logo image path - be specific to avoid double replacement
+    sed -i 's|src="images/logo\.png"|src="images/jellyfin/logo.png"|g' "$index_file"
+    sed -i 's|src="../images/logo\.png"|src="../images/jellyfin/logo.png"|g' "$index_file"
+
+    # Update specific favicon and meta tag images
+    sed -i 's|href="images/android-chrome-192x192\.png"|href="images/jellyfin/android-chrome-192x192.png"|g' "$index_file"
+    sed -i 's|href="/images/android-chrome-192x192\.png"|href="/images/jellyfin/android-chrome-192x192.png"|g' "$index_file"
+    sed -i 's|href="../images/android-chrome-192x192\.png"|href="../images/jellyfin/android-chrome-192x192.png"|g' "$index_file"
+
+    sed -i 's|href="images/android-chrome-592x592\.png"|href="images/jellyfin/android-chrome-592x592.png"|g' "$index_file"
+    sed -i 's|href="/images/android-chrome-592x592\.png"|href="/images/jellyfin/android-chrome-592x592.png"|g' "$index_file"
+    sed -i 's|href="../images/android-chrome-592x592\.png"|href="../images/jellyfin/android-chrome-592x592.png"|g' "$index_file"
+
+    sed -i 's|href="images/apple-touch-icon\.png"|href="images/jellyfin/apple-touch-icon.png"|g' "$index_file"
+    sed -i 's|href="../images/apple-touch-icon\.png"|href="../images/jellyfin/apple-touch-icon.png"|g' "$index_file"
+
+    sed -i 's|href="images/favicon-32x32\.png"|href="images/jellyfin/favicon-32x32.png"|g' "$index_file"
+    sed -i 's|href="../images/favicon-32x32\.png"|href="../images/jellyfin/favicon-32x32.png"|g' "$index_file"
+
+    sed -i 's|href="images/favicon-16x16\.png"|href="images/jellyfin/favicon-16x16.png"|g' "$index_file"
+    sed -i 's|href="../images/favicon-16x16\.png"|href="../images/jellyfin/favicon-16x16.png"|g' "$index_file"
+
+    # Update manifest.json path if it exists
+    sed -i 's|href="/manifest\.json"|href="/manifest-jellyfin.json"|g' "$index_file"
+    sed -i 's|href="../manifest\.json"|href="../manifest-jellyfin.json"|g' "$index_file"
 
     # Create temporary file with Jellyfin CSS overrides
     cat >/tmp/jellyfin_theme.css <<'EOF'
 
         /* Jellyfin Theme Overrides */
         :root {
-            --primary-color: #00a4dc;
-            --primary-hover: #0288c2;
-            --primary-light: rgba(0, 164, 220, 0.1);
-            --bg-color: #101010;
-            --secondary-bg: #181818;
-            --header-bg: #141414;
-            --tab-bg: #252525;
+            --primary-color: #00a4dc !important;
+            --primary-hover: #0288c2 !important;
+            --primary-light: rgba(0, 164, 220, 0.1) !important;
+            --bg-color: #101010 !important;
+            --secondary-bg: #181818 !important;
+            --header-bg: #141414 !important;
+            --tab-bg: #252525 !important;
         }
         
         /* Ensure full screen coverage without affecting layout */
@@ -187,15 +447,26 @@ apply_jellyfin_theme() {
             background-color: rgba(0, 164, 220, 0.2) !important;
         }
         
-        /* Jellyfin media item hover - remove glow */
+        /* Jellyfin media item hover - no glow, better contrast */
         .media-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
         }
         
+        /* Jellyfin poster container - better contrast against dark background */
+        .poster-container,
+        .media-item {
+            background-color: #252525 !important;
+        }
+        
         /* Jellyfin scroll indicators */
         .scroll-to-top {
             background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+            color: #ffffff !important;
+        }
+        
+        .scroll-to-top:hover {
+            background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
         }
         
         /* Jellyfin modal backdrop */
@@ -206,7 +477,7 @@ apply_jellyfin_theme() {
         /* Jellyfin header styling */
         .header {
             background-color: #141414 !important;
-            border-bottom: 1px solid rgba(0, 164, 220, 0.2);
+            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
         }
         
         /* Jellyfin search input styling */
@@ -262,6 +533,78 @@ apply_jellyfin_theme() {
             background-color: rgba(0, 164, 220, 0.2) !important;
             color: #00a4dc !important;
         }
+        
+        /* Jellyfin modal styling */
+        .modal-content {
+            background-color: #181818 !important;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
+        }
+        
+        .modal-title {
+            color: #ffffff !important;
+        }
+        
+        .modal-year {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        
+        .metadata-item {
+            background-color: rgba(0, 164, 220, 0.15) !important;
+            color: #ffffff !important;
+        }
+        
+        .modal-section-title {
+            color: #00a4dc !important;
+        }
+        
+        .cast-item {
+            background-color: rgba(0, 164, 220, 0.08) !important;
+        }
+        
+        .cast-name {
+            color: #ffffff !important;
+        }
+        
+        .cast-role {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        
+        /* Jellyfin trailer button */
+        .watch-trailer-btn {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+            color: #ffffff !important;
+        }
+        
+        .watch-trailer-btn:hover {
+            background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
+        }
+        
+        /* Jellyfin mobile menu */
+        .mobile-menu {
+            background-color: #141414 !important;
+        }
+        
+        /* Jellyfin tabs styling */
+        .tab {
+            background-color: #252525 !important;
+        }
+        
+        .sort-button,
+        .genre-button {
+            background-color: #252525 !important;
+        }
+        
+        /* Jellyfin genre drawer styling */
+        .genre-drawer {
+            background-color: #181818 !important;
+        }
+        
+        .genre-drawer-header {
+            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
+        }
 EOF
 
     # Insert Jellyfin theme CSS after the existing styles but before closing </style>
@@ -285,17 +628,196 @@ apply_plex_theme() {
     local index_file=$1
     echo "Applying Plex theme to $index_file (default colors)"
 
-    # Update the app title in browser tab if we're theming the main index
-    if [[ "$index_file" == *"/index.html" ]] && [[ "$index_file" != *"/plex/index.html" ]]; then
-        # Get current title and add Plex indicator
-        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        if [[ "$current_title" != *"Plex"* ]]; then
-            sed -i "s/<title>$current_title<\/title>/<title>$current_title - Plex<\/title>/" "$index_file"
-        fi
+    # Remove any existing Jellyfin theme overrides completely
+    sed -i '/\/\* Jellyfin Theme Overrides \*\//,/^        }$/d' "$index_file"
+    # Also remove any remaining jellyfin theme blocks that might have different formatting
+    sed -i '/\/\* Jellyfin Theme Overrides \*\//,/^    }$/d' "$index_file"
+
+    # Reset any image paths that might have been changed to jellyfin
+    sed -i 's|images/jellyfin/|images/|g' "$index_file"
+    sed -i 's|../images/jellyfin/|../images/|g' "$index_file"
+
+    # Fix title - remove any server indicators completely for primary, add only for secondary routes
+    current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+    # Remove any existing server indicators
+    clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+
+    if [[ "$index_file" == *"/plex/index.html" ]]; then
+        # This is a secondary Plex route, add Plex indicator
+        sed -i "s/<title>.*<\/title>/<title>$clean_title - Plex<\/title>/" "$index_file"
+    else
+        # This is main index or primary server, no server indicator
+        sed -i "s/<title>.*<\/title>/<title>$clean_title<\/title>/" "$index_file"
     fi
 
-    # Plex uses the default theme, so no additional CSS needed
+    # Add comprehensive Plex theme CSS to ensure all elements use Plex colors
+    cat >/tmp/plex_theme_reset.css <<'EOF'
+
+        /* Plex Theme Reset and Enforcement */
+        :root {
+            --primary-color: #e5a00d !important;
+            --primary-hover: #f1b020 !important;
+            --primary-light: rgba(229, 160, 13, 0.1) !important;
+            --bg-color: #1a1a1a !important;
+            --secondary-bg: #2a2a2a !important;
+            --header-bg: #242424 !important;
+            --tab-bg: #333 !important;
+        }
+        
+        /* Ensure Plex background - override any gradient backgrounds */
+        body {
+            background: #1a1a1a !important;
+            background-color: #1a1a1a !important;
+            background-image: none !important;
+            background-attachment: initial !important;
+        }
+        
+        /* Plex accent color for active elements */
+        .tab.active,
+        .sort-button.active,
+        .genre-button.active {
+            background-color: #e5a00d !important;
+            background: #e5a00d !important;
+            color: #000 !important;
+        }
+        
+        /* Plex hover effects */
+        .tab:hover:not(.active),
+        .sort-button:hover:not(.active),
+        .genre-button:hover:not(.active),
+        .server-toggle-button:hover,
+        .roulette-button:hover,
+        .modal-try-again-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Plex media item hover - no glow */
+        .media-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        /* Plex poster container styling */
+        .poster-container,
+        .media-item {
+            background-color: #2a2a2a !important;
+        }
+        
+        /* Plex scroll indicators */
+        .scroll-to-top {
+            background-color: #e5a00d !important;
+            color: #000 !important;
+        }
+        
+        .scroll-to-top:hover {
+            background-color: #f1b020 !important;
+        }
+        
+        /* Plex header styling */
+        .header {
+            background-color: #242424 !important;
+            border-bottom: 1px solid rgba(85, 85, 85, 0.5) !important;
+        }
+        
+        /* Plex search input styling */
+        .search-input {
+            background-color: rgba(0, 0, 0, 0.25) !important;
+            border: none !important;
+            color: #ffffff !important;
+        }
+        
+        .search-input:focus {
+            background-color: rgba(0, 0, 0, 0.35) !important;
+            box-shadow: 0 0 0 2px rgba(229, 160, 13, 0.4) !important;
+            border-color: transparent !important;
+        }
+        
+        .search-input::placeholder {
+            color: #aaa !important;
+        }
+        
+        .search-clear {
+            color: #aaa !important;
+        }
+        
+        .search-clear:hover {
+            color: #e5a00d !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        /* Plex genre styling */
+        .genre-tag {
+            background-color: rgba(229, 160, 13, 0.2) !important;
+            border: 1px solid rgba(229, 160, 13, 0.3) !important;
+            color: #ffffff !important;
+        }
+        
+        .genre-tag:hover {
+            background-color: rgba(229, 160, 13, 0.3) !important;
+            border-color: rgba(229, 160, 13, 0.5) !important;
+            color: #ffffff !important;
+        }
+        
+        /* Plex genre dropdown/drawer styling */
+        .genre-menu,
+        .genre-drawer {
+            background-color: #2a2a2a !important;
+            border: 1px solid #555 !important;
+        }
+        
+        .genre-item:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .genre-item.active {
+            background-color: rgba(229, 160, 13, 0.1) !important;
+            color: #e5a00d !important;
+        }
+        
+        /* Plex modal backdrop */
+        .modal-backdrop::after {
+            background: linear-gradient(to bottom, rgba(42, 42, 42, 0.3) 0%, #2a2a2a 100%) !important;
+        }
+        
+        /* Plex theme for PWA elements */
+        meta[name="theme-color"] {
+            content: "#e5a00d" !important;
+        }
+        
+        /* Ensure tab backgrounds use Plex colors */
+        .tab {
+            background-color: #333 !important;
+        }
+        
+        .sort-button,
+        .genre-button {
+            background-color: #333 !important;
+        }
+        
+        /* Mobile menu Plex colors */
+        .mobile-menu {
+            background-color: #242424 !important;
+        }
+        
+        /* Genre drawer Plex colors */
+        .genre-drawer {
+            background-color: #2a2a2a !important;
+        }
+        
+        .genre-drawer-header {
+            border-bottom: 1px solid #555 !important;
+        }
+EOF
+
+    # Insert Plex theme CSS after the existing styles but before closing </style>
+    sed -i '/<\/style>/e cat /tmp/plex_theme_reset.css' "$index_file"
+
+    # Clean up temporary file
+    rm -f /tmp/plex_theme_reset.css
+
+    echo "Plex theme applied successfully to $index_file"
 }
+
 remove_server_toggle() {
     local index_file=$1
     echo "Removing server toggle from $index_file"
@@ -442,25 +964,9 @@ if [ -f /app/web/index.html ]; then
         both_servers_configured=true
         echo "Both servers configured - keeping server toggle functionality"
 
-        # Update the toggle button text based on primary server for main index
-        if [ "$PRIMARY_SERVER" = "plex" ]; then
-            # Main index shows Plex, so switch to Jellyfin (secondary)
-            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
-        else
-            # Main index shows Jellyfin, so switch to Plex (secondary)
-            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
-        fi
-    else
-        echo "Only one server configured - removing server toggle functionality"
-        remove_server_toggle "/app/web/index.html"
-    fi
-
-    # Handle server toggle based on configuration
-    # Check if both servers are configured
-    both_servers_configured=false
-    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ] && [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
-        both_servers_configured=true
-        echo "Both servers configured - keeping server toggle functionality"
+        # Create themed manifest and offline page based on primary server
+        create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
+        create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
 
         # Update the toggle button for main index and apply theme
         if [ "$PRIMARY_SERVER" = "plex" ]; then
@@ -475,6 +981,10 @@ if [ -f /app/web/index.html ]; then
     else
         echo "Only one server configured - removing server toggle functionality"
         remove_server_toggle "/app/web/index.html"
+
+        # Create themed manifest and offline page based on single server type
+        create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
+        create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
 
         # Apply theme based on single server type
         if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
@@ -492,6 +1002,7 @@ if [ -f /app/web/index.html ]; then
             create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
             # When viewing secondary Jellyfin, switch back to primary (root)
             update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
+            # Apply Jellyfin theme to the secondary route
             apply_jellyfin_theme "/app/web/jellyfin/index.html"
         else
             # Jellyfin is primary, so create Plex route only
@@ -499,6 +1010,7 @@ if [ -f /app/web/index.html ]; then
             create_server_index "plex" "data/plex" "/app/web/plex/index.html"
             # When viewing secondary Plex, switch back to primary (root)
             update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
+            # Apply Plex theme to the secondary route
             apply_plex_theme "/app/web/plex/index.html"
         fi
     else

@@ -1,10 +1,10 @@
 // Service Worker for Glimpse Media Viewer
 
-const CACHE_NAME = "glimpse-media-viewer-v6.7";
-const DYNAMIC_CACHE = "glimpse-media-dynamic-v6.7";
+const CACHE_NAME = "glimpse-media-viewer-v6.8";
+const DYNAMIC_CACHE = "glimpse-media-dynamic-v6.8";
 
-// Assets to cache on install
-const STATIC_ASSETS = ["/", "/index.html", "/manifest.json", "/test.html"];
+// Assets to cache on install (excluding HTML files that might have themes)
+const STATIC_ASSETS = ["/manifest.json", "/test.html"];
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
@@ -52,6 +52,30 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// Check if a request is for a themed HTML file
+function isThemedHtmlRequest(request) {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+
+  // Main index, plex route, or jellyfin route - these have themes
+  return (
+    pathname === "/" ||
+    pathname === "/index.html" ||
+    pathname === "/plex/" ||
+    pathname === "/plex/index.html" ||
+    pathname === "/jellyfin/" ||
+    pathname === "/jellyfin/index.html"
+  );
+}
+
+// Check if request is for dynamic media data
+function isMediaDataRequest(request) {
+  return (
+    request.url.includes("/data/") &&
+    (request.url.endsWith(".json") || request.url.endsWith(".jpg"))
+  );
+}
+
 // Fetch event - serve from cache or network
 self.addEventListener("fetch", (event) => {
   // Skip cross-origin requests
@@ -59,18 +83,63 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // JSON data - network first, then cache
-  if (
-    event.request.url.includes("/data/") &&
-    (event.request.url.endsWith(".json") || event.request.url.endsWith(".jpg"))
-  ) {
+  // Themed HTML files - always fetch from network to get latest theme
+  if (isThemedHtmlRequest(event.request)) {
+    event.respondWith(networkFirstWithCacheFallback(event.request));
+    return;
+  }
+
+  // JSON data and images - network first, then cache
+  if (isMediaDataRequest(event.request)) {
     event.respondWith(networkFirstStrategy(event.request));
     return;
   }
 
-  // HTML, CSS, and JS - cache first, then network
+  // Other static assets - cache first, then network
   event.respondWith(cacheFirstStrategy(event.request));
 });
+
+// Network-first with cache fallback for themed HTML
+async function networkFirstWithCacheFallback(request) {
+  try {
+    console.log("Fetching themed HTML from network:", request.url);
+    const networkResponse = await fetch(request);
+
+    if (networkResponse.ok) {
+      // Update cache with fresh themed content
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+      return networkResponse;
+    }
+
+    // If network fails, try cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      console.log("Network failed, serving cached themed HTML:", request.url);
+      return cachedResponse;
+    }
+
+    return networkResponse; // Return the error response
+  } catch (error) {
+    console.log(
+      "Network request failed for themed HTML, trying cache:",
+      request.url
+    );
+
+    // Try to get from cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // If no cache and it's an HTML request, return offline page
+    if (request.headers.get("Accept")?.includes("text/html")) {
+      return caches.match("/offline.html");
+    }
+
+    throw error;
+  }
+}
 
 // Cache-first strategy: try cache, fall back to network
 async function cacheFirstStrategy(request) {
@@ -90,7 +159,7 @@ async function cacheFirstStrategy(request) {
   } catch (error) {
     console.error("Fetch failed:", error);
     // If it's an HTML request, return a simple offline page
-    if (request.headers.get("Accept").includes("text/html")) {
+    if (request.headers.get("Accept")?.includes("text/html")) {
       return caches.match("/offline.html");
     }
     // For other resources, just return the error
@@ -117,6 +186,34 @@ async function networkFirstStrategy(request) {
     throw error;
   }
 }
+
+// Clear themed HTML cache when receiving a message from the app
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "CLEAR_THEMED_CACHE") {
+    console.log("Service Worker: Clearing themed HTML cache");
+
+    // Clear specific themed URLs from cache
+    const themedUrls = [
+      "/",
+      "/index.html",
+      "/plex/",
+      "/plex/index.html",
+      "/jellyfin/",
+      "/jellyfin/index.html",
+    ];
+
+    caches.open(DYNAMIC_CACHE).then((cache) => {
+      themedUrls.forEach((url) => {
+        cache.delete(url);
+        // Also try with the full origin
+        cache.delete(new URL(url, self.location.origin).href);
+      });
+    });
+
+    // Send confirmation back to the app
+    event.ports[0]?.postMessage({ success: true });
+  }
+});
 
 // Simple offline fallback page
 const OFFLINE_HTML = `
@@ -176,7 +273,7 @@ const OFFLINE_HTML = `
     <div class="container">
         <div class="icon">📶</div>
         <h1>You're Offline</h1>
-        <p>It looks like you're not connected to the internet. Glimpse Media Viewer needs a connection to show your Plex content.</p>
+        <p>It looks like you're not connected to the internet. Glimpse Media Viewer needs a connection to show your media content.</p>
         <button onclick="window.location.reload()">Try Again</button>
     </div>
 </body>
