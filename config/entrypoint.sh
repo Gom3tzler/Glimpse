@@ -156,6 +156,7 @@ update_server_toggle() {
     local index_file=$1
     local switch_to_server=$2
     local switch_to_path=$3
+    local is_primary=$4 # New parameter to indicate if this is the primary server
 
     echo "Updating server toggle in $index_file: Switch to $switch_to_server"
 
@@ -170,9 +171,15 @@ update_server_toggle() {
     # Now update with the correct values
     sed -i "s/Switch to SERVER_NAME/Switch to $switch_to_server/g" "$index_file"
 
-    # Update the path - escape forward slashes to avoid sed delimiter issues
-    local escaped_path=$(echo "$switch_to_path" | sed 's/\//\\\//g')
-    sed -i "s/SERVER_PATH/$escaped_path/g" "$index_file"
+    # Update the path - if switching to primary server, go to root, otherwise go to specific route
+    if [ "$is_primary" = "true" ]; then
+        # Going to primary server - use root path
+        sed -i "s/SERVER_PATH\//\//g" "$index_file"
+    else
+        # Going to secondary server - use specific route
+        local escaped_path=$(echo "$switch_to_path" | sed 's/\//\\\//g')
+        sed -i "s/SERVER_PATH/$escaped_path/g" "$index_file"
+    fi
 }
 
 # Function to create index.html for a specific server
@@ -274,42 +281,55 @@ if [ -f /app/web/index.html ]; then
 
         # Update the toggle button text based on primary server for main index
         if [ "$PRIMARY_SERVER" = "plex" ]; then
-            # Main index shows Plex, so switch to Jellyfin
-            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin"
+            # Main index shows Plex, so switch to Jellyfin (secondary)
+            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
         else
-            # Main index shows Jellyfin, so switch to Plex
-            update_server_toggle "/app/web/index.html" "Plex" "plex"
+            # Main index shows Jellyfin, so switch to Plex (secondary)
+            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
         fi
     else
         echo "Only one server configured - removing server toggle functionality"
         remove_server_toggle "/app/web/index.html"
     fi
 
-    # Create secondary server index files
-    # Plex route always points to data/plex/
-    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
-        create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+    # Handle server toggle based on configuration
+    # Check if both servers are configured
+    both_servers_configured=false
+    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ] && [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        both_servers_configured=true
+        echo "Both servers configured - keeping server toggle functionality"
 
-        # Update toggle for plex route if both servers configured
-        if [ "$both_servers_configured" = true ]; then
-            # When viewing Plex, show "Switch to Jellyfin"
-            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../jellyfin"
+        # Update the toggle button for main index (always switches to secondary server)
+        if [ "$PRIMARY_SERVER" = "plex" ]; then
+            # Main index shows Plex, so switch to Jellyfin (secondary)
+            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
         else
-            remove_server_toggle "/app/web/plex/index.html"
+            # Main index shows Jellyfin, so switch to Plex (secondary)
+            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
         fi
+    else
+        echo "Only one server configured - removing server toggle functionality"
+        remove_server_toggle "/app/web/index.html"
     fi
 
-    # Jellyfin route always points to data/jellyfin/
-    if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
-        create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
-
-        # Update toggle for jellyfin route if both servers configured
-        if [ "$both_servers_configured" = true ]; then
-            # When viewing Jellyfin, show "Switch to Plex"
-            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../plex"
+    # Create route ONLY for secondary servers
+    if [ "$both_servers_configured" = true ]; then
+        if [ "$PRIMARY_SERVER" = "plex" ]; then
+            # Plex is primary, so create Jellyfin route only
+            echo "Creating secondary server route: /jellyfin/"
+            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+            # When viewing secondary Jellyfin, switch back to primary (root)
+            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
         else
-            remove_server_toggle "/app/web/jellyfin/index.html"
+            # Jellyfin is primary, so create Plex route only
+            echo "Creating secondary server route: /plex/"
+            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+            # When viewing secondary Plex, switch back to primary (root)
+            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
         fi
+    else
+        # Single server setup - no secondary routes needed
+        echo "Single server setup - no secondary routes created"
     fi
 
     echo "Configuration updated successfully"
