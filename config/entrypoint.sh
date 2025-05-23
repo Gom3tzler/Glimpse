@@ -303,9 +303,9 @@ create_themed_manifest() {
         # Jellyfin themed manifest
         cat >/app/web/manifest.json <<EOF
 {
-  "name": "$app_title",
-  "short_name": "$app_title",
-  "description": "A sleek, responsive web application for browsing your Jellyfin media library",
+  "name": "Glimpse Media Viewer",
+  "short_name": "Glimpse",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101010",
@@ -330,9 +330,9 @@ EOF
         # Plex themed manifest (default)
         cat >/app/web/manifest.json <<EOF
 {
-  "name": "$app_title",
-  "short_name": "$app_title",
-  "description": "A sleek, responsive web application for browsing your Plex media library",
+  "name": "Glimpse Media Viewer",
+  "short_name": "Glimpse",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
