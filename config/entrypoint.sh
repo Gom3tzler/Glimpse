@@ -633,20 +633,37 @@ EOF
 
 remove_server_toggle() {
     local index_file=$1
-    echo "Removing server toggle from $index_file"
+    echo "Hiding server toggle from $index_file (single server mode)"
 
-    # Remove the desktop server toggle div and its contents
-    sed -i '/<div class="server-toggle">/,/<\/div>/d' "$index_file"
+    # Instead of removing HTML/JavaScript (which can cause syntax errors),
+    # just hide the server toggle elements with CSS and make the function safe
 
-    # Remove the mobile server toggle button
-    sed -i '/<!-- Mobile Server Toggle/,/>/d' "$index_file"
-    sed -i '/<button class="sort-button server-toggle-button"/d' "$index_file"
+    # Add CSS to hide server toggle elements
+    cat >>"$index_file" <<'EOF'
+<style>
+/* Hide server toggle in single server mode */
+.server-toggle,
+.server-toggle-button {
+    display: none !important;
+    visibility: hidden !important;
+}
+</style>
 
-    # Remove the server toggle CSS
-    sed -i '/\/\* Server Toggle Styles \*\//,/}/d' "$index_file"
-
-    # Remove the server toggle JavaScript function
-    sed -i '/\/\/ Server toggle functionality/,/}/d' "$index_file"
+<script>
+// Override toggleServer function to be safe in single server mode
+if (typeof toggleServer !== 'undefined') {
+    window.toggleServer = function() {
+        console.log("Server toggle disabled - only one server configured");
+        return false;
+    };
+} else {
+    window.toggleServer = function() {
+        console.log("Server toggle disabled - only one server configured");
+        return false;
+    };
+}
+</script>
+EOF
 }
 
 # Function to update server toggle text and path
