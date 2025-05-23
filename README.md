@@ -2,9 +2,13 @@
 
 A sleek, responsive web application for browsing and viewing your Plex or Jellyfin media library content. This dockerized solution fetches metadata and artwork from your media server and presents it in an elegant, user-friendly interface with support for both Plex and Jellyfin servers.
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-updated-6.png)
+![Glimpse Media Viewer Plex Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-plex.png)
 
-![Glimpse Media Viewer Screenshot](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-updated-6.png)
+![Glimpse Media Viewer Plex Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-plex.png)
+
+![Glimpse Media Viewer Jellyfin Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-jellyfin.png)
+
+![Glimpse Media Viewer Jellyfin Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-jellyfin.png)
 
 ## ✨ Features
 
