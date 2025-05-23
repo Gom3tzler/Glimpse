@@ -335,8 +335,8 @@ EOF
   "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a1a",
-  "theme_color": "#1a1a1a",
+  "background_color": "#131313",
+  "theme_color": "#131313",
   "orientation": "any",
   "icons": [
     {
@@ -361,9 +361,9 @@ EOF
     # Also update the HTML meta theme-color tag
     if [ -f /app/web/index.html ]; then
         if [ "$server_type" = "jellyfin" ]; then
-            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#00a4dc">/' /app/web/index.html
+            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#101010">/' /app/web/index.html
         else
-            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#e5a00d">/' /app/web/index.html
+            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#131313">/' /app/web/index.html
         fi
     fi
 }

@@ -167,7 +167,8 @@
             padding: 10px 36px 10px 16px;
             width: 100%;
             box-sizing: border-box;
-            border: none;
+            border: 1px solid;
+            border-color: transparent;
             border-radius: 20px;
             background-color: rgba(0, 0, 0, 0.25);
             color: var(--light-text);
@@ -2782,62 +2783,152 @@
             });
         }
 
-        // Add install prompt
+        // Add install prompt with PWA detection
         let deferredPrompt;
         const installButton = document.createElement('button');
         installButton.style.display = 'none';
         installButton.classList.add('install-button');
         installButton.textContent = 'Install App';
 
+        // Function to check if app is running as PWA
+        function isPWA() {
+            // Check if running in standalone mode (most PWAs)
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                return true;
+            }
+
+            // Check for iOS Safari standalone mode
+            if (window.navigator.standalone === true) {
+                return true;
+            }
+
+            // Check for fullscreen mode (some PWAs)
+            if (window.matchMedia('(display-mode: fullscreen)').matches) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // Function to hide install buttons
+        function hideInstallButtons() {
+            installButton.style.display = 'none';
+            const mobileInstallButton = document.querySelector('.mobile-install-button');
+            if (mobileInstallButton) {
+                mobileInstallButton.style.display = 'none';
+            }
+        }
+
+        // Function to show install buttons
+        function showInstallButtons() {
+            // Only show if not already running as PWA
+            if (!isPWA()) {
+                installButton.style.display = 'none';
+                const mobileInstallButton = document.querySelector('.mobile-install-button');
+                if (mobileInstallButton) {
+                    mobileInstallButton.style.display = 'flex';
+                }
+            }
+        }
+
+        // Check if app is already running as PWA on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isPWA()) {
+                hideInstallButtons();
+                console.log('App is running as PWA - hiding install buttons');
+            }
+        });
+
+        // Listen for app installation
+        window.addEventListener('appinstalled', (e) => {
+            console.log('PWA was installed');
+            hideInstallButtons();
+            deferredPrompt = null;
+        });
+
         // Get the mobile install button
         window.addEventListener('beforeinstallprompt', (e) => {
             // Get the mobile install button inside the event listener
             const mobileInstallButton = document.querySelector('.mobile-install-button');
+
+            // Don't show install prompt if already running as PWA
+            if (isPWA()) {
+                hideInstallButtons();
+                return;
+            }
+
             // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
 
             // Show both desktop and mobile install buttons
-            installButton.style.display = 'none';
-            if (mobileInstallButton) {
-                mobileInstallButton.style.display = 'flex';
-            }
+            showInstallButtons();
 
             // Get the logo section and h1 element for desktop button
             const logoSection = document.querySelector('.logo-section');
 
             // Insert the desktop button right after the h1 element inside the logo section
-            logoSection.appendChild(installButton);
+            if (!logoSection.contains(installButton)) {
+                logoSection.appendChild(installButton);
+            }
 
             // Handle install for both buttons
             const handleInstall = (e) => {
                 // Hide both install buttons
-                installButton.style.display = 'none';
-                if (mobileInstallButton) {
-                    mobileInstallButton.style.display = 'none';
-                }
+                hideInstallButtons();
+
                 // Show the install prompt
                 deferredPrompt.prompt();
+
                 // Wait for the user to respond to the prompt
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
                     } else {
                         console.log('User dismissed the install prompt');
+                        // Show buttons again if user dismissed
+                        setTimeout(() => {
+                            if (!isPWA()) {
+                                showInstallButtons();
+                            }
+                        }, 1000);
                     }
                     deferredPrompt = null;
                 });
             };
 
-            installButton.addEventListener('click', handleInstall);
+            // Remove any existing event listeners to avoid duplicates
+            installButton.replaceWith(installButton.cloneNode(true));
+            const newInstallButton = document.querySelector('.install-button');
+
+            newInstallButton.addEventListener('click', handleInstall);
+
             if (mobileInstallButton) {
-                mobileInstallButton.addEventListener('click', (e) => {
+                // Clone mobile button to remove existing listeners
+                const newMobileButton = mobileInstallButton.cloneNode(true);
+                mobileInstallButton.parentNode.replaceChild(newMobileButton, mobileInstallButton);
+
+                newMobileButton.addEventListener('click', (e) => {
                     handleInstall(e);
                     // Also close the mobile menu
                     const mobileMenu = document.querySelector('.mobile-menu');
                     mobileMenu.classList.remove('open');
                 });
+            }
+        });
+
+        // Also check when window regains focus (user might have installed from another tab)
+        window.addEventListener('focus', () => {
+            if (isPWA()) {
+                hideInstallButtons();
+            }
+        });
+
+        // Check when page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isPWA()) {
+                hideInstallButtons();
             }
         });
 
@@ -2853,6 +2944,7 @@
                 margin-left: 15px;
                 transition: background-color 0.3s;
                 align-self: center;
+                display: none;
             }
             .install-button:hover {
                 background-color: var(--primary-hover);
