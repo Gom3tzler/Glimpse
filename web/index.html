@@ -1495,6 +1495,11 @@
                 <span class="server-icon">🔄</span>
                 <span class="server-text">Switch to SERVER_NAME</span>
             </button>
+            <!-- Mobile Install Button (will be shown/hidden by JavaScript) -->
+            <button class="sort-button install-button mobile-install-button">
+                <span class="install-icon">📱</span>
+                <span class="install-text">Install App</span>
+            </button>
         </div>
     </div>
 
@@ -2784,24 +2789,34 @@
         installButton.classList.add('install-button');
         installButton.textContent = 'Install App';
 
+        // Get the mobile install button
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Get the mobile install button inside the event listener
+            const mobileInstallButton = document.querySelector('.mobile-install-button');
             // Prevent Chrome 67 and earlier from automatically showing the prompt
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
 
-            // Create and show the install button - position after the H1
-            installButton.style.display = 'block';
+            // Show both desktop and mobile install buttons
+            installButton.style.display = 'none';
+            if (mobileInstallButton) {
+                mobileInstallButton.style.display = 'flex';
+            }
 
-            // Get the logo section and h1 element
+            // Get the logo section and h1 element for desktop button
             const logoSection = document.querySelector('.logo-section');
 
-            // Insert the button right after the h1 element inside the logo section
+            // Insert the desktop button right after the h1 element inside the logo section
             logoSection.appendChild(installButton);
 
-            installButton.addEventListener('click', (e) => {
-                // Hide the install button
+            // Handle install for both buttons
+            const handleInstall = (e) => {
+                // Hide both install buttons
                 installButton.style.display = 'none';
+                if (mobileInstallButton) {
+                    mobileInstallButton.style.display = 'none';
+                }
                 // Show the install prompt
                 deferredPrompt.prompt();
                 // Wait for the user to respond to the prompt
@@ -2813,7 +2828,17 @@
                     }
                     deferredPrompt = null;
                 });
-            });
+            };
+
+            installButton.addEventListener('click', handleInstall);
+            if (mobileInstallButton) {
+                mobileInstallButton.addEventListener('click', (e) => {
+                    handleInstall(e);
+                    // Also close the mobile menu
+                    const mobileMenu = document.querySelector('.mobile-menu');
+                    mobileMenu.classList.remove('open');
+                });
+            }
         });
 
         // Add styles for the install button
@@ -2825,7 +2850,6 @@
                 border: none;
                 border-radius: 20px;
                 padding: 8px 15px;
-                font-weight: 600;
                 cursor: pointer;
                 margin-left: 15px;
                 transition: background-color 0.3s;
@@ -2839,12 +2863,24 @@
                 align-items: center;
                 gap: 10px;
             }
+            
+            /* Mobile install button styling */
+            .mobile-install-button {
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+                padding: 10px;
+                color: #fff !important;
+                margin-left: 0px;
+            }
+            
+            .install-icon {
+                font-size: 1rem;
+            }
+            
             @media screen and (max-width: 768px) {
-                .install-button {
-                    margin-left: 15px;
-                    margin-right: -15px;
-                    padding: 6px 12px;
-                    font-size: 0.85rem;
+                .install-button:not(.mobile-install-button) {
+                    display: none !important;
                 }
             }
         `;

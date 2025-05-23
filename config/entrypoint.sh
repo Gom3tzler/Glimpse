@@ -398,8 +398,8 @@ apply_jellyfin_theme() {
     sed -i 's|href="../images/favicon-16x16\.png"|href="../images/jellyfin/favicon-16x16.png"|g' "$index_file"
 
     # Update manifest.json path if it exists
-    sed -i 's|href="/manifest\.json"|href="/manifest-jellyfin.json"|g' "$index_file"
-    sed -i 's|href="../manifest\.json"|href="../manifest-jellyfin.json"|g' "$index_file"
+    sed -i 's|href="/manifest\.json"|href="/manifest.json"|g' "$index_file"
+    sed -i 's|href="../manifest\.json"|href="../manifest.json"|g' "$index_file"
 
     # Update title for main index files (primary server gets indicator too)
     if [[ "$index_file" == "/app/web/index.html" ]]; then
