@@ -309,7 +309,7 @@ create_themed_manifest() {
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101010",
-  "theme_color": "#00a4dc",
+  "theme_color": "#101010",
   "orientation": "any",
   "icons": [
     {
@@ -336,7 +336,7 @@ EOF
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a1a",
-  "theme_color": "#e5a00d",
+  "theme_color": "#1a1a1a",
   "orientation": "any",
   "icons": [
     {
