@@ -91,6 +91,20 @@ class PlexDataFetcher:
             print(f"Error fetching sections: {e}")
             return None
 
+    def fetch_detailed_metadata(self, rating_key):
+        """Fetch detailed metadata for a specific item including cast roles"""
+        try:
+            response = self.session.get(f"{self.plex_url}/library/metadata/{rating_key}")
+            response.raise_for_status()
+            data = response.json()
+            
+            if 'MediaContainer' in data and 'Metadata' in data['MediaContainer']:
+                return data['MediaContainer']['Metadata'][0]
+            return None
+        except requests.RequestException as e:
+            print(f"Error fetching detailed metadata for {rating_key}: {e}")
+            return None
+
     def fetch_section_content(self, section_key):
         """Fetch all content from a specific section using pagination"""
         all_items = []
@@ -200,9 +214,17 @@ class PlexDataFetcher:
     def process_media_item(self, item, media_type):
         """Process a single media item and extract relevant metadata"""
         try:
+            rating_key = item.get('ratingKey', '')
+            
+            # Fetch detailed metadata to get cast with roles
+            detailed_item = self.fetch_detailed_metadata(rating_key)
+            if detailed_item:
+                # Use detailed metadata if available, otherwise fall back to basic item
+                item = detailed_item
+            
             # Extract common fields
             media_info = {
-                'id': str(item.get('ratingKey', '')),
+                'id': str(rating_key),
                 'title': item.get('title', ''),
                 'year': item.get('year', ''),
                 'summary': item.get('summary', ''),
@@ -219,31 +241,70 @@ class PlexDataFetcher:
                 for genre in item['Genre']:
                     media_info['genres'].append(genre.get('tag', ''))
             
-            # Extract actor information - check multiple possible field names
-            # First try 'Role' field
-            if 'Role' in item:
+            # Extract actor information with improved role detection
+            # Try multiple possible field names and approaches
+            actors_found = False
+            
+            # First try 'Role' field (most common)
+            if 'Role' in item and not actors_found:
+                print(f"  Found Role field with {len(item['Role'])} actors")
                 for role in item['Role']:
                     actor_info = {
                         'name': role.get('tag', ''),
                         'role': role.get('role', '')
                     }
                     media_info['actors'].append(actor_info)
-            # If 'Role' doesn't exist, try 'Actor' field
-            elif 'Actor' in item:
+                actors_found = True
+            
+            # If 'Role' doesn't exist or is empty, try 'Actor' field
+            if 'Actor' in item and not actors_found:
+                print(f"  Found Actor field with {len(item['Actor'])} actors")
                 for actor in item['Actor']:
                     actor_info = {
                         'name': actor.get('tag', ''),
                         'role': actor.get('role', '')
                     }
                     media_info['actors'].append(actor_info)
-            # Try a third possible field used in some Plex versions
-            elif 'Cast' in item:
+                actors_found = True
+            
+            # Try 'Cast' field as a fallback
+            if 'Cast' in item and not actors_found:
+                print(f"  Found Cast field with {len(item['Cast'])} actors")
                 for cast in item['Cast']:
                     actor_info = {
                         'name': cast.get('tag', ''),
                         'role': cast.get('role', '')
                     }
                     media_info['actors'].append(actor_info)
+                actors_found = True
+            
+            # If we still don't have actors, try to get them from a different API endpoint
+            if not actors_found and rating_key:
+                print(f"  No actors found in standard fields, trying alternative approach...")
+                try:
+                    # Try fetching cast information separately
+                    cast_response = self.session.get(f"{self.plex_url}/library/metadata/{rating_key}/cast")
+                    if cast_response.status_code == 200:
+                        cast_data = cast_response.json()
+                        if 'MediaContainer' in cast_data and 'Metadata' in cast_data['MediaContainer']:
+                            for cast_member in cast_data['MediaContainer']['Metadata']:
+                                actor_info = {
+                                    'name': cast_member.get('tag', ''),
+                                    'role': cast_member.get('role', '')
+                                }
+                                media_info['actors'].append(actor_info)
+                            actors_found = True
+                            print(f"  Found {len(media_info['actors'])} actors from cast endpoint")
+                except Exception as e:
+                    print(f"  Error fetching cast from alternative endpoint: {e}")
+            
+            # Limit to first 3 actors to match Jellyfin behavior
+            if len(media_info['actors']) > 3:
+                media_info['actors'] = media_info['actors'][:3]
+            
+            print(f"  Final cast count: {len(media_info['actors'])}")
+            for i, actor in enumerate(media_info['actors']):
+                print(f"    {i+1}. {actor['name']} as '{actor['role']}'")
             
             if media_type == 'movie':
                 media_info.update({
@@ -263,6 +324,8 @@ class PlexDataFetcher:
             return media_info
         except Exception as e:
             print(f"Error processing media item: {e}")
+            import traceback
+            traceback.print_exc()
             return None
 
     def fetch_and_save_data(self):
@@ -299,7 +362,8 @@ class PlexDataFetcher:
             items = content_data['MediaContainer'].get('Metadata', [])
             print(f"Found {len(items)} items in {section_title}")
             
-            for item in items:
+            for i, item in enumerate(items):
+                print(f"Processing item {i+1}/{len(items)}: {item.get('title', 'Unknown')}")
                 media_type = 'movie' if section_type == 'movie' else 'tvshow'
                 media_info = self.process_media_item(item, media_type)
                 
@@ -313,9 +377,9 @@ class PlexDataFetcher:
                     if poster_url:
                         success = self.download_image(poster_url, poster_path)
                         if success:
-                            print(f"Processed poster for: {media_info['title']}")
+                            print(f"  ✓ Processed poster for: {media_info['title']}")
                         else:
-                            print(f"Failed to process poster for: {media_info['title']}")
+                            print(f"  ✗ Failed to process poster for: {media_info['title']}")
                     
                     # Download backdrop/art image if available
                     backdrop_url = item.get('art')
@@ -324,24 +388,29 @@ class PlexDataFetcher:
                         backdrop_path = backdrop_dir / f"{media_info['id']}.jpg"
                         success = self.download_image(backdrop_url, backdrop_path)
                         if success:
-                            print(f"Processed backdrop for: {media_info['title']}")
+                            print(f"  ✓ Processed backdrop for: {media_info['title']}")
                         else:
-                            print(f"Failed to process backdrop for: {media_info['title']}")
+                            print(f"  ✗ Failed to process backdrop for: {media_info['title']}")
                     
                     # Add to appropriate list
                     if media_type == 'movie':
                         movies_data.append(media_info)
                     else:
                         tvshows_data.append(media_info)
+                
+                # Add a small delay between items to reduce server load
+                time.sleep(0.1)
         
         # Save JSON files
         movies_file = self.output_dir / "movies.json"
         tvshows_file = self.output_dir / "tvshows.json"
         
+        print(f"\nSaving {len(movies_data)} movies to: {movies_file}")
         with open(movies_file, 'w') as f:
             json.dump(movies_data, f, indent=2)
         self.set_permissions(movies_file)
         
+        print(f"Saving {len(tvshows_data)} TV shows to: {tvshows_file}")
         with open(tvshows_file, 'w') as f:
             json.dump(tvshows_data, f, indent=2)
         self.set_permissions(tvshows_file)
