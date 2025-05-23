@@ -463,7 +463,6 @@ apply_jellyfin_theme() {
         }
         
         /* Jellyfin poster container - better contrast against dark background */
-        .poster-container,
         .media-item {
             background-color: #252525 !important;
         }
@@ -632,197 +631,6 @@ EOF
     rm -f /tmp/jellyfin_theme.css
 }
 
-# Function to apply Plex theme (default/existing theme)
-apply_plex_theme() {
-    local index_file=$1
-    echo "Applying Plex theme to $index_file (default colors)"
-
-    # Remove any existing Jellyfin theme overrides completely
-    sed -i '/\/\* Jellyfin Theme Overrides \*\//,/^        }$/d' "$index_file"
-    # Also remove any remaining jellyfin theme blocks that might have different formatting
-    sed -i '/\/\* Jellyfin Theme Overrides \*\//,/^    }$/d' "$index_file"
-
-    # Reset any image paths that might have been changed to jellyfin
-    sed -i 's|images/jellyfin/|images/|g' "$index_file"
-    sed -i 's|../images/jellyfin/|../images/|g' "$index_file"
-
-    # Update title for main index files (primary server gets indicator too)
-    if [[ "$index_file" == "/app/web/index.html" ]]; then
-        # This is the main index, add Plex indicator
-        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
-        sed -i "s|<title>.*</title>|<title>$clean_title - Plex</title>|" "$index_file"
-        echo "Updated main index title to: $clean_title - Plex"
-    fi
-
-    # Add comprehensive Plex theme CSS to ensure all elements use Plex colors
-    cat >/tmp/plex_theme_reset.css <<'EOF'
-
-        /* Plex Theme Reset and Enforcement */
-        :root {
-            --primary-color: #e5a00d !important;
-            --primary-hover: #f1b020 !important;
-            --primary-light: rgba(229, 160, 13, 0.1) !important;
-            --bg-color: #1a1a1a !important;
-            --secondary-bg: #2a2a2a !important;
-            --header-bg: #242424 !important;
-            --tab-bg: #333 !important;
-        }
-        
-        /* Ensure Plex background - override any gradient backgrounds */
-        body {
-            background: #1a1a1a !important;
-            background-color: #1a1a1a !important;
-            background-image: none !important;
-            background-attachment: initial !important;
-        }
-        
-        /* Plex accent color for active elements */
-        .tab.active,
-        .sort-button.active,
-        .genre-button.active {
-            background-color: #e5a00d !important;
-            background: #e5a00d !important;
-            color: #000 !important;
-        }
-        
-        /* Plex hover effects */
-        .tab:hover:not(.active),
-        .sort-button:hover:not(.active),
-        .genre-button:hover:not(.active),
-        .server-toggle-button:hover,
-        .roulette-button:hover,
-        .modal-try-again-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        /* Plex media item hover - no glow */
-        .media-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        /* Plex poster container styling */
-        .poster-container,
-        .media-item {
-            background-color: #2a2a2a !important;
-        }
-        
-        /* Plex scroll indicators */
-        .scroll-to-top {
-            background-color: #e5a00d !important;
-            color: #000 !important;
-        }
-        
-        .scroll-to-top:hover {
-            background-color: #f1b020 !important;
-        }
-        
-        /* Plex header styling */
-        .header {
-            background-color: #242424 !important;
-            border-bottom: 1px solid rgba(85, 85, 85, 0.5) !important;
-        }
-        
-        /* Plex search input styling */
-        .search-input {
-            background-color: rgba(0, 0, 0, 0.25) !important;
-            border: none !important;
-            color: #ffffff !important;
-        }
-        
-        .search-input:focus {
-            background-color: rgba(0, 0, 0, 0.35) !important;
-            box-shadow: 0 0 0 2px rgba(229, 160, 13, 0.4) !important;
-            border-color: transparent !important;
-        }
-        
-        .search-input::placeholder {
-            color: #aaa !important;
-        }
-        
-        .search-clear {
-            color: #aaa !important;
-        }
-        
-        .search-clear:hover {
-            color: #e5a00d !important;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-        }
-        
-        /* Plex genre styling */
-        .genre-tag {
-            background-color: rgba(229, 160, 13, 0.2) !important;
-            border: 1px solid rgba(229, 160, 13, 0.3) !important;
-            color: #ffffff !important;
-        }
-        
-        .genre-tag:hover {
-            background-color: rgba(229, 160, 13, 0.3) !important;
-            border-color: rgba(229, 160, 13, 0.5) !important;
-            color: #ffffff !important;
-        }
-        
-        /* Plex genre dropdown/drawer styling */
-        .genre-menu,
-        .genre-drawer {
-            background-color: #2a2a2a !important;
-            border: 1px solid #555 !important;
-        }
-        
-        .genre-item:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .genre-item.active {
-            background-color: rgba(229, 160, 13, 0.1) !important;
-            color: #e5a00d !important;
-        }
-        
-        /* Plex modal backdrop */
-        .modal-backdrop::after {
-            background: linear-gradient(to bottom, rgba(42, 42, 42, 0.3) 0%, #2a2a2a 100%) !important;
-        }
-        
-        /* Plex theme for PWA elements */
-        meta[name="theme-color"] {
-            content: "#e5a00d" !important;
-        }
-        
-        /* Ensure tab backgrounds use Plex colors */
-        .tab {
-            background-color: #333 !important;
-        }
-        
-        .sort-button,
-        .genre-button {
-            background-color: #333 !important;
-        }
-        
-        /* Mobile menu Plex colors */
-        .mobile-menu {
-            background-color: #242424 !important;
-        }
-        
-        /* Genre drawer Plex colors */
-        .genre-drawer {
-            background-color: #2a2a2a !important;
-        }
-        
-        .genre-drawer-header {
-            border-bottom: 1px solid #555 !important;
-        }
-EOF
-
-    # Insert Plex theme CSS after the existing styles but before closing </style>
-    sed -i '/<\/style>/e cat /tmp/plex_theme_reset.css' "$index_file"
-
-    # Clean up temporary file
-    rm -f /tmp/plex_theme_reset.css
-
-    echo "Plex theme applied successfully to $index_file"
-}
-
 remove_server_toggle() {
     local index_file=$1
     echo "Removing server toggle from $index_file"
@@ -882,6 +690,20 @@ create_server_index() {
 
     # Copy the main index.html as a template
     cp /app/web/index.html "$output_file"
+
+    # Add mobile install button if it doesn't exist
+    if ! grep -q "mobile-install-button" "$output_file"; then
+        echo "Adding mobile install button to $output_file"
+        # Find the server toggle button and add the install button after it
+        sed -i '/<!-- Mobile Server Toggle/,/<\/button>/ {
+            /<\/button>/ a\
+            <!-- Mobile Install Button (will be shown/hidden by JavaScript) -->\
+            <button class="sort-button install-button mobile-install-button" style="display: none;">\
+                <span class="install-icon">📱</span>\
+                <span class="install-text">Install App</span>\
+            </button>
+        }' "$output_file"
+    fi
 
     # Set the title immediately based on the route type
     if [[ "$output_file" == *"/plex/index.html" ]]; then
@@ -990,15 +812,34 @@ if [ -f /app/web/index.html ]; then
         create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
         create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
 
-        # Update the toggle button for main index and apply theme
+        # Create routes FIRST, before applying themes
+        if [ "$PRIMARY_SERVER" = "plex" ]; then
+            # Plex is primary, so create Jellyfin route only
+            echo "Creating secondary server route: /jellyfin/"
+            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+            # When viewing secondary Jellyfin, switch back to primary (root)
+            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
+        else
+            # Jellyfin is primary, so create Plex route only
+            echo "Creating secondary server route: /plex/"
+            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+            # When viewing secondary Plex, switch back to primary (root)
+            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
+        fi
+
+        # NOW apply themes after routes are created
         if [ "$PRIMARY_SERVER" = "plex" ]; then
             # Main index shows Plex, so switch to Jellyfin (secondary)
             update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
-            apply_plex_theme "/app/web/index.html"
+            # No theme application needed for main index - it's already Plex-themed
+            # Apply Jellyfin theme to the secondary route
+            apply_jellyfin_theme "/app/web/jellyfin/index.html"
         else
             # Main index shows Jellyfin, so switch to Plex (secondary)
             update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
+            # Apply Jellyfin theme to main index
             apply_jellyfin_theme "/app/web/index.html"
+            # No theme application needed for Plex secondary route - it uses original styling
         fi
     else
         echo "Only one server configured - removing server toggle functionality"
@@ -1012,32 +853,9 @@ if [ -f /app/web/index.html ]; then
         if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
             apply_jellyfin_theme "/app/web/index.html"
         else
-            apply_plex_theme "/app/web/index.html"
+            # No theme application needed - index.html is already Plex-themed
+            echo "Plex is primary server - using default index.html styling"
         fi
-    fi
-
-    # Create route ONLY for secondary servers
-    if [ "$both_servers_configured" = true ]; then
-        if [ "$PRIMARY_SERVER" = "plex" ]; then
-            # Plex is primary, so create Jellyfin route only
-            echo "Creating secondary server route: /jellyfin/"
-            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
-            # When viewing secondary Jellyfin, switch back to primary (root)
-            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
-            # Apply Jellyfin theme to the secondary route
-            apply_jellyfin_theme "/app/web/jellyfin/index.html"
-        else
-            # Jellyfin is primary, so create Plex route only
-            echo "Creating secondary server route: /plex/"
-            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
-            # When viewing secondary Plex, switch back to primary (root)
-            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
-            # Apply Plex theme to the secondary route
-            apply_plex_theme "/app/web/plex/index.html"
-        fi
-    else
-        # Single server setup - no secondary routes needed
-        echo "Single server setup - no secondary routes created"
     fi
 
     echo "Configuration updated successfully"
