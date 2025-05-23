@@ -4,7 +4,7 @@ const CACHE_NAME = "glimpse-media-viewer-v6.8";
 const DYNAMIC_CACHE = "glimpse-media-dynamic-v6.8";
 
 // Assets to cache on install (excluding HTML files that might have themes)
-const STATIC_ASSETS = ["/manifest.json", "/test.html"];
+const STATIC_ASSETS = ["/test.html"];
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
