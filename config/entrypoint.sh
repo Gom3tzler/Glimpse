@@ -613,6 +613,21 @@ apply_jellyfin_theme() {
         .genre-drawer-header {
             border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
         }
+
+        /* Jellyfin trailer loading styling */
+        .trailer-loading {
+            background-color: rgba(16, 16, 16, 0.8) !important;
+        }
+        
+        .trailer-spinner {
+            border: 4px solid rgba(0, 164, 220, 0.2) !important;
+            border-top-color: #00a4dc !important;
+        }
+        
+        .trailer-loading-text {
+            color: #ffffff !important;
+        }
+
 EOF
 
     # Insert Jellyfin theme CSS after the existing styles but before closing </style>
