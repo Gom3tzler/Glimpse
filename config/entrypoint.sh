@@ -741,7 +741,8 @@ remove_server_toggle() {
 <style>
 /* Hide server toggle in single server mode */
 .server-toggle,
-.server-toggle-button {
+.server-toggle-button,
+.server-dropdown {
     display: none !important;
     visibility: hidden !important;
 }
@@ -762,37 +763,6 @@ if (typeof toggleServer !== 'undefined') {
 }
 </script>
 EOF
-}
-
-# Function to update server toggle text and path (for 2-server mode only)
-update_server_toggle() {
-    local index_file=$1
-    local switch_to_server=$2
-    local switch_to_path=$3
-    local is_primary=$4
-
-    echo "Updating server toggle in $index_file: Switch to $switch_to_server (path: $switch_to_path)"
-
-    # First, reset any existing toggle text back to placeholders
-    sed -i 's/Switch to Plex/Switch to SERVER_NAME/g' "$index_file"
-    sed -i 's/Switch to Jellyfin/Switch to SERVER_NAME/g' "$index_file"
-    sed -i 's/Switch to Emby/Switch to SERVER_NAME/g' "$index_file"
-
-    # Reset ONLY the toggle button path, not the data paths
-    sed -i 's/newPath = "[^"]*";/newPath = "SERVER_PATH\/";/g' "$index_file"
-
-    # Now update with the correct values
-    sed -i "s/Switch to SERVER_NAME/Switch to $switch_to_server/g" "$index_file"
-
-    # Update the path
-    if [ "$switch_to_path" = "../" ]; then
-        # Going to primary server - use root path
-        sed -i "s/SERVER_PATH\//\//g" "$index_file"
-    else
-        # Going to secondary server
-        local escaped_path=$(echo "$switch_to_path" | sed 's/\//\\\//g')
-        sed -i "s/SERVER_PATH/$escaped_path/g" "$index_file"
-    fi
 }
 
 # Function to create index.html for a specific server
@@ -887,47 +857,9 @@ count_configured_servers() {
     echo $count
 }
 
-# Function to configure two-server toggle
-configure_two_server_toggle() {
-    echo "Configuring two-server toggle system"
-
-    # Create routes for secondary server
-    if [ "$PRIMARY_SERVER" = "plex" ]; then
-        if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
-            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
-            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
-            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
-        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
-            create_server_index "emby" "data/emby" "/app/web/emby/index.html"
-            update_server_toggle "/app/web/index.html" "Emby" "emby" "false"
-            update_server_toggle "/app/web/emby/index.html" "Plex" "../" "true"
-        fi
-    elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
-        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
-            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
-            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
-            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
-        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
-            create_server_index "emby" "data/emby" "/app/web/emby/index.html"
-            update_server_toggle "/app/web/index.html" "Emby" "emby" "false"
-            update_server_toggle "/app/web/emby/index.html" "Jellyfin" "../" "true"
-        fi
-    else # emby
-        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
-            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
-            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
-            update_server_toggle "/app/web/plex/index.html" "Emby" "../" "true"
-        elif [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
-            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
-            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
-            update_server_toggle "/app/web/jellyfin/index.html" "Emby" "../" "true"
-        fi
-    fi
-}
-
-# Function to configure three-server dropdown
-configure_three_server_dropdown() {
-    echo "Configuring three-server dropdown system"
+# Function to configure multi-server dropdown (for 2+ servers)
+configure_multi_server_dropdown() {
+    echo "Configuring multi-server dropdown system for 2+ servers"
 
     # Create routes for all secondary servers
     if [ "$PRIMARY_SERVER" != "plex" ] && [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
@@ -1316,20 +1248,15 @@ if [ -f /app/web/index.html ]; then
             echo "Plex is primary server - using default index.html styling"
         fi
     else
-        echo "Multiple servers configured - setting up server toggle functionality"
+        echo "Multiple servers configured - setting up server dropdown functionality"
 
         # Create themed manifest and offline page based on primary server
         create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
         create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
 
-        # Determine UI approach based on server count
-        if [ "$server_count" -eq 2 ]; then
-            echo "Two servers configured - using toggle button"
-            configure_two_server_toggle
-        else
-            echo "Three servers configured - using dropdown menu"
-            configure_three_server_dropdown
-        fi
+        # Use dropdown for 2+ servers (simplified logic)
+        echo "Using dropdown menu for $server_count servers"
+        configure_multi_server_dropdown
 
         # NOW apply themes after routes are created
         echo "Applying themes to all routes..."
