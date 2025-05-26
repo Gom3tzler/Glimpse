@@ -742,7 +742,8 @@ remove_server_toggle() {
 /* Hide server toggle in single server mode */
 .server-toggle,
 .server-toggle-button,
-.server-dropdown {
+.server-dropdown,
+.server-drawer-overlay {
     display: none !important;
     visibility: hidden !important;
 }
@@ -897,16 +898,21 @@ replace_toggle_with_dropdown() {
     local dropdown_items=""
     local current_server_display=""
     local current_server_icon=""
+    local icon_base_path=""
 
-    # Determine current path based on file location
+    # Determine current path and icon base path based on file location
     if [[ "$index_file" == "/app/web/index.html" ]]; then
         current_path="/"
+        icon_base_path="images/icons/"
     elif [[ "$index_file" == *"/plex/index.html" ]]; then
         current_path="/plex/"
+        icon_base_path="../images/icons/"
     elif [[ "$index_file" == *"/jellyfin/index.html" ]]; then
         current_path="/jellyfin/"
+        icon_base_path="../images/icons/"
     elif [[ "$index_file" == *"/emby/index.html" ]]; then
         current_path="/emby/"
+        icon_base_path="../images/icons/"
     fi
 
     # Add options for all configured servers
@@ -934,10 +940,10 @@ replace_toggle_with_dropdown() {
         if [ "$current_server" = "plex" ]; then
             plex_active=" active"
             current_server_display="Plex"
-            current_server_icon="📺"
+            current_server_icon="<img src=\"${icon_base_path}plex.png\" alt=\"Plex\" class=\"server-icon-img\">"
         fi
 
-        dropdown_items="$dropdown_items<div class=\"server-item$plex_active\" data-path=\"$plex_relative_path\">📺 Plex</div>"
+        dropdown_items="$dropdown_items<div class=\"server-item$plex_active\" data-path=\"$plex_relative_path\"><img src=\"${icon_base_path}plex.png\" alt=\"Plex\" class=\"server-icon-img\"> Plex</div>"
     fi
 
     if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
@@ -964,10 +970,10 @@ replace_toggle_with_dropdown() {
         if [ "$current_server" = "jellyfin" ]; then
             jellyfin_active=" active"
             current_server_display="Jellyfin"
-            current_server_icon="🌊"
+            current_server_icon="<img src=\"${icon_base_path}jellyfin.png\" alt=\"Jellyfin\" class=\"server-icon-img\">"
         fi
 
-        dropdown_items="$dropdown_items<div class=\"server-item$jellyfin_active\" data-path=\"$jellyfin_relative_path\">🌊 Jellyfin</div>"
+        dropdown_items="$dropdown_items<div class=\"server-item$jellyfin_active\" data-path=\"$jellyfin_relative_path\"><img src=\"${icon_base_path}jellyfin.png\" alt=\"Jellyfin\" class=\"server-icon-img\"> Jellyfin</div>"
     fi
 
     if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
@@ -994,10 +1000,10 @@ replace_toggle_with_dropdown() {
         if [ "$current_server" = "emby" ]; then
             emby_active=" active"
             current_server_display="Emby"
-            current_server_icon="🟢"
+            current_server_icon="<img src=\"${icon_base_path}emby.png\" alt=\"Emby\" class=\"server-icon-img\">"
         fi
 
-        dropdown_items="$dropdown_items<div class=\"server-item$emby_active\" data-path=\"$emby_relative_path\">🟢 Emby</div>"
+        dropdown_items="$dropdown_items<div class=\"server-item$emby_active\" data-path=\"$emby_relative_path\"><img src=\"${icon_base_path}emby.png\" alt=\"Emby\" class=\"server-icon-img\"> Emby</div>"
     fi
 
     # Create the dropdown HTML and JavaScript
@@ -1021,7 +1027,7 @@ replace_toggle_with_dropdown() {
 .server-dropdown {
     position: relative;
     display: inline-block;
-    margin-left: 15px;
+    margin-left: 8px;
 }
 
 .server-button {
@@ -1078,6 +1084,9 @@ replace_toggle_with_dropdown() {
     transition: all var(--transition-speed);
     white-space: nowrap;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .server-item:hover {
@@ -1089,6 +1098,34 @@ replace_toggle_with_dropdown() {
     color: var(--primary-color);
     font-weight: 600;
     cursor: default;
+}
+
+/* Server Icon Image Styles */
+.server-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    vertical-align: middle;
+    flex-shrink: 0;
+    margin-right: 2px;
+}
+
+/* Server button icon sizing */
+.server-button .server-icon-img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Mobile server button icon sizing */
+.mobile-menu .server-button .server-icon-img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Server drawer icon sizing */
+.server-drawer .server-item .server-icon-img {
+    width: 20px;
+    height: 20px;
 }
 
 /* Server Drawer Styles - Matching Genre Drawer */
@@ -1174,8 +1211,9 @@ replace_toggle_with_dropdown() {
     padding: 15px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    gap: 12px;
 }
 
 .server-drawer .server-item:last-child {
