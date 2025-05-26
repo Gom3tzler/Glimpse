@@ -33,8 +33,8 @@ RUN chmod +x /app/entrypoint.sh
 RUN touch /etc/cron.d/media-cron
 RUN chmod 0644 /etc/cron.d/media-cron
 
-# Create data directory structure for both servers
-RUN mkdir -p /app/data/plex /app/data/jellyfin
+# Create data directory structure for all three servers
+RUN mkdir -p /app/data/plex /app/data/jellyfin /app/data/emby
 
 WORKDIR /app
 

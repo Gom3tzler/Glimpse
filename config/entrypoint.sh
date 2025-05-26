@@ -14,6 +14,10 @@ if [ "$PRIMARY_SERVER" = "plex" ]; then
             echo "Warning: PRIMARY_SERVER set to 'plex' but only Jellyfin credentials provided"
             echo "Auto-switching PRIMARY_SERVER to 'jellyfin'"
             PRIMARY_SERVER="jellyfin"
+        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'plex' but only Emby credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'emby'"
+            PRIMARY_SERVER="emby"
         else
             echo "Error: PRIMARY_SERVER=plex but no valid credentials provided for any server"
             exit 1
@@ -25,8 +29,27 @@ elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
             echo "Warning: PRIMARY_SERVER set to 'jellyfin' but only Plex credentials provided"
             echo "Auto-switching PRIMARY_SERVER to 'plex'"
             PRIMARY_SERVER="plex"
+        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'jellyfin' but only Emby credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'emby'"
+            PRIMARY_SERVER="emby"
         else
             echo "Error: PRIMARY_SERVER=jellyfin but no valid credentials provided for any server"
+            exit 1
+        fi
+    fi
+elif [ "$PRIMARY_SERVER" = "emby" ]; then
+    if [ -z "$EMBY_URL" ] || [ -z "$EMBY_TOKEN" ]; then
+        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'emby' but only Plex credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'plex'"
+            PRIMARY_SERVER="plex"
+        elif [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+            echo "Warning: PRIMARY_SERVER set to 'emby' but only Jellyfin credentials provided"
+            echo "Auto-switching PRIMARY_SERVER to 'jellyfin'"
+            PRIMARY_SERVER="jellyfin"
+        else
+            echo "Error: PRIMARY_SERVER=emby but no valid credentials provided for any server"
             exit 1
         fi
     fi
@@ -38,9 +61,12 @@ else
     elif [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
         echo "PRIMARY_SERVER not set or invalid, defaulting to 'jellyfin' based on available credentials"
         PRIMARY_SERVER="jellyfin"
+    elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+        echo "PRIMARY_SERVER not set or invalid, defaulting to 'emby' based on available credentials"
+        PRIMARY_SERVER="emby"
     else
         echo "Error: No valid credentials provided for any media server"
-        echo "Please set PLEX_URL/PLEX_TOKEN or JELLYFIN_URL/JELLYFIN_TOKEN"
+        echo "Please set PLEX_URL/PLEX_TOKEN, JELLYFIN_URL/JELLYFIN_TOKEN, or EMBY_URL/EMBY_TOKEN"
         exit 1
     fi
 fi
@@ -76,6 +102,10 @@ fi
 
 if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
     echo "$CRON_SCHEDULE root cd /app && $PYTHON_PATH /app/scripts/jellyfin_data_fetcher.py --url \"$JELLYFIN_URL\" --token \"$JELLYFIN_TOKEN\" --output /app/data/jellyfin >> /var/log/cron.log 2>&1" >>/etc/cron.d/media-cron
+fi
+
+if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+    echo "$CRON_SCHEDULE root cd /app && $PYTHON_PATH /app/scripts/jellyfin_data_fetcher.py --url \"$EMBY_URL\" --token \"$EMBY_TOKEN\" --output /app/data/emby >> /var/log/cron.log 2>&1" >>/etc/cron.d/media-cron
 fi
 
 # Apply cron job
@@ -132,9 +162,10 @@ migrate_existing_data() {
 # Run migration before setting up new structure
 migrate_existing_data
 
-# Create directory structure for both servers
+# Create directory structure for all servers
 mkdir -p /app/web/plex
 mkdir -p /app/web/jellyfin
+mkdir -p /app/web/emby
 
 # Function to create themed offline.html
 create_themed_offline() {
@@ -211,6 +242,79 @@ create_themed_offline() {
         <div class="icon">📶</div>
         <h1>You're Offline</h1>
         <p>It looks like you're not connected to the internet. REPLACE_APP_TITLE needs a connection to show your Jellyfin content.</p>
+        <button onclick="window.location.reload()">Try Again</button>
+    </div>
+</body>
+</html>
+EOF
+    elif [ "$server_type" = "emby" ]; then
+        # Emby themed offline page
+        cat >/app/web/offline.html <<'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - REPLACE_APP_TITLE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0d1b2a 100%);
+            background-attachment: fixed;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+        }
+        h1 {
+            color: #52c41a;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 30px;
+            filter: hue-rotate(100deg);
+        }
+        button {
+            background: linear-gradient(135deg, #52c41a, #389e0d);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(82, 196, 26, 0.3);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #389e0d, #237804);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(82, 196, 26, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📶</div>
+        <h1>You're Offline</h1>
+        <p>It looks like you're not connected to the internet. REPLACE_APP_TITLE needs a connection to show your Emby content.</p>
         <button onclick="window.location.reload()">Try Again</button>
     </div>
 </body>
@@ -305,7 +409,7 @@ create_themed_manifest() {
 {
   "name": "Glimpse Media Viewer",
   "short_name": "Glimpse",
-  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin/Emby media server",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#101010",
@@ -326,13 +430,40 @@ create_themed_manifest() {
   ]
 }
 EOF
+    elif [ "$server_type" = "emby" ]; then
+        # Emby themed manifest
+        cat >/app/web/manifest.json <<EOF
+{
+  "name": "Glimpse Media Viewer",
+  "short_name": "Glimpse",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin/Emby media server",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1419",
+  "theme_color": "#0f1419",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/emby/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/emby/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+EOF
     else
         # Plex themed manifest (default)
         cat >/app/web/manifest.json <<EOF
 {
   "name": "Glimpse Media Viewer",
   "short_name": "Glimpse",
-  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin media server",
+  "description": "A sleek, responsive web application for browsing your Plex/Jellyfin/Emby media server",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#131313",
@@ -362,6 +493,8 @@ EOF
     if [ -f /app/web/index.html ]; then
         if [ "$server_type" = "jellyfin" ]; then
             sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#101010">/' /app/web/index.html
+        elif [ "$server_type" = "emby" ]; then
+            sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#0f1419">/' /app/web/index.html
         else
             sed -i 's/<meta name="theme-color" content="[^"]*">/<meta name="theme-color" content="#131313">/' /app/web/index.html
         fi
@@ -397,15 +530,11 @@ apply_jellyfin_theme() {
     sed -i 's|href="images/favicon-16x16\.png"|href="images/jellyfin/favicon-16x16.png"|g' "$index_file"
     sed -i 's|href="../images/favicon-16x16\.png"|href="../images/jellyfin/favicon-16x16.png"|g' "$index_file"
 
-    # Update manifest.json path if it exists
-    sed -i 's|href="/manifest\.json"|href="/manifest.json"|g' "$index_file"
-    sed -i 's|href="../manifest\.json"|href="../manifest.json"|g' "$index_file"
-
     # Update title for main index files (primary server gets indicator too)
     if [[ "$index_file" == "/app/web/index.html" ]]; then
         # This is the main index, add Jellyfin indicator
         current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g' | sed 's/ - Emby//g')
         sed -i "s|<title>.*</title>|<title>$clean_title - Jellyfin</title>|" "$index_file"
         echo "Updated main index title to: $clean_title - Jellyfin"
     fi
@@ -476,174 +605,128 @@ apply_jellyfin_theme() {
         .scroll-to-top:hover {
             background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
         }
-        
-        /* Jellyfin modal backdrop */
-        .modal-backdrop::after {
-            background: linear-gradient(to bottom, rgba(16, 16, 16, 0.3) 0%, #101010 100%) !important;
-        }
-        
-        /* Jellyfin header styling */
-        .header {
-            background-color: #141414 !important;
-            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
-        }
-        
-        /* Jellyfin search input styling */
-        .search-input {
-            background-color: rgba(24, 24, 24, 0.8) !important;
-            border: 1px solid rgba(0, 164, 220, 0.3) !important;
-            color: #ffffff !important;
-        }
-        
-        .search-input:focus {
-            background-color: rgba(24, 24, 24, 0.9) !important;
-            box-shadow: 0 0 0 2px rgba(0, 164, 220, 0.4) !important;
-            border-color: rgba(0, 164, 220, 0.6) !important;
-        }
-        
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-        
-        .search-clear {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-        
-        .search-clear:hover {
-            color: #00a4dc !important;
-            background-color: rgba(0, 164, 220, 0.1) !important;
-        }
-        
-        /* Jellyfin genre styling */
-        .genre-tag {
-            background-color: rgba(0, 164, 220, 0.15) !important;
-            border: 1px solid rgba(0, 164, 220, 0.3) !important;
-            color: #00a4dc !important;
-        }
-        
-        .genre-tag:hover {
-            background-color: rgba(0, 164, 220, 0.25) !important;
-            border-color: rgba(0, 164, 220, 0.5) !important;
-        }
-        
-        /* Jellyfin genre dropdown/drawer styling */
-        .genre-menu,
-        .genre-drawer {
-            background-color: #181818 !important;
-            border: 1px solid rgba(0, 164, 220, 0.2) !important;
-        }
-        
-        .genre-item:hover {
-            background-color: rgba(0, 164, 220, 0.15) !important;
-        }
-        
-        .genre-item.active {
-            background-color: rgba(0, 164, 220, 0.2) !important;
-            color: #00a4dc !important;
-        }
-        
-        /* Jellyfin modal styling */
-        .modal-content {
-            background-color: #181818 !important;
-        }
-        
-        .modal-header {
-            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
-        }
-        
-        .modal-title {
-            color: #ffffff !important;
-        }
-        
-        .modal-year {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        
-        .metadata-item {
-            background-color: rgba(0, 164, 220, 0.15) !important;
-            color: #ffffff !important;
-        }
-        
-        .modal-section-title {
-            color: #00a4dc !important;
-        }
-        
-        .cast-item {
-            background-color: rgba(0, 164, 220, 0.08) !important;
-        }
-        
-        .cast-name {
-            color: #ffffff !important;
-        }
-        
-        .cast-role {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-        
-        /* Jellyfin trailer button */
-        .watch-trailer-btn {
-            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
-            color: #ffffff !important;
-        }
-        
-        .watch-trailer-btn:hover {
-            background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
-        }
-        
-        /* Jellyfin mobile menu */
-        .mobile-menu {
-            background-color: #141414 !important;
-        }
-        
-        /* Jellyfin tabs styling */
-        .tab {
-            background-color: #252525 !important;
-        }
-        
-        .sort-button,
-        .genre-button {
-            background-color: #252525 !important;
-        }
-        
-        /* Jellyfin genre drawer styling */
-        .genre-drawer {
-            background-color: #181818 !important;
-        }
-        
-        .genre-drawer-header {
-            border-bottom: 1px solid rgba(0, 164, 220, 0.2) !important;
-        }
-
-        /* Jellyfin trailer loading styling */
-        .trailer-loading {
-            background-color: rgba(16, 16, 16, 0.8) !important;
-        }
-        
-        .trailer-spinner {
-            border: 4px solid rgba(0, 164, 220, 0.2) !important;
-            border-top-color: #00a4dc !important;
-        }
-        
-        .trailer-loading-text {
-            color: #ffffff !important;
-        }
 
 EOF
 
     # Insert Jellyfin theme CSS after the existing styles but before closing </style>
     sed -i '/<\/style>/e cat /tmp/jellyfin_theme.css' "$index_file"
 
-    # Update the app title in browser tab if we're theming the main index
-    if [[ "$index_file" == *"/index.html" ]] && [[ "$index_file" != *"/jellyfin/index.html" ]]; then
-        # Get current title and add Jellyfin indicator
-        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        if [[ "$current_title" != *"Jellyfin"* ]]; then
-            sed -i "s/<title>$current_title<\/title>/<title>$current_title - Jellyfin<\/title>/" "$index_file"
-        fi
-    fi
-
     # Clean up temporary file
     rm -f /tmp/jellyfin_theme.css
+}
+
+apply_emby_theme() {
+    local index_file=$1
+    echo "Applying Emby theme to $index_file"
+
+    # Update image paths to point to emby directory
+    echo "Updating image paths to use emby directory"
+
+    # Update logo image path - be specific to avoid double replacement
+    sed -i 's|src="images/logo\.png"|src="images/emby/logo.png"|g' "$index_file"
+    sed -i 's|src="../images/logo\.png"|src="../images/emby/logo.png"|g' "$index_file"
+
+    # Update specific favicon and meta tag images
+    sed -i 's|href="images/android-chrome-192x192\.png"|href="images/emby/android-chrome-192x192.png"|g' "$index_file"
+    sed -i 's|href="/images/android-chrome-192x192\.png"|href="/images/emby/android-chrome-192x192.png"|g' "$index_file"
+    sed -i 's|href="../images/android-chrome-192x192\.png"|href="../images/emby/android-chrome-192x192.png"|g' "$index_file"
+
+    sed -i 's|href="images/android-chrome-592x592\.png"|href="images/emby/android-chrome-592x592.png"|g' "$index_file"
+    sed -i 's|href="/images/android-chrome-592x592\.png"|href="/images/emby/android-chrome-592x592.png"|g' "$index_file"
+    sed -i 's|href="../images/android-chrome-592x592\.png"|href="../images/emby/android-chrome-592x592.png"|g' "$index_file"
+
+    sed -i 's|href="images/apple-touch-icon\.png"|href="images/emby/apple-touch-icon.png"|g' "$index_file"
+    sed -i 's|href="../images/apple-touch-icon\.png"|href="../images/emby/apple-touch-icon.png"|g' "$index_file"
+
+    sed -i 's|href="images/favicon-32x32\.png"|href="images/emby/favicon-32x32.png"|g' "$index_file"
+    sed -i 's|href="../images/favicon-32x32\.png"|href="../images/emby/favicon-32x32.png"|g' "$index_file"
+
+    sed -i 's|href="images/favicon-16x16\.png"|href="images/emby/favicon-16x16.png"|g' "$index_file"
+    sed -i 's|href="../images/favicon-16x16\.png"|href="../images/emby/favicon-16x16.png"|g' "$index_file"
+
+    # Update title for main index files (primary server gets indicator too)
+    if [[ "$index_file" == "/app/web/index.html" ]]; then
+        # This is the main index, add Emby indicator
+        current_title=$(grep -o '<title>[^<]*</title>' "$index_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g' | sed 's/ - Emby//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Emby</title>|" "$index_file"
+        echo "Updated main index title to: $clean_title - Emby"
+    fi
+
+    # Create temporary file with Emby CSS overrides
+    cat >/tmp/emby_theme.css <<'EOF'
+
+        /* Emby Theme Overrides */
+        :root {
+            --primary-color: #52c41a !important;
+            --primary-hover: #389e0d !important;
+            --primary-light: rgba(82, 196, 26, 0.1) !important;
+            --bg-color: #0f1419 !important;
+            --secondary-bg: #1a2332 !important;
+            --header-bg: #162029 !important;
+            --tab-bg: #2a3441 !important;
+        }
+        
+        /* Ensure full screen coverage without affecting layout */
+        html {
+            min-height: 100vh;
+        }
+        
+        /* Emby gradient background */
+        body {
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0d1b2a 100%) !important;
+            background-attachment: fixed !important;
+            background-size: cover !important;
+            background-repeat: no-repeat !important;
+            min-height: 100vh;
+        }
+        
+        /* Emby accent color for active elements */
+        .tab.active,
+        .sort-button.active,
+        .genre-button.active {
+            background: linear-gradient(135deg, #52c41a, #389e0d) !important;
+            color: white !important;
+        }
+        
+        /* Emby hover effects */
+        .tab:hover:not(.active),
+        .sort-button:hover:not(.active),
+        .genre-button:hover:not(.active),
+        .server-toggle-button:hover,
+        .roulette-button:hover,
+        .modal-try-again-btn:hover {
+            background-color: rgba(82, 196, 26, 0.2) !important;
+        }
+        
+        /* Emby media item hover - no glow, better contrast */
+        .media-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* Emby poster container - better contrast against dark background */
+        .media-item {
+            background-color: #2a3441 !important;
+        }
+        
+        /* Emby scroll indicators */
+        .scroll-to-top {
+            background: linear-gradient(135deg, #52c41a, #389e0d) !important;
+            color: #ffffff !important;
+        }
+        
+        .scroll-to-top:hover {
+            background: linear-gradient(135deg, #389e0d, #237804) !important;
+        }
+
+EOF
+
+    # Insert Emby theme CSS after the existing styles but before closing </style>
+    sed -i '/<\/style>/e cat /tmp/emby_theme.css' "$index_file"
+
+    # Clean up temporary file
+    rm -f /tmp/emby_theme.css
 }
 
 remove_server_toggle() {
@@ -681,32 +764,32 @@ if (typeof toggleServer !== 'undefined') {
 EOF
 }
 
-# Function to update server toggle text and path
+# Function to update server toggle text and path (for 2-server mode only)
 update_server_toggle() {
     local index_file=$1
     local switch_to_server=$2
     local switch_to_path=$3
-    local is_primary=$4 # New parameter to indicate if this is the primary server
+    local is_primary=$4
 
-    echo "Updating server toggle in $index_file: Switch to $switch_to_server"
+    echo "Updating server toggle in $index_file: Switch to $switch_to_server (path: $switch_to_path)"
 
     # First, reset any existing toggle text back to placeholders
     sed -i 's/Switch to Plex/Switch to SERVER_NAME/g' "$index_file"
     sed -i 's/Switch to Jellyfin/Switch to SERVER_NAME/g' "$index_file"
+    sed -i 's/Switch to Emby/Switch to SERVER_NAME/g' "$index_file"
 
     # Reset ONLY the toggle button path, not the data paths
-    # Look for the specific pattern in the toggleServer function
     sed -i 's/newPath = "[^"]*";/newPath = "SERVER_PATH\/";/g' "$index_file"
 
     # Now update with the correct values
     sed -i "s/Switch to SERVER_NAME/Switch to $switch_to_server/g" "$index_file"
 
-    # Update the path - if switching to primary server, go to root, otherwise go to specific route
-    if [ "$is_primary" = "true" ]; then
+    # Update the path
+    if [ "$switch_to_path" = "../" ]; then
         # Going to primary server - use root path
         sed -i "s/SERVER_PATH\//\//g" "$index_file"
     else
-        # Going to secondary server - use specific route
+        # Going to secondary server
         local escaped_path=$(echo "$switch_to_path" | sed 's/\//\\\//g')
         sed -i "s/SERVER_PATH/$escaped_path/g" "$index_file"
     fi
@@ -723,47 +806,30 @@ create_server_index() {
     # Copy the main index.html as a template
     cp /app/web/index.html "$output_file"
 
-    # Add mobile install button if it doesn't exist
-    if ! grep -q "mobile-install-button" "$output_file"; then
-        echo "Adding mobile install button to $output_file"
-        # Find the server toggle button and add the install button after it
-        sed -i '/<!-- Mobile Server Toggle/,/<\/button>/ {
-            /<\/button>/ a\
-            <!-- Mobile Install Button (will be shown/hidden by JavaScript) -->\
-            <button class="sort-button install-button mobile-install-button" style="display: none;">\
-                <span class="install-icon">📱</span>\
-                <span class="install-text">Install App</span>\
-            </button>
-        }' "$output_file"
-    fi
-
     # Set the title immediately based on the route type
     if [[ "$output_file" == *"/plex/index.html" ]]; then
         # This is a Plex secondary route
         current_title=$(grep -o '<title>[^<]*</title>' "$output_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g' | sed 's/ - Emby//g')
         sed -i "s|<title>.*</title>|<title>$clean_title - Plex</title>|" "$output_file"
         echo "Set Plex secondary route title: $clean_title - Plex"
     elif [[ "$output_file" == *"/jellyfin/index.html" ]]; then
         # This is a Jellyfin secondary route
         current_title=$(grep -o '<title>[^<]*</title>' "$output_file" | sed 's/<title>\(.*\)<\/title>/\1/')
-        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g' | sed 's/ - Emby//g')
         sed -i "s|<title>.*</title>|<title>$clean_title - Jellyfin</title>|" "$output_file"
         echo "Set Jellyfin secondary route title: $clean_title - Jellyfin"
+    elif [[ "$output_file" == *"/emby/index.html" ]]; then
+        # This is an Emby secondary route
+        current_title=$(grep -o '<title>[^<]*</title>' "$output_file" | sed 's/<title>\(.*\)<\/title>/\1/')
+        clean_title=$(echo "$current_title" | sed 's/ - Jellyfin//g' | sed 's/ - Plex//g' | sed 's/ - Emby//g')
+        sed -i "s|<title>.*</title>|<title>$clean_title - Emby</title>|" "$output_file"
+        echo "Set Emby secondary route title: $clean_title - Emby"
     fi
 
     # For sub-directory routes, we need to use relative paths from the sub-directory
     if [ "$output_file" != "/app/web/index.html" ]; then
-        # For /plex/ and /jellyfin/ routes, update data paths with ../
-        sed -i "s|'data/movies\.json'|'../${data_path}/movies.json'|g" "$output_file"
-        sed -i "s|\"data/movies\.json\"|\"../${data_path}/movies.json\"|g" "$output_file"
-        sed -i "s|'data/tvshows\.json'|'../${data_path}/tvshows.json'|g" "$output_file"
-        sed -i "s|\"data/tvshows\.json\"|\"../${data_path}/tvshows.json\"|g" "$output_file"
-        sed -i "s|data/posters/|../${data_path}/posters/|g" "$output_file"
-        sed -i "s|data/backdrops/|../${data_path}/backdrops/|g" "$output_file"
-
-        # If the main index was already modified for a primary server, we need to undo those changes first
-        # Replace any existing data/jellyfin/ or data/plex/ paths back to data/ then apply the new paths
+        # Reset any existing server-specific paths first
         sed -i "s|data/jellyfin/movies\.json|data/movies.json|g" "$output_file"
         sed -i "s|data/jellyfin/tvshows\.json|data/tvshows.json|g" "$output_file"
         sed -i "s|data/jellyfin/posters/|data/posters/|g" "$output_file"
@@ -772,6 +838,10 @@ create_server_index() {
         sed -i "s|data/plex/tvshows\.json|data/tvshows.json|g" "$output_file"
         sed -i "s|data/plex/posters/|data/posters/|g" "$output_file"
         sed -i "s|data/plex/backdrops/|data/backdrops/|g" "$output_file"
+        sed -i "s|data/emby/movies\.json|data/movies.json|g" "$output_file"
+        sed -i "s|data/emby/tvshows\.json|data/tvshows.json|g" "$output_file"
+        sed -i "s|data/emby/posters/|data/posters/|g" "$output_file"
+        sed -i "s|data/emby/backdrops/|data/backdrops/|g" "$output_file"
 
         # Now apply the correct paths with ../
         sed -i "s|'data/movies\.json'|'../${data_path}/movies.json'|g" "$output_file"
@@ -798,6 +868,358 @@ create_server_index() {
     fi
 }
 
+# Function to count configured servers
+count_configured_servers() {
+    local count=0
+
+    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+        count=$((count + 1))
+    fi
+
+    if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        count=$((count + 1))
+    fi
+
+    if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+        count=$((count + 1))
+    fi
+
+    echo $count
+}
+
+# Function to configure two-server toggle
+configure_two_server_toggle() {
+    echo "Configuring two-server toggle system"
+
+    # Create routes for secondary server
+    if [ "$PRIMARY_SERVER" = "plex" ]; then
+        if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
+            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
+        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+            create_server_index "emby" "data/emby" "/app/web/emby/index.html"
+            update_server_toggle "/app/web/index.html" "Emby" "emby" "false"
+            update_server_toggle "/app/web/emby/index.html" "Plex" "../" "true"
+        fi
+    elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
+        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
+            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
+        elif [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+            create_server_index "emby" "data/emby" "/app/web/emby/index.html"
+            update_server_toggle "/app/web/index.html" "Emby" "emby" "false"
+            update_server_toggle "/app/web/emby/index.html" "Jellyfin" "../" "true"
+        fi
+    else # emby
+        if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
+            update_server_toggle "/app/web/plex/index.html" "Emby" "../" "true"
+        elif [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
+            update_server_toggle "/app/web/jellyfin/index.html" "Emby" "../" "true"
+        fi
+    fi
+}
+
+# Function to configure three-server dropdown
+configure_three_server_dropdown() {
+    echo "Configuring three-server dropdown system"
+
+    # Create routes for all secondary servers
+    if [ "$PRIMARY_SERVER" != "plex" ] && [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+        create_server_index "plex" "data/plex" "/app/web/plex/index.html"
+    fi
+    if [ "$PRIMARY_SERVER" != "jellyfin" ] && [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
+    fi
+    if [ "$PRIMARY_SERVER" != "emby" ] && [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+        create_server_index "emby" "data/emby" "/app/web/emby/index.html"
+    fi
+
+    # Replace toggle button with dropdown for all routes
+    replace_toggle_with_dropdown "/app/web/index.html" "$PRIMARY_SERVER"
+
+    if [ -f "/app/web/plex/index.html" ]; then
+        replace_toggle_with_dropdown "/app/web/plex/index.html" "plex"
+    fi
+    if [ -f "/app/web/jellyfin/index.html" ]; then
+        replace_toggle_with_dropdown "/app/web/jellyfin/index.html" "jellyfin"
+    fi
+    if [ -f "/app/web/emby/index.html" ]; then
+        replace_toggle_with_dropdown "/app/web/emby/index.html" "emby"
+    fi
+}
+
+# Function to replace toggle button with dropdown
+replace_toggle_with_dropdown() {
+    local index_file=$1
+    local current_server=$2
+
+    echo "Replacing toggle button with dropdown in $index_file (current: $current_server)"
+
+    # Build dropdown options
+    local dropdown_options=""
+    local current_path=""
+
+    # Determine current path based on file location
+    if [[ "$index_file" == "/app/web/index.html" ]]; then
+        current_path="/"
+    elif [[ "$index_file" == *"/plex/index.html" ]]; then
+        current_path="/plex/"
+    elif [[ "$index_file" == *"/jellyfin/index.html" ]]; then
+        current_path="/jellyfin/"
+    elif [[ "$index_file" == *"/emby/index.html" ]]; then
+        current_path="/emby/"
+    fi
+
+    # Add options for all configured servers
+    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ]; then
+        local plex_path="/"
+        local plex_relative_path=""
+
+        if [ "$PRIMARY_SERVER" = "plex" ]; then
+            plex_path="/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                plex_relative_path="/"
+            else
+                plex_relative_path="../"
+            fi
+        else
+            plex_path="/plex/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                plex_relative_path="plex/"
+            else
+                plex_relative_path="../plex/"
+            fi
+        fi
+
+        local plex_selected=""
+        if [ "$current_server" = "plex" ]; then
+            plex_selected=" selected disabled"
+        fi
+
+        dropdown_options="$dropdown_options<option value=\"$plex_relative_path\"$plex_selected>📺 Plex</option>"
+    fi
+
+    if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
+        local jellyfin_path="/"
+        local jellyfin_relative_path=""
+
+        if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
+            jellyfin_path="/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                jellyfin_relative_path="/"
+            else
+                jellyfin_relative_path="../"
+            fi
+        else
+            jellyfin_path="/jellyfin/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                jellyfin_relative_path="jellyfin/"
+            else
+                jellyfin_relative_path="../jellyfin/"
+            fi
+        fi
+
+        local jellyfin_selected=""
+        if [ "$current_server" = "jellyfin" ]; then
+            jellyfin_selected=" selected disabled"
+        fi
+
+        dropdown_options="$dropdown_options<option value=\"$jellyfin_relative_path\"$jellyfin_selected>🌊 Jellyfin</option>"
+    fi
+
+    if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+        local emby_path="/"
+        local emby_relative_path=""
+
+        if [ "$PRIMARY_SERVER" = "emby" ]; then
+            emby_path="/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                emby_relative_path="/"
+            else
+                emby_relative_path="../"
+            fi
+        else
+            emby_path="/emby/"
+            if [[ "$index_file" == "/app/web/index.html" ]]; then
+                emby_relative_path="emby/"
+            else
+                emby_relative_path="../emby/"
+            fi
+        fi
+
+        local emby_selected=""
+        if [ "$current_server" = "emby" ]; then
+            emby_selected=" selected disabled"
+        fi
+
+        dropdown_options="$dropdown_options<option value=\"$emby_relative_path\"$emby_selected>🟢 Emby</option>"
+    fi
+
+    # Create the dropdown HTML and JavaScript
+    cat >>"$index_file" <<EOF
+
+<style>
+/* Server Dropdown Styles */
+.server-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+}
+
+.server-dropdown select {
+    background-color: var(--tab-bg);
+    color: var(--light-text);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 32px;
+    min-width: 120px;
+}
+
+.server-dropdown select:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.server-dropdown select:focus {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.server-dropdown option {
+    background-color: var(--secondary-bg);
+    color: var(--light-text);
+    padding: 8px 12px;
+}
+
+.server-dropdown option:disabled {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+    .server-dropdown {
+        margin-left: 10px;
+    }
+    
+    .server-dropdown select {
+        min-width: 100px;
+        font-size: 0.85rem;
+        padding: 6px 8px;
+        padding-right: 28px;
+    }
+    
+    /* Mobile menu dropdown */
+    .mobile-menu .server-dropdown {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .mobile-menu .server-dropdown select {
+        width: 100%;
+        min-width: unset;
+        padding: 10px 12px;
+        padding-right: 32px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<script>
+// Replace existing server toggle functionality with dropdown
+document.addEventListener('DOMContentLoaded', function() {
+    // Hide existing toggle buttons
+    const toggleButtons = document.querySelectorAll('.server-toggle-button');
+    toggleButtons.forEach(button => {
+        button.style.display = 'none';
+    });
+    
+    // Create dropdown for desktop
+    const serverToggle = document.querySelector('.server-toggle');
+    if (serverToggle) {
+        serverToggle.innerHTML = \`
+            <div class="server-dropdown">
+                <select onchange="switchServer(this.value)">
+                    <option value="" disabled>Switch Server</option>
+                    $dropdown_options
+                </select>
+            </div>
+        \`;
+    }
+    
+    // Create dropdown for mobile menu
+    const mobileMenu = document.querySelector('.mobile-menu');
+    if (mobileMenu) {
+        // Find the server toggle button in mobile menu and replace it
+        const mobileToggleButton = mobileMenu.querySelector('.server-toggle-button');
+        if (mobileToggleButton) {
+            mobileToggleButton.style.display = 'none';
+            
+            // Add dropdown after the genre button
+            const genreButton = mobileMenu.querySelector('#mobile-genre-button');
+            if (genreButton) {
+                const mobileDropdownHtml = \`
+                    <div class="server-dropdown">
+                        <select onchange="switchServer(this.value); document.querySelector('.mobile-menu').classList.remove('open');">
+                            <option value="" disabled>Switch Server</option>
+                            $dropdown_options
+                        </select>
+                    </div>
+                \`;
+                genreButton.insertAdjacentHTML('afterend', mobileDropdownHtml);
+            }
+        }
+    }
+});
+
+// Function to handle server switching
+function switchServer(path) {
+    if (path && path !== '/') {
+        // Clear themed cache before switching
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            try {
+                const messageChannel = new MessageChannel();
+                navigator.serviceWorker.controller.postMessage(
+                    { type: 'CLEAR_THEMED_CACHE' },
+                    [messageChannel.port2]
+                );
+            } catch (error) {
+                console.log('Could not clear service worker cache:', error);
+            }
+        }
+        
+        window.location.href = path;
+    }
+}
+
+// Override the old toggleServer function to prevent errors
+window.toggleServer = function() {
+    console.log("Using dropdown instead of toggle");
+    return false;
+};
+</script>
+EOF
+}
+
 # Update the main index.html based on primary server
 if [ -f /app/web/index.html ]; then
     echo "Updating app title to: $APP_TITLE"
@@ -822,7 +1244,12 @@ if [ -f /app/web/index.html ]; then
         sed -i "s|\"data/tvshows\.json\"|\"data/plex/tvshows.json\"|g" /app/web/index.html
         sed -i "s|data/posters/|data/plex/posters/|g" /app/web/index.html
         sed -i "s|data/backdrops/|data/plex/backdrops/|g" /app/web/index.html
-    else
+
+        # Update title to include Plex indicator
+        sed -i "s/<title>$APP_TITLE<\/title>/<title>$APP_TITLE - Plex<\/title>/" /app/web/index.html
+        echo "Updated primary index title to: $APP_TITLE - Plex"
+
+    elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
         echo "Setting up primary server as Jellyfin"
         # Main index.html points to jellyfin data
         sed -i "s|'data/movies\.json'|'data/jellyfin/movies.json'|g" /app/web/index.html
@@ -831,51 +1258,49 @@ if [ -f /app/web/index.html ]; then
         sed -i "s|\"data/tvshows\.json\"|\"data/jellyfin/tvshows.json\"|g" /app/web/index.html
         sed -i "s|data/posters/|data/jellyfin/posters/|g" /app/web/index.html
         sed -i "s|data/backdrops/|data/jellyfin/backdrops/|g" /app/web/index.html
+
+        # Update title to include Jellyfin indicator
+        sed -i "s/<title>$APP_TITLE<\/title>/<title>$APP_TITLE - Jellyfin<\/title>/" /app/web/index.html
+        echo "Updated primary index title to: $APP_TITLE - Jellyfin"
+
+    else # emby
+        echo "Setting up primary server as Emby"
+        # Main index.html points to emby data
+        sed -i "s|'data/movies\.json'|'data/emby/movies.json'|g" /app/web/index.html
+        sed -i "s|\"data/movies\.json\"|\"data/emby/movies.json\"|g" /app/web/index.html
+        sed -i "s|'data/tvshows\.json'|'data/emby/tvshows.json'|g" /app/web/index.html
+        sed -i "s|\"data/tvshows\.json\"|\"data/emby/tvshows.json\"|g" /app/web/index.html
+        sed -i "s|data/posters/|data/emby/posters/|g" /app/web/index.html
+        sed -i "s|data/backdrops/|data/emby/backdrops/|g" /app/web/index.html
+
+        # Update title to include Emby indicator
+        sed -i "s/<title>$APP_TITLE<\/title>/<title>$APP_TITLE - Emby<\/title>/" /app/web/index.html
+        echo "Updated primary index title to: $APP_TITLE - Emby"
     fi
 
     # Handle server toggle based on configuration
-    # Check if both servers are configured
-    both_servers_configured=false
-    if [ -n "$PLEX_URL" ] && [ -n "$PLEX_TOKEN" ] && [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
-        both_servers_configured=true
-        echo "Both servers configured - keeping server toggle functionality"
+    server_count=$(count_configured_servers)
+    echo "Number of configured servers: $server_count"
 
-        # Create themed manifest and offline page based on primary server
-        create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
-        create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
-
-        # Create routes FIRST, before applying themes
-        if [ "$PRIMARY_SERVER" = "plex" ]; then
-            # Plex is primary, so create Jellyfin route only
-            echo "Creating secondary server route: /jellyfin/"
-            create_server_index "jellyfin" "data/jellyfin" "/app/web/jellyfin/index.html"
-            # When viewing secondary Jellyfin, switch back to primary (root)
-            update_server_toggle "/app/web/jellyfin/index.html" "Plex" "../" "true"
-        else
-            # Jellyfin is primary, so create Plex route only
-            echo "Creating secondary server route: /plex/"
-            create_server_index "plex" "data/plex" "/app/web/plex/index.html"
-            # When viewing secondary Plex, switch back to primary (root)
-            update_server_toggle "/app/web/plex/index.html" "Jellyfin" "../" "true"
-        fi
-
-        # NOW apply themes after routes are created
-        if [ "$PRIMARY_SERVER" = "plex" ]; then
-            # Main index shows Plex, so switch to Jellyfin (secondary)
-            update_server_toggle "/app/web/index.html" "Jellyfin" "jellyfin" "false"
-            # No theme application needed for main index - it's already Plex-themed
-            # Apply Jellyfin theme to the secondary route
-            apply_jellyfin_theme "/app/web/jellyfin/index.html"
-        else
-            # Main index shows Jellyfin, so switch to Plex (secondary)
-            update_server_toggle "/app/web/index.html" "Plex" "plex" "false"
-            # Apply Jellyfin theme to main index
-            apply_jellyfin_theme "/app/web/index.html"
-            # No theme application needed for Plex secondary route - it uses original styling
-        fi
-    else
+    if [ "$server_count" -eq 1 ]; then
         echo "Only one server configured - removing server toggle functionality"
         remove_server_toggle "/app/web/index.html"
+
+        # Add server name to title for single server mode too
+        current_title=$(grep -o '<title>[^<]*</title>' /app/web/index.html | sed 's/<title>\(.*\)<\/title>/\1/')
+        if [[ "$current_title" != *" - "* ]]; then
+            # Only add server name if it's not already there
+            if [ "$PRIMARY_SERVER" = "plex" ]; then
+                sed -i "s/<title>$current_title<\/title>/<title>$current_title - Plex<\/title>/" /app/web/index.html
+                echo "Updated single server title to: $current_title - Plex"
+            elif [ "$PRIMARY_SERVER" = "jellyfin" ]; then
+                sed -i "s/<title>$current_title<\/title>/<title>$current_title - Jellyfin<\/title>/" /app/web/index.html
+                echo "Updated single server title to: $current_title - Jellyfin"
+            elif [ "$PRIMARY_SERVER" = "emby" ]; then
+                sed -i "s/<title>$current_title<\/title>/<title>$current_title - Emby<\/title>/" /app/web/index.html
+                echo "Updated single server title to: $current_title - Emby"
+            fi
+        fi
 
         # Create themed manifest and offline page based on single server type
         create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
@@ -884,9 +1309,50 @@ if [ -f /app/web/index.html ]; then
         # Apply theme based on single server type
         if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
             apply_jellyfin_theme "/app/web/index.html"
+        elif [ "$PRIMARY_SERVER" = "emby" ]; then
+            apply_emby_theme "/app/web/index.html"
         else
             # No theme application needed - index.html is already Plex-themed
             echo "Plex is primary server - using default index.html styling"
+        fi
+    else
+        echo "Multiple servers configured - setting up server toggle functionality"
+
+        # Create themed manifest and offline page based on primary server
+        create_themed_manifest "$PRIMARY_SERVER" "$APP_TITLE"
+        create_themed_offline "$PRIMARY_SERVER" "$APP_TITLE"
+
+        # Determine UI approach based on server count
+        if [ "$server_count" -eq 2 ]; then
+            echo "Two servers configured - using toggle button"
+            configure_two_server_toggle
+        else
+            echo "Three servers configured - using dropdown menu"
+            configure_three_server_dropdown
+        fi
+
+        # NOW apply themes after routes are created
+        echo "Applying themes to all routes..."
+
+        # Apply theme to main index based on primary server
+        if [ "$PRIMARY_SERVER" = "jellyfin" ]; then
+            apply_jellyfin_theme "/app/web/index.html"
+        elif [ "$PRIMARY_SERVER" = "emby" ]; then
+            apply_emby_theme "/app/web/index.html"
+        fi
+        # Plex primary needs no theme - it's the default
+
+        # Apply themes to all secondary routes
+        if [ -f "/app/web/plex/index.html" ]; then
+            echo "Plex secondary route uses default styling"
+        fi
+
+        if [ -f "/app/web/jellyfin/index.html" ]; then
+            apply_jellyfin_theme "/app/web/jellyfin/index.html"
+        fi
+
+        if [ -f "/app/web/emby/index.html" ]; then
+            apply_emby_theme "/app/web/emby/index.html"
         fi
     fi
 
@@ -920,6 +1386,12 @@ if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
     $PYTHON_PATH /app/scripts/jellyfin_data_fetcher.py --url "$JELLYFIN_URL" --token "$JELLYFIN_TOKEN" --output /app/data/jellyfin
 fi
 
+# Fetch Emby data if configured (using jellyfin fetcher since APIs are compatible)
+if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
+    echo "Fetching Emby data using Jellyfin API compatibility"
+    $PYTHON_PATH /app/scripts/jellyfin_data_fetcher.py --url "$EMBY_URL" --token "$EMBY_TOKEN" --output /app/data/emby
+fi
+
 # Make sure the data directory is accessible by nginx
 chown -R www-data:www-data /app/data
 chown -R www-data:www-data /app/web
@@ -931,6 +1403,7 @@ ls -la /etc/nginx/sites-enabled/ || echo "No sites-enabled directory"
 echo "Checking web directory:"
 ls -la /app/web/
 echo "Primary server: $PRIMARY_SERVER"
+echo "Configured servers: $(count_configured_servers)"
 
 # Start supervisor (which will start both nginx and cron)
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

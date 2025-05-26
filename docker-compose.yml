@@ -11,7 +11,7 @@ services:
       # - ./logo.png:/app/web/images/logo.png # Add your logo.png file and uncomment this line to customize the logo
     environment:
       # Primary Media Server Configuration
-      - PRIMARY_SERVER=plex # Options: plex, jellyfin
+      - PRIMARY_SERVER=plex # Options: plex, jellyfin, emby
 
       # Plex Configuration
       - PLEX_URL=http://your-plex-server:32400
@@ -20,6 +20,10 @@ services:
       # Jellyfin Configuration
       - JELLYFIN_URL=http://your-jellyfin-server:8096
       - JELLYFIN_TOKEN=your-jellyfin-api-token
+
+      # Emby Configuration
+      - EMBY_URL=http://your-emby-server:8096
+      - EMBY_TOKEN=your-emby-api-token
 
       # General Configuration
       - CRON_SCHEDULE=0 */6 * * * # Default: every 6 hours
