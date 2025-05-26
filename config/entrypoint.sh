@@ -585,6 +585,76 @@ apply_jellyfin_theme() {
             background-color: rgba(0, 164, 220, 0.2) !important;
         }
         
+        /* Jellyfin search input focus styling */
+        .search-input:focus {
+            background-color: rgba(0, 0, 0, 0.35) !important;
+            box-shadow: 0 0 0 2px rgba(0, 164, 220, 0.4) !important;
+        }
+        
+        /* Jellyfin search clear button */
+        .search-clear:hover {
+            color: #00a4dc !important;
+            background-color: rgba(0, 164, 220, 0.1) !important;
+        }
+        
+        /* Jellyfin genre styling */
+        .genre-tag {
+            background-color: rgba(0, 164, 220, 0.2) !important;
+            color: #00a4dc !important;
+        }
+        
+        .genre-tag:hover {
+            background-color: rgba(0, 164, 220, 0.3) !important;
+        }
+        
+        .genre-item.active {
+            background-color: rgba(0, 164, 220, 0.1) !important;
+            color: #00a4dc !important;
+        }
+        
+        .genre-badge {
+            background-color: #00a4dc !important;
+            color: #ffffff !important;
+        }
+        
+        /* Jellyfin trailer loading spinner */
+        .trailer-spinner,
+        .trailer-loading .trailer-spinner {
+            border: 4px solid rgba(0, 164, 220, 0.2) !important;
+            border-top-color: #00a4dc !important;
+        }
+        
+        /* Jellyfin roulette spinner */
+        .spinner-item {
+            background-color: #00a4dc !important;
+        }
+        
+        /* Jellyfin loading spinner (main) */
+        .loading-spinner {
+            border: 3px solid rgba(0, 164, 220, 0.1) !important;
+            border-top-color: #00a4dc !important;
+        }
+        
+        /* Jellyfin watch trailer button */
+        .watch-trailer-btn {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+            color: #ffffff !important;
+        }
+        
+        .watch-trailer-btn:hover {
+            background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
+        }
+        
+        /* Jellyfin install button */
+        .install-button {
+            background: linear-gradient(135deg, #00a4dc, #7b68ee) !important;
+            color: #ffffff !important;
+        }
+        
+        .install-button:hover {
+            background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
+        }
+        
         /* Jellyfin media item hover - no glow, better contrast */
         .media-item:hover {
             transform: translateY(-5px);
@@ -604,6 +674,12 @@ apply_jellyfin_theme() {
         
         .scroll-to-top:hover {
             background: linear-gradient(135deg, #0288c2, #6a5acd) !important;
+        }
+        
+        /* Jellyfin text placeholders */
+        .text-placeholder {
+            border: 1px solid rgba(0, 164, 220, 0.2) !important;
+            color: #00a4dc !important;
         }
 
 EOF
@@ -699,6 +775,76 @@ apply_emby_theme() {
             background-color: rgba(82, 196, 26, 0.2) !important;
         }
         
+        /* Emby search input focus styling */
+        .search-input:focus {
+            background-color: rgba(0, 0, 0, 0.35) !important;
+            box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.4) !important;
+        }
+        
+        /* Emby search clear button */
+        .search-clear:hover {
+            color: #52c41a !important;
+            background-color: rgba(82, 196, 26, 0.1) !important;
+        }
+        
+        /* Emby genre styling */
+        .genre-tag {
+            background-color: rgba(82, 196, 26, 0.2) !important;
+            color: #52c41a !important;
+        }
+        
+        .genre-tag:hover {
+            background-color: rgba(82, 196, 26, 0.3) !important;
+        }
+        
+        .genre-item.active {
+            background-color: rgba(82, 196, 26, 0.1) !important;
+            color: #52c41a !important;
+        }
+        
+        .genre-badge {
+            background-color: #52c41a !important;
+            color: #ffffff !important;
+        }
+        
+        /* Emby trailer loading spinner */
+        .trailer-spinner,
+        .trailer-loading .trailer-spinner {
+            border: 4px solid rgba(82, 196, 26, 0.2) !important;
+            border-top-color: #52c41a !important;
+        }
+        
+        /* Emby roulette spinner */
+        .spinner-item {
+            background-color: #52c41a !important;
+        }
+        
+        /* Emby loading spinner (main) */
+        .loading-spinner {
+            border: 3px solid rgba(82, 196, 26, 0.1) !important;
+            border-top-color: #52c41a !important;
+        }
+        
+        /* Emby watch trailer button */
+        .watch-trailer-btn {
+            background: linear-gradient(135deg, #52c41a, #389e0d) !important;
+            color: #ffffff !important;
+        }
+        
+        .watch-trailer-btn:hover {
+            background: linear-gradient(135deg, #389e0d, #237804) !important;
+        }
+        
+        /* Emby install button */
+        .install-button {
+            background: linear-gradient(135deg, #52c41a, #389e0d) !important;
+            color: #ffffff !important;
+        }
+        
+        .install-button:hover {
+            background: linear-gradient(135deg, #389e0d, #237804) !important;
+        }
+        
         /* Emby media item hover - no glow, better contrast */
         .media-item:hover {
             transform: translateY(-5px);
@@ -718,6 +864,12 @@ apply_emby_theme() {
         
         .scroll-to-top:hover {
             background: linear-gradient(135deg, #389e0d, #237804) !important;
+        }
+        
+        /* Emby text placeholders */
+        .text-placeholder {
+            border: 1px solid rgba(82, 196, 26, 0.2) !important;
+            color: #52c41a !important;
         }
 
 EOF
