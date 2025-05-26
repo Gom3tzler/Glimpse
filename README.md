@@ -1,19 +1,23 @@
 # 🎬 Glimpse Media Viewer
 
-A sleek, responsive web application for browsing and viewing your Plex or Jellyfin media library content. This dockerized solution fetches metadata and artwork from your media server and presents it in an elegant, user-friendly interface with support for both Plex and Jellyfin servers.
+A sleek, responsive web application for browsing and viewing your Plex, Jellyfin, or Emby media library content. This dockerized solution fetches metadata and artwork from your media server and presents it in an elegant, user-friendly interface with support for multiple media servers.
 
-![Glimpse Media Viewer Plex Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-plex.png)
+![Glimpse Media Viewer Plex Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-plex-2.png)
 
-![Glimpse Media Viewer Plex Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-plex.png)
+![Glimpse Media Viewer Plex Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-plex-2.png)
 
-![Glimpse Media Viewer Jellyfin Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-jellyfin.png)
+![Glimpse Media Viewer Jellyfin Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-jellyfin-2.png)
 
-![Glimpse Media Viewer Jellyfin Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-jellyfin.png)
+![Glimpse Media Viewer Jellyfin Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-jellyfin-2.png)
+
+![Glimpse Media Viewer Emby Main](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-main-emby-2.png)
+
+![Glimpse Media Viewer Emby Details](https://raw.githubusercontent.com/jeremehancock/Glimpse/main/assets/screenshot-details-emby-2.png)
 
 ## ✨ Features
 
 - **Modern Interface**: Clean, responsive design that works on mobile and desktop
-- **Multi-Server Support**: Connect to Plex, Jellyfin, or both servers simultaneously
+- **Multi-Server Support**: Connect to Plex, Jellyfin, Emby, or multiple servers simultaneously
 - **Media Browsing**: View your Movies and TV Shows with poster art
 - **Search Capability**: Quickly find content across your libraries
 - **Detailed View**: See cast information, genres, and descriptions
@@ -36,7 +40,7 @@ A sleek, responsive web application for browsing and viewing your Plex or Jellyf
 ## 🔧 Prerequisites
 
 - Docker and Docker Compose installed on your host system
-- A running Plex Media Server and/or Jellyfin Media Server
+- A running Plex Media Server, Jellyfin Media Server, and/or Emby Media Server
 - Authentication tokens for your media server(s)
 - Basic knowledge of Docker and containerization
 
@@ -64,9 +68,9 @@ cd Glimpse
 
 ### 2. Configure Docker Compose
 
-Edit `docker-compose.yml` to set your media server details. You can configure one or both servers:
+Edit `docker-compose.yml` to set your media server details. You can configure any combination of Plex, Jellyfin, and/or Emby servers:
 
-#### Single Server Configuration (Plex)
+#### Plex Server Configuration
 
 ```yaml
 environment:
@@ -79,7 +83,7 @@ environment:
   - SORT_BY_DATE_ADDED=false # Sort by date instead of title
 ```
 
-#### Single Server Configuration (Jellyfin)
+#### Jellyfin Server Configuration
 
 ```yaml
 environment:
@@ -92,7 +96,22 @@ environment:
   - SORT_BY_DATE_ADDED=false # Sort by date instead of title
 ```
 
-#### Dual Server Configuration (Both Plex and Jellyfin)
+#### Emby Server Configuration
+
+```yaml
+environment:
+  - PRIMARY_SERVER=emby
+  - EMBY_URL=http://your-emby-server:8096
+  - EMBY_TOKEN=your-emby-api-token
+  - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
+  - TZ=UTC # Your timezone
+  - APP_TITLE=Glimpse # Set app title
+  - SORT_BY_DATE_ADDED=false # Sort by date instead of title
+```
+
+#### Multi-Server Configuration
+
+To configure multiple servers, simply include the environment variables for each server you want to use. For example, to use both Plex and Jellyfin:
 
 ```yaml
 environment:
@@ -132,6 +151,8 @@ http://your-server:9090
 | `PLEX_TOKEN`         | Authentication token for Plex             | _None_                        | If using Plex     |
 | `JELLYFIN_URL`       | URL of your Jellyfin server               | _None_                        | If using Jellyfin |
 | `JELLYFIN_TOKEN`     | API token for Jellyfin                    | _None_                        | If using Jellyfin |
+| `EMBY_URL`           | URL of your Emby server                   | _None_                        | If using Emby     |
+| `EMBY_TOKEN`         | API token for Emby                        | _None_                        | If using Emby     |
 | `CRON_SCHEDULE`      | When to update data (cron format)         | `0 */6 * * *` (every 6 hours) | No                |
 | `TZ`                 | Timezone for scheduled tasks              | `UTC`                         | No                |
 | `APP_TITLE`          | Custom title for the application          | `Glimpse`                     | No                |
@@ -140,9 +161,9 @@ http://your-server:9090
 ### Server Configuration Notes
 
 - **Single Server**: Configure only one server's credentials. The app will automatically detect and use the available server.
-- **Dual Server**: Configure both servers' credentials. The app will show a toggle button to switch between servers.
-- **Primary Server**: When both servers are configured, `PRIMARY_SERVER` determines which one is shown by default and affects the app's theme.
-- **Automatic Detection**: If `PRIMARY_SERVER` is set incorrectly or credentials are missing, the app will automatically detect and switch to the available server.
+- **Multi-Server**: Configure credentials for any combination of servers. The app will show a dropdown to switch between servers.
+- **Primary Server**: When multiple servers are configured, `PRIMARY_SERVER` determines which one is shown by default and affects the app's theme.
+- **Automatic Detection**: If `PRIMARY_SERVER` is set incorrectly or credentials are missing, the app will automatically detect and switch to an available server.
 
 ### Finding Your Plex Token
 
@@ -169,6 +190,18 @@ To get your Jellyfin API token:
 
 Alternatively, you can find your API token in the Jellyfin server logs when you first authenticate, or use the Jellyfin API documentation to generate one programmatically.
 
+### Finding Your Emby API Token
+
+To get your Emby API token:
+
+1. Log in to your Emby Web Interface
+2. Go to **Settings** → **Advanced** → **API Keys**
+3. Click **New API Key**
+4. Give it a name (e.g., "Glimpse Media Viewer")
+5. Copy the generated API key
+
+Alternatively, you can create an API key through the Emby server settings or by using the Emby API documentation.
+
 ## 🏗️ Project Structure
 
 ```
@@ -179,7 +212,7 @@ Glimpse/
 │
 ├── scripts/
 │   ├── plex_data_fetcher.py  # Python script to fetch Plex data
-│   └── jellyfin_data_fetcher.py # Python script to fetch Jellyfin data
+│   └── jellyfin_data_fetcher.py # Python script to fetch Jellyfin/Emby data
 │
 ├── web/
 │   ├── index.html            # Frontend web interface
@@ -194,7 +227,15 @@ Glimpse/
 │       ├── favicon.ico                 # Favicon
 │       ├── favicon-16x16.png           # Favicon (16x16)
 │       ├── favicon-32x32.png           # Favicon (32x32)
-│       └── jellyfin/                   # Jellyfin-specific themed icons
+│       ├── icons/                      # Server icons for dropdown menus
+│       │   ├── plex.png                # Plex server icon
+│       │   ├── jellyfin.png            # Jellyfin server icon
+│       │   └── emby.png                # Emby server icon
+│       ├── jellyfin/                   # Jellyfin-specific themed icons
+│       │   ├── android-chrome-192x192.png
+│       │   ├── android-chrome-512x512.png
+│       │   └── apple-touch-icon.png
+│       └── emby/                       # Emby-specific themed icons
 │           ├── android-chrome-192x192.png
 │           ├── android-chrome-512x512.png
 │           └── apple-touch-icon.png
@@ -211,21 +252,27 @@ Glimpse/
     │   ├── checksums.pkl     # MD5 checksums for Plex artwork
     │   ├── posters/          # Plex movie and TV show posters
     │   └── backdrops/        # Plex movie and TV show backgrounds
-    └── jellyfin/             # Jellyfin server data
-        ├── movies.json       # Jellyfin movie metadata
-        ├── tvshows.json      # Jellyfin TV show metadata
-        ├── checksums.pkl     # MD5 checksums for Jellyfin artwork
-        ├── posters/          # Jellyfin movie and TV show posters
-        └── backdrops/        # Jellyfin movie and TV show backgrounds
+    ├── jellyfin/             # Jellyfin server data
+    │   ├── movies.json       # Jellyfin movie metadata
+    │   ├── tvshows.json      # Jellyfin TV show metadata
+    │   ├── checksums.pkl     # MD5 checksums for Jellyfin artwork
+    │   ├── posters/          # Jellyfin movie and TV show posters
+    │   └── backdrops/        # Jellyfin movie and TV show backgrounds
+    └── emby/                 # Emby server data
+        ├── movies.json       # Emby movie metadata
+        ├── tvshows.json      # Emby TV show metadata
+        ├── checksums.pkl     # MD5 checksums for Emby artwork
+        ├── posters/          # Emby movie and TV show posters
+        └── backdrops/        # Emby movie and TV show backgrounds
 ```
 
 ## 🔄 How It Works
 
 1. **Data Fetching**: Python scripts connect to your media server(s) using the provided tokens and fetch metadata for all movies and TV shows.
-2. **Multi-Server Support**: When both servers are configured, data is fetched separately and stored in server-specific directories.
+2. **Multi-Server Support**: When multiple servers are configured, data is fetched separately and stored in server-specific directories.
 3. **Image Processing**: Media posters and backdrops are downloaded, with MD5 checksums to avoid re-downloading unchanged files.
-4. **Theming**: The interface automatically adapts its theme based on your primary server (Plex orange/yellow or Jellyfin blue).
-5. **Server Switching**: If both servers are configured, users can toggle between them with a single click.
+4. **Theming**: The interface automatically adapts its theme based on your primary server (Plex orange/yellow, Jellyfin blue, or Emby green).
+5. **Server Switching**: If multiple servers are configured, users can switch between them with a dropdown menu.
 6. **Web Server**: Nginx serves the static web interface and the downloaded data.
 7. **Scheduled Updates**: Cron runs the data fetchers on the configured schedule to keep content up-to-date.
 8. **Persistence**: All data is stored in volumes mapped to your host, ensuring it persists between container restarts.
@@ -266,16 +313,16 @@ Set the `APP_TITLE` environment variable:
 
 ### Setting the Primary Server
 
-When both servers are configured, set which one appears by default:
+When multiple servers are configured, set which one appears by default:
 
 ```yaml
-- PRIMARY_SERVER=jellyfin # Options: plex, jellyfin
+- PRIMARY_SERVER=jellyfin # Options: plex, jellyfin, emby
 ```
 
 This affects:
 
 - Which server's content is shown when the app first loads
-- The app's color theme (Plex = orange/yellow, Jellyfin = blue)
+- The app's color theme (Plex = orange/yellow, Jellyfin = blue, Emby = green)
 - The default offline page styling
 
 ## 🔍 Troubleshooting
@@ -314,6 +361,12 @@ To trigger a data update manually for Jellyfin:
 docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$JELLYFIN_URL" --token "$JELLYFIN_TOKEN" --output /app/data/jellyfin'
 ```
 
+To trigger a data update manually for Emby:
+
+```bash
+docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$EMBY_URL" --token "$EMBY_TOKEN" --output /app/data/emby'
+```
+
 ### Common Issues
 
 #### Default Nginx Page Shows Instead of the App
@@ -349,11 +402,11 @@ If media images aren't displaying:
 
 #### Server Toggle Not Appearing
 
-If you configured both servers but don't see the toggle button:
+If you configured multiple servers but don't see the server dropdown:
 
-1. Verify both server URLs and tokens are correct
+1. Verify all server URLs and tokens are correct
 2. Check the container logs for authentication errors
-3. Ensure both servers are accessible from the container
+3. Ensure all servers are accessible from the container
 4. Try restarting the container after fixing configuration
 
 #### Wrong Theme Colors
