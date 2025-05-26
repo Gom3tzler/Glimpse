@@ -893,9 +893,10 @@ replace_toggle_with_dropdown() {
 
     echo "Replacing toggle button with dropdown in $index_file (current: $current_server)"
 
-    # Build dropdown options
-    local dropdown_options=""
-    local current_path=""
+    # Build dropdown options and current server display
+    local dropdown_items=""
+    local current_server_display=""
+    local current_server_icon=""
 
     # Determine current path based on file location
     if [[ "$index_file" == "/app/web/index.html" ]]; then
@@ -929,12 +930,14 @@ replace_toggle_with_dropdown() {
             fi
         fi
 
-        local plex_selected=""
+        local plex_active=""
         if [ "$current_server" = "plex" ]; then
-            plex_selected=" selected disabled"
+            plex_active=" active"
+            current_server_display="Plex"
+            current_server_icon="📺"
         fi
 
-        dropdown_options="$dropdown_options<option value=\"$plex_relative_path\"$plex_selected>📺 Plex</option>"
+        dropdown_items="$dropdown_items<div class=\"server-item$plex_active\" data-path=\"$plex_relative_path\">📺 Plex</div>"
     fi
 
     if [ -n "$JELLYFIN_URL" ] && [ -n "$JELLYFIN_TOKEN" ]; then
@@ -957,12 +960,14 @@ replace_toggle_with_dropdown() {
             fi
         fi
 
-        local jellyfin_selected=""
+        local jellyfin_active=""
         if [ "$current_server" = "jellyfin" ]; then
-            jellyfin_selected=" selected disabled"
+            jellyfin_active=" active"
+            current_server_display="Jellyfin"
+            current_server_icon="🌊"
         fi
 
-        dropdown_options="$dropdown_options<option value=\"$jellyfin_relative_path\"$jellyfin_selected>🌊 Jellyfin</option>"
+        dropdown_items="$dropdown_items<div class=\"server-item$jellyfin_active\" data-path=\"$jellyfin_relative_path\">🌊 Jellyfin</div>"
     fi
 
     if [ -n "$EMBY_URL" ] && [ -n "$EMBY_TOKEN" ]; then
@@ -985,65 +990,200 @@ replace_toggle_with_dropdown() {
             fi
         fi
 
-        local emby_selected=""
+        local emby_active=""
         if [ "$current_server" = "emby" ]; then
-            emby_selected=" selected disabled"
+            emby_active=" active"
+            current_server_display="Emby"
+            current_server_icon="🟢"
         fi
 
-        dropdown_options="$dropdown_options<option value=\"$emby_relative_path\"$emby_selected>🟢 Emby</option>"
+        dropdown_items="$dropdown_items<div class=\"server-item$emby_active\" data-path=\"$emby_relative_path\">🟢 Emby</div>"
     fi
 
     # Create the dropdown HTML and JavaScript
     cat >>"$index_file" <<EOF
 
+<!-- Server Drawer Overlay for Mobile -->
+<div class="server-drawer-overlay">
+    <div class="server-drawer">
+        <div class="server-drawer-header">
+            <div class="server-drawer-title">Select Server</div>
+            <button class="server-drawer-close">×</button>
+        </div>
+        <div class="server-drawer-content">
+            $dropdown_items
+        </div>
+    </div>
+</div>
+
 <style>
-/* Server Dropdown Styles */
+/* Server Dropdown Styles - Matching Genre Dropdown */
 .server-dropdown {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    position: relative;
+    display: inline-block;
     margin-left: 15px;
 }
 
-.server-dropdown select {
-    background-color: var(--tab-bg);
-    color: var(--light-text);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+.server-button {
     padding: 6px 12px;
+    cursor: pointer;
+    background-color: var(--tab-bg);
+    border: none;
+    border-radius: 20px;
+    transition: all var(--transition-speed);
+    white-space: nowrap;
     font-weight: 500;
     font-size: 0.9rem;
+    color: var(--light-text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.server-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.server-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    z-index: 10;
+    min-width: 140px;
+    max-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* For dropdowns near the left edge of the screen */
+.server-dropdown:first-child .server-menu {
+    left: 0;
+    right: auto;
+}
+
+.server-menu.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+}
+
+.server-item {
+    padding: 10px 15px;
     cursor: pointer;
     transition: all var(--transition-speed);
-    outline: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 8px center;
-    background-repeat: no-repeat;
-    background-size: 16px;
-    padding-right: 32px;
-    min-width: 120px;
+    white-space: nowrap;
+    font-size: 0.9rem;
 }
 
-.server-dropdown select:hover {
+.server-item:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
 }
 
-.server-dropdown select:focus {
-    box-shadow: 0 0 0 2px var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.server-dropdown option {
-    background-color: var(--secondary-bg);
-    color: var(--light-text);
-    padding: 8px 12px;
-}
-
-.server-dropdown option:disabled {
+.server-item.active {
+    background-color: var(--primary-light);
     color: var(--primary-color);
     font-weight: 600;
+    cursor: default;
+}
+
+/* Server Drawer Styles - Matching Genre Drawer */
+.server-drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.server-drawer-overlay.open {
+    display: block;
+    opacity: 1;
+}
+
+.server-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--secondary-bg);
+    border-radius: 16px 16px 0 0;
+    z-index: 1002;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.server-drawer.open {
+    transform: translateY(0);
+}
+
+.server-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.server-drawer-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--light-text);
+    flex: 1;
+    text-align: center;
+}
+
+.server-drawer-close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 50%;
+    color: var(--light-text);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.server-drawer-content {
+    overflow-y: auto;
+    padding: 10px 0;
+    max-height: calc(70vh - 70px);
+}
+
+.server-drawer .server-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.server-drawer .server-item:last-child {
+    border-bottom: none;
+}
+
+.server-drawer .server-item.active {
+    background-color: var(--primary-light);
 }
 
 /* Mobile styles */
@@ -1052,26 +1192,42 @@ replace_toggle_with_dropdown() {
         margin-left: 10px;
     }
     
-    .server-dropdown select {
-        min-width: 100px;
+    .server-button {
         font-size: 0.85rem;
-        padding: 6px 8px;
-        padding-right: 28px;
+        padding: 6px 10px;
     }
     
-    /* Mobile menu dropdown */
+    /* Hide server dropdown on mobile in favor of mobile menu */
+    .server-dropdown {
+        display: none;
+    }
+    
+    /* Mobile menu server button */
     .mobile-menu .server-dropdown {
+        display: block;
         width: 100%;
         margin-left: 0;
         margin-top: 10px;
     }
     
-    .mobile-menu .server-dropdown select {
+    .mobile-menu .server-button {
         width: 100%;
-        min-width: unset;
-        padding: 10px 12px;
-        padding-right: 32px;
+        justify-content: center;
+        padding: 10px;
         font-size: 0.9rem;
+    }
+    
+    /* Never show dropdown menu on mobile */
+    .mobile-menu .server-menu {
+        display: none !important;
+    }
+}
+
+/* Apply drawer to mobile server buttons */
+@media screen and (max-width: 992px) {
+    .server-dropdown .server-menu {
+        display: none !important;
+        /* Never show dropdown menu on mobile */
     }
 }
 </style>
@@ -1079,6 +1235,11 @@ replace_toggle_with_dropdown() {
 <script>
 // Replace existing server toggle functionality with dropdown
 document.addEventListener('DOMContentLoaded', function() {
+    // Get server drawer elements
+    const serverDrawerOverlay = document.querySelector('.server-drawer-overlay');
+    const serverDrawer = document.querySelector('.server-drawer');
+    const serverDrawerClose = document.querySelector('.server-drawer-close');
+    
     // Hide existing toggle buttons
     const toggleButtons = document.querySelectorAll('.server-toggle-button');
     toggleButtons.forEach(button => {
@@ -1090,15 +1251,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (serverToggle) {
         serverToggle.innerHTML = \`
             <div class="server-dropdown">
-                <select onchange="switchServer(this.value)">
-                    <option value="" disabled>Switch Server</option>
-                    $dropdown_options
-                </select>
+                <button class="server-button">
+                    <span class="server-icon">$current_server_icon</span>
+                    <span class="server-text">$current_server_display</span>
+                </button>
+                <div class="server-menu">
+                    $dropdown_items
+                </div>
             </div>
         \`;
     }
     
-    // Create dropdown for mobile menu
+    // Create button for mobile menu (drawer trigger)
     const mobileMenu = document.querySelector('.mobile-menu');
     if (mobileMenu) {
         // Find the server toggle button in mobile menu and replace it
@@ -1106,26 +1270,118 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mobileToggleButton) {
             mobileToggleButton.style.display = 'none';
             
-            // Add dropdown after the genre button
+            // Add button after the genre button
             const genreButton = mobileMenu.querySelector('#mobile-genre-button');
             if (genreButton) {
-                const mobileDropdownHtml = \`
-                    <div class="server-dropdown">
-                        <select onchange="switchServer(this.value); document.querySelector('.mobile-menu').classList.remove('open');">
-                            <option value="" disabled>Switch Server</option>
-                            $dropdown_options
-                        </select>
-                    </div>
+                const mobileButtonHtml = \`
+                    <button class="sort-button server-button" id="mobile-server-button">
+                        <span class="sort-icon">$current_server_icon $current_server_display</span>
+                    </button>
                 \`;
-                genreButton.insertAdjacentHTML('afterend', mobileDropdownHtml);
+                genreButton.insertAdjacentHTML('afterend', mobileButtonHtml);
             }
         }
     }
+    
+    // Function to open the server drawer
+    function openServerDrawer() {
+        serverDrawerOverlay.classList.add('open');
+        serverDrawer.classList.add('open');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+    
+    // Function to close the server drawer
+    function closeServerDrawer() {
+        serverDrawerOverlay.classList.remove('open');
+        serverDrawer.classList.remove('open');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+    
+    // Mobile server button click handler - open drawer
+    const mobileServerButton = document.querySelector('#mobile-server-button');
+    if (mobileServerButton) {
+        mobileServerButton.addEventListener('click', () => {
+            openServerDrawer();
+            
+            // Close mobile menu if open
+            const mobileMenu = document.querySelector('.mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+    }
+    
+    // Close server drawer when clicking the close button
+    if (serverDrawerClose) {
+        serverDrawerClose.addEventListener('click', closeServerDrawer);
+    }
+    
+    // Close server drawer when clicking the overlay
+    if (serverDrawerOverlay) {
+        serverDrawerOverlay.addEventListener('click', (e) => {
+            if (e.target === serverDrawerOverlay) {
+                closeServerDrawer();
+            }
+        });
+    }
+    
+    // Add click event listeners to desktop server dropdown buttons
+    document.querySelectorAll('.server-dropdown .server-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            // Check if we're on mobile/tablet
+            if (window.innerWidth <= 992) {
+                openServerDrawer();
+                return;
+            }
+            
+            e.stopPropagation();
+            
+            const dropdown = button.closest('.server-dropdown');
+            const menu = dropdown.querySelector('.server-menu');
+            
+            // Close other dropdowns first
+            document.querySelectorAll('.server-menu.show').forEach(m => {
+                if (m !== menu) {
+                    m.classList.remove('show');
+                }
+            });
+            
+            // Toggle current dropdown
+            menu.classList.toggle('show');
+        });
+    });
+    
+    // Add click event listeners to server menu items (both desktop and drawer)
+    document.querySelectorAll('.server-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const path = item.dataset.path;
+            if (!item.classList.contains('active') && path) {
+                switchServer(path);
+            }
+            
+            // Close desktop menu
+            document.querySelectorAll('.server-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+            
+            // Close mobile drawer
+            closeServerDrawer();
+        });
+    });
+    
+    // Close server dropdown when clicking outside (desktop only)
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.server-dropdown')) {
+            document.querySelectorAll('.server-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
 });
 
 // Function to handle server switching
 function switchServer(path) {
-    if (path && path !== '/') {
+    if (path && path !== '/' && path !== window.location.pathname) {
         // Clear themed cache before switching
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
             try {
