@@ -881,12 +881,104 @@ EOF
     rm -f /tmp/emby_theme.css
 }
 
+# Function to clean up any duplicate server dropdown content from HTML files
+cleanup_duplicate_server_content() {
+    local index_file=$1
+    echo "Cleaning up duplicate server content from $index_file"
+
+    # Create a temporary file for the cleaned content
+    local temp_file=$(mktemp)
+
+    # Use awk to remove duplicate sections
+    awk '
+    BEGIN {
+        in_server_drawer = 0
+        in_server_style = 0
+        in_server_script = 0
+        server_drawer_count = 0
+        server_style_count = 0
+        server_script_count = 0
+        skip_until_tag = ""
+    }
+    
+    # Track server drawer overlay sections
+    /<!-- Server Drawer Overlay/ {
+        server_drawer_count++
+        if (server_drawer_count > 1) {
+            in_server_drawer = 1
+            skip_until_tag = "</div>"
+            next
+        }
+    }
+    
+    # Track server dropdown styles
+    /\/\* Server Dropdown Styles/ {
+        server_style_count++
+        if (server_style_count > 1) {
+            in_server_style = 1
+            skip_until_tag = "}"
+            next
+        }
+    }
+    
+    # Track server JavaScript sections
+    /\/\/ Replace existing server toggle functionality/ {
+        server_script_count++
+        if (server_script_count > 1) {
+            in_server_script = 1
+            skip_until_tag = "</script>"
+            next
+        }
+    }
+    
+    # Skip content until we reach the end tag
+    {
+        if (in_server_drawer && $0 ~ skip_until_tag && $0 ~ /server-drawer/) {
+            in_server_drawer = 0
+            skip_until_tag = ""
+            next
+        }
+        if (in_server_style && $0 ~ /^[[:space:]]*}[[:space:]]*$/ && prev_line ~ /mobile.*server/) {
+            in_server_style = 0
+            skip_until_tag = ""
+            next
+        }
+        if (in_server_script && $0 ~ skip_until_tag) {
+            in_server_script = 0
+            skip_until_tag = ""
+            next
+        }
+        
+        if (!in_server_drawer && !in_server_style && !in_server_script) {
+            print $0
+        }
+        prev_line = $0
+    }
+    ' "$index_file" >"$temp_file"
+
+    # Replace the original file with the cleaned version
+    mv "$temp_file" "$index_file"
+
+    # Also remove any duplicate toggleServer function definitions
+    sed -i '/window\.toggleServer = function()/,/^[[:space:]]*};[[:space:]]*$/{ 
+        /window\.toggleServer = function()/!b skip
+        N
+        :loop
+        /^[[:space:]]*};[[:space:]]*$/!{N; b loop}
+        # Keep only the first occurrence
+        s/.*//
+        :skip
+    }' "$index_file" 2>/dev/null || true
+
+    echo "Cleanup completed for $index_file"
+}
+
 remove_server_toggle() {
     local index_file=$1
     echo "Hiding server toggle from $index_file (single server mode)"
 
-    # Instead of removing HTML/JavaScript (which can cause syntax errors),
-    # just hide the server toggle elements with CSS and make the function safe
+    # Clean up any existing server dropdown content first
+    cleanup_duplicate_server_content "$index_file"
 
     # Add CSS to hide server toggle elements
     cat >>"$index_file" <<'EOF'
@@ -928,6 +1020,9 @@ create_server_index() {
 
     # Copy the main index.html as a template
     cp /app/web/index.html "$output_file"
+
+    # Clean up any duplicate content from the copied file
+    cleanup_duplicate_server_content "$output_file"
 
     # Set the title immediately based on the route type
     if [[ "$output_file" == *"/plex/index.html" ]]; then
@@ -1046,6 +1141,9 @@ replace_toggle_with_dropdown() {
 
     echo "Replacing toggle button with dropdown in $index_file (current: $current_server)"
 
+    # Clean up any existing dropdown content first
+    cleanup_duplicate_server_content "$index_file"
+
     # Build dropdown options and current server display
     local dropdown_items=""
     local current_server_display=""
@@ -1158,8 +1256,8 @@ replace_toggle_with_dropdown() {
         dropdown_items="$dropdown_items<div class=\"server-item$emby_active\" data-path=\"$emby_relative_path\"><img src=\"${icon_base_path}emby.png\" alt=\"Emby\" class=\"server-icon-img\"> Emby</div>"
     fi
 
-    # Create the dropdown HTML and JavaScript
-    cat >>"$index_file" <<EOF
+    # Create a temporary file with the server dropdown content
+    cat >/tmp/server_dropdown_content.html <<EOF
 
 <!-- Server Drawer Overlay for Mobile -->
 <div class="server-drawer-overlay">
@@ -1596,11 +1694,43 @@ window.toggleServer = function() {
 };
 </script>
 EOF
+
+    # Append the content to the index file
+    cat /tmp/server_dropdown_content.html >>"$index_file"
+
+    # Clean up temporary file
+    rm -f /tmp/server_dropdown_content.html
+
+    echo "Successfully added server dropdown to $index_file"
+}
+
+# Function to fix files that may have corrupted content
+fix_corrupted_files() {
+    echo "Checking for and fixing any files with duplicate server content..."
+
+    # Check all HTML files for multiple server dropdown sections
+    for file in /app/web/index.html /app/web/plex/index.html /app/web/jellyfin/index.html /app/web/emby/index.html; do
+        if [ -f "$file" ]; then
+            # Count how many server drawer overlays exist
+            drawer_count=$(grep -c "<!-- Server Drawer Overlay" "$file" 2>/dev/null || echo "0")
+
+            if [ "$drawer_count" -gt 1 ]; then
+                echo "Found $drawer_count server drawer overlays in $file, cleaning up..."
+                cleanup_duplicate_server_content "$file"
+            fi
+        fi
+    done
+
+    echo "Corruption check and cleanup completed"
 }
 
 # Update the main index.html based on primary server
 if [ -f /app/web/index.html ]; then
     echo "Updating app title to: $APP_TITLE"
+
+    # Clean up any existing duplicate content first
+    cleanup_duplicate_server_content "/app/web/index.html"
+
     # Replace title tag content
     sed -i "s/<title>.*<\/title>/<title>$APP_TITLE<\/title>/" /app/web/index.html
     # Replace h1 content (preserve the logo icon span)
@@ -1733,6 +1863,9 @@ if [ -f /app/web/index.html ]; then
 else
     echo "Warning: index.html not found in /app/web/"
 fi
+
+# Run the corruption fix at the end to ensure all files are clean
+fix_corrupted_files
 
 # Create symlinks for data directories
 # Remove existing symlink if it exists

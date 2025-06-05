@@ -1,7 +1,7 @@
 // Service Worker for Glimpse Media Viewer
 
-const CACHE_NAME = "glimpse-media-viewer-v7.0";
-const DYNAMIC_CACHE = "glimpse-media-dynamic-v7.0";
+const CACHE_NAME = "glimpse-media-viewer-v7.1";
+const DYNAMIC_CACHE = "glimpse-media-dynamic-v7.1";
 
 // Assets to cache on install (excluding HTML files that might have themes)
 const STATIC_ASSETS = ["/manifest.json", "/test.html"];
@@ -57,14 +57,16 @@ function isThemedHtmlRequest(request) {
   const url = new URL(request.url);
   const pathname = url.pathname;
 
-  // Main index, plex route, or jellyfin route - these have themes
+  // Main index, plex route, jellyfin route, or emby route - these have themes
   return (
     pathname === "/" ||
     pathname === "/index.html" ||
     pathname === "/plex/" ||
     pathname === "/plex/index.html" ||
     pathname === "/jellyfin/" ||
-    pathname === "/jellyfin/index.html"
+    pathname === "/jellyfin/index.html" ||
+    pathname === "/emby/" ||
+    pathname === "/emby/index.html"
   );
 }
 
@@ -192,7 +194,7 @@ self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "CLEAR_THEMED_CACHE") {
     console.log("Service Worker: Clearing themed HTML cache");
 
-    // Clear specific themed URLs from cache
+    // Clear specific themed URLs from cache - now includes all three server types
     const themedUrls = [
       "/",
       "/index.html",
@@ -200,6 +202,8 @@ self.addEventListener("message", (event) => {
       "/plex/index.html",
       "/jellyfin/",
       "/jellyfin/index.html",
+      "/emby/",
+      "/emby/index.html",
     ];
 
     caches.open(DYNAMIC_CACHE).then((cache) => {
