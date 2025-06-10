@@ -1,7 +1,7 @@
 // Service Worker for Glimpse Media Viewer
 
-const CACHE_NAME = "glimpse-media-viewer-v7.1";
-const DYNAMIC_CACHE = "glimpse-media-dynamic-v7.1";
+const CACHE_NAME = "glimpse-media-viewer-v7.2"; // Bump version
+const DYNAMIC_CACHE = "glimpse-media-dynamic-v7.2"; // Bump version
 
 // Assets to cache on install (excluding HTML files that might have themes)
 const STATIC_ASSETS = ["/manifest.json", "/test.html"];
@@ -70,12 +70,19 @@ function isThemedHtmlRequest(request) {
   );
 }
 
+// Check if request is for JSON data files (these need fresh data)
+function isJsonDataRequest(request) {
+  return request.url.includes("/data/") && request.url.endsWith(".json");
+}
+
+// Check if request is for image files (these can be cached more aggressively)
+function isImageDataRequest(request) {
+  return request.url.includes("/data/") && request.url.endsWith(".jpg");
+}
+
 // Check if request is for dynamic media data
 function isMediaDataRequest(request) {
-  return (
-    request.url.includes("/data/") &&
-    (request.url.endsWith(".json") || request.url.endsWith(".jpg"))
-  );
+  return isJsonDataRequest(request) || isImageDataRequest(request);
 }
 
 // Fetch event - serve from cache or network
@@ -91,15 +98,113 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // JSON data and images - network first, then cache
-  if (isMediaDataRequest(event.request)) {
-    event.respondWith(networkFirstStrategy(event.request));
+  // JSON data files - always fetch fresh (no caching)
+  if (isJsonDataRequest(event.request)) {
+    event.respondWith(alwaysFreshStrategy(event.request));
+    return;
+  }
+
+  // Image files - use stale-while-revalidate for better performance
+  if (isImageDataRequest(event.request)) {
+    event.respondWith(staleWhileRevalidateStrategy(event.request));
     return;
   }
 
   // Other static assets - cache first, then network
   event.respondWith(cacheFirstStrategy(event.request));
 });
+
+// Always fetch fresh strategy for JSON data
+async function alwaysFreshStrategy(request) {
+  try {
+    console.log("Fetching fresh data:", request.url);
+    const response = await fetch(request, {
+      cache: "no-store", // Bypass all caches
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+
+    if (response.ok) {
+      console.log("Fresh data fetched successfully:", request.url);
+      return response;
+    }
+
+    // If fresh fetch fails, try cache as fallback
+    console.log("Fresh fetch failed, trying cache:", request.url);
+    const cachedResponse = await caches.match(request);
+    return cachedResponse || response;
+  } catch (error) {
+    console.log("Network error, trying cache:", request.url);
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
+
+// Stale-while-revalidate strategy for images
+async function staleWhileRevalidateStrategy(request) {
+  const cache = await caches.open(DYNAMIC_CACHE);
+  const cachedResponse = await cache.match(request);
+
+  // Fetch fresh version in background
+  const fetchPromise = fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch((error) => {
+      console.log("Background fetch failed for image:", request.url);
+      return null;
+    });
+
+  // Return cached version immediately if available, otherwise wait for network
+  if (cachedResponse) {
+    console.log("Serving cached image while revalidating:", request.url);
+    fetchPromise; // Fire and forget
+    return cachedResponse;
+  } else {
+    console.log("No cached image, waiting for network:", request.url);
+    return fetchPromise;
+  }
+}
+
+// Always fetch fresh strategy for JSON data (no caching)
+async function alwaysFreshStrategy(request) {
+  try {
+    console.log("Fetching fresh JSON data:", request.url);
+    const response = await fetch(request, {
+      cache: "no-store", // Bypass all browser caches
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+    });
+
+    if (response.ok) {
+      console.log("Fresh JSON data fetched successfully:", request.url);
+      return response;
+    }
+
+    // If fresh fetch fails, try cache as last resort
+    console.log("Fresh fetch failed, trying cache:", request.url);
+    const cachedResponse = await caches.match(request);
+    return cachedResponse || response;
+  } catch (error) {
+    console.log("Network error for JSON, trying cache:", request.url);
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
 
 // Network-first with cache fallback for themed HTML
 async function networkFirstWithCacheFallback(request) {
@@ -169,32 +274,12 @@ async function cacheFirstStrategy(request) {
   }
 }
 
-// Network-first strategy: try network, fall back to cache
-async function networkFirstStrategy(request) {
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    console.log("Network request failed, trying cache:", request.url);
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    console.error("No cached response available for:", request.url);
-    throw error;
-  }
-}
-
-// Clear themed HTML cache when receiving a message from the app
-self.addEventListener("message", (event) => {
+// Clear specific cache types when receiving a message from the app
+self.addEventListener("message", async (event) => {
   if (event.data && event.data.type === "CLEAR_THEMED_CACHE") {
     console.log("Service Worker: Clearing themed HTML cache");
 
-    // Clear specific themed URLs from cache - now includes all three server types
+    // Clear specific themed URLs from cache
     const themedUrls = [
       "/",
       "/index.html",
@@ -206,13 +291,44 @@ self.addEventListener("message", (event) => {
       "/emby/index.html",
     ];
 
-    caches.open(DYNAMIC_CACHE).then((cache) => {
-      themedUrls.forEach((url) => {
-        cache.delete(url);
-        // Also try with the full origin
-        cache.delete(new URL(url, self.location.origin).href);
-      });
-    });
+    const cache = await caches.open(DYNAMIC_CACHE);
+    for (const url of themedUrls) {
+      await cache.delete(url);
+      await cache.delete(new URL(url, self.location.origin).href);
+    }
+
+    // Send confirmation back to the app
+    event.ports[0]?.postMessage({ success: true });
+  }
+
+  if (event.data && event.data.type === "CLEAR_DATA_CACHE") {
+    console.log("Service Worker: Clearing data cache");
+
+    // Clear all data files from cache
+    const cache = await caches.open(DYNAMIC_CACHE);
+    const keys = await cache.keys();
+
+    for (const request of keys) {
+      if (request.url.includes("/data/")) {
+        await cache.delete(request);
+        console.log("Deleted from cache:", request.url);
+      }
+    }
+
+    // Send confirmation back to the app
+    event.ports[0]?.postMessage({ success: true });
+  }
+
+  if (event.data && event.data.type === "CLEAR_ALL_CACHE") {
+    console.log("Service Worker: Clearing all caches");
+
+    const cacheNames = await caches.keys();
+    for (const cacheName of cacheNames) {
+      if (cacheName.startsWith("glimpse-media-")) {
+        await caches.delete(cacheName);
+        console.log("Deleted cache:", cacheName);
+      }
+    }
 
     // Send confirmation back to the app
     event.ports[0]?.postMessage({ success: true });
