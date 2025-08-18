@@ -28,6 +28,7 @@ A sleek, responsive web application for browsing and viewing your Plex, Jellyfin
 - **Sort by Date Added (Ascending / Descending)**: Sort media by when it was added
 - **Server Toggle**: Switch between multiple configured servers with one click
 - **Automatic Theme Adaptation**: Interface automatically adapts to match your primary server
+- **Library Exclusion**: Selectively exclude specific libraries from being displayed
 - **MD5 Checksum Verification**: Only downloads images when they've changed
 - **Dockerized**: Easy deployment with Docker and Docker Compose
 - **Customizable**: Configure update schedule, app title, and more
@@ -77,6 +78,7 @@ environment:
   - PRIMARY_SERVER=plex
   - PLEX_URL=http://your-plex-server:32400
   - PLEX_TOKEN=your-plex-token
+  - PLEX_EXCLUDE_LIBRARIES= # Optional: Comma-separated list of library names or IDs to exclude
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
   - APP_TITLE=Glimpse # Set app title
@@ -90,6 +92,7 @@ environment:
   - PRIMARY_SERVER=jellyfin
   - JELLYFIN_URL=http://your-jellyfin-server:8096
   - JELLYFIN_TOKEN=your-jellyfin-api-token
+  - JELLYFIN_EXCLUDE_LIBRARIES= # Optional: Comma-separated list of library names or IDs to exclude
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
   - APP_TITLE=Glimpse # Set app title
@@ -103,6 +106,7 @@ environment:
   - PRIMARY_SERVER=emby
   - EMBY_URL=http://your-emby-server:8096
   - EMBY_TOKEN=your-emby-api-token
+  - EMBY_EXCLUDE_LIBRARIES= # Optional: Comma-separated list of library names or IDs to exclude
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
   - APP_TITLE=Glimpse # Set app title
@@ -118,8 +122,10 @@ environment:
   - PRIMARY_SERVER=plex # Which server to show by default
   - PLEX_URL=http://your-plex-server:32400
   - PLEX_TOKEN=your-plex-token
+  - PLEX_EXCLUDE_LIBRARIES=Adult Movies,Personal Collection
   - JELLYFIN_URL=http://your-jellyfin-server:8096
   - JELLYFIN_TOKEN=your-jellyfin-api-token
+  - JELLYFIN_EXCLUDE_LIBRARIES=XXX Content,Private Shows
   - CRON_SCHEDULE=0 */6 * * * # Update every 6 hours
   - TZ=UTC # Your timezone
   - APP_TITLE=Glimpse # Set app title
@@ -144,19 +150,67 @@ http://your-server:9090
 
 ### Environment Variables
 
-| Variable             | Description                               | Default                       | Required          |
-| -------------------- | ----------------------------------------- | ----------------------------- | ----------------- |
-| `PRIMARY_SERVER`     | Which server to show by default           | `plex`                        | No                |
-| `PLEX_URL`           | URL of your Plex server                   | _None_                        | If using Plex     |
-| `PLEX_TOKEN`         | Authentication token for Plex             | _None_                        | If using Plex     |
-| `JELLYFIN_URL`       | URL of your Jellyfin server               | _None_                        | If using Jellyfin |
-| `JELLYFIN_TOKEN`     | API token for Jellyfin                    | _None_                        | If using Jellyfin |
-| `EMBY_URL`           | URL of your Emby server                   | _None_                        | If using Emby     |
-| `EMBY_TOKEN`         | API token for Emby                        | _None_                        | If using Emby     |
-| `CRON_SCHEDULE`      | When to update data (cron format)         | `0 */6 * * *` (every 6 hours) | No                |
-| `TZ`                 | Timezone for scheduled tasks              | `UTC`                         | No                |
-| `APP_TITLE`          | Custom title for the application          | `Glimpse`                     | No                |
-| `SORT_BY_DATE_ADDED` | Sort items by date added instead of title | `false`                       | No                |
+| Variable                     | Description                               | Default                       | Required          |
+| ---------------------------- | ----------------------------------------- | ----------------------------- | ----------------- |
+| `PRIMARY_SERVER`             | Which server to show by default           | `plex`                        | No                |
+| `PLEX_URL`                   | URL of your Plex server                   | _None_                        | If using Plex     |
+| `PLEX_TOKEN`                 | Authentication token for Plex             | _None_                        | If using Plex     |
+| `PLEX_EXCLUDE_LIBRARIES`     | Libraries to exclude from Plex            | _None_                        | No                |
+| `JELLYFIN_URL`               | URL of your Jellyfin server               | _None_                        | If using Jellyfin |
+| `JELLYFIN_TOKEN`             | API token for Jellyfin                    | _None_                        | If using Jellyfin |
+| `JELLYFIN_EXCLUDE_LIBRARIES` | Libraries to exclude from Jellyfin        | _None_                        | No                |
+| `EMBY_URL`                   | URL of your Emby server                   | _None_                        | If using Emby     |
+| `EMBY_TOKEN`                 | API token for Emby                        | _None_                        | If using Emby     |
+| `EMBY_EXCLUDE_LIBRARIES`     | Libraries to exclude from Emby            | _None_                        | No                |
+| `CRON_SCHEDULE`              | When to update data (cron format)         | `0 */6 * * *` (every 6 hours) | No                |
+| `TZ`                         | Timezone for scheduled tasks              | `UTC`                         | No                |
+| `APP_TITLE`                  | Custom title for the application          | `Glimpse`                     | No                |
+| `SORT_BY_DATE_ADDED`         | Sort items by date added instead of title | `false`                       | No                |
+
+### Library Exclusion
+
+You can exclude specific libraries from being displayed in Glimpse. This is useful for:
+
+- Adult content libraries
+- Test or development libraries
+- Personal or private collections
+- Music libraries (if not supported)
+- Any content you don't want visible in the interface
+
+#### Configuration Format
+
+Exclusion lists are comma-separated and can include library names or IDs:
+
+```yaml
+# Exclude by library name (case-sensitive)
+- PLEX_EXCLUDE_LIBRARIES=Adult Movies,Personal Collection,Test Library
+
+# Exclude by library ID
+- JELLYFIN_EXCLUDE_LIBRARIES=1,5,12
+
+# Mixed names and IDs
+- EMBY_EXCLUDE_LIBRARIES=Adult Movies,5,Personal Collection
+```
+
+#### Finding Library Names
+
+**Plex:**
+
+1. Open Plex Web interface
+2. Go to Settings > Libraries
+3. Library names are displayed in the list
+
+**Jellyfin:**
+
+1. Open Jellyfin Web interface
+2. Go to Dashboard > Libraries
+3. Library names are shown in the list
+
+**Emby:**
+
+1. Open Emby Web interface
+2. Go to Dashboard > Libraries
+3. Library names are visible in the management interface
 
 ### Server Configuration Notes
 
@@ -164,6 +218,7 @@ http://your-server:9090
 - **Multi-Server**: Configure credentials for any combination of servers. The app will show a dropdown to switch between servers.
 - **Primary Server**: When multiple servers are configured, `PRIMARY_SERVER` determines which one is shown by default and affects the app's theme.
 - **Automatic Detection**: If `PRIMARY_SERVER` is set incorrectly or credentials are missing, the app will automatically detect and switch to an available server.
+- **Clean Data Updates**: When libraries are excluded, the fetchers automatically clean existing data files to ensure excluded content doesn't persist.
 
 ### Finding Your Plex Token
 
@@ -269,13 +324,14 @@ Glimpse/
 ## 🔄 How It Works
 
 1. **Data Fetching**: Python scripts connect to your media server(s) using the provided tokens and fetch metadata for all movies and TV shows.
-2. **Multi-Server Support**: When multiple servers are configured, data is fetched separately and stored in server-specific directories.
-3. **Image Processing**: Media posters and backdrops are downloaded, with MD5 checksums to avoid re-downloading unchanged files.
-4. **Theming**: The interface automatically adapts its theme based on your primary server (Plex orange/yellow, Jellyfin blue, or Emby green).
-5. **Server Switching**: If multiple servers are configured, users can switch between them with a dropdown menu.
-6. **Web Server**: Nginx serves the static web interface and the downloaded data.
-7. **Scheduled Updates**: Cron runs the data fetchers on the configured schedule to keep content up-to-date.
-8. **Persistence**: All data is stored in volumes mapped to your host, ensuring it persists between container restarts.
+2. **Library Filtering**: Excluded libraries are automatically skipped during data fetching, and existing data files are cleaned to ensure consistency.
+3. **Multi-Server Support**: When multiple servers are configured, data is fetched separately and stored in server-specific directories.
+4. **Image Processing**: Media posters and backdrops are downloaded, with MD5 checksums to avoid re-downloading unchanged files.
+5. **Theming**: The interface automatically adapts its theme based on your primary server (Plex orange/yellow, Jellyfin blue, or Emby green).
+6. **Server Switching**: If multiple servers are configured, users can switch between them with a dropdown menu.
+7. **Web Server**: Nginx serves the static web interface and the downloaded data.
+8. **Scheduled Updates**: Cron runs the data fetchers on the configured schedule to keep content up-to-date.
+9. **Persistence**: All data is stored in volumes mapped to your host, ensuring it persists between container restarts.
 
 ## 🌐 Customization
 
@@ -349,22 +405,44 @@ docker-compose logs glimpse-media-viewer
 
 ### Manual Data Update
 
-To trigger a data update manually for Plex:
+To trigger a data update manually (using your configured exclusions):
+
+**Plex:**
 
 ```bash
 docker exec glimpse-media-viewer bash -c 'python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --output /app/data/plex'
 ```
 
-To trigger a data update manually for Jellyfin:
+**Jellyfin:**
 
 ```bash
 docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$JELLYFIN_URL" --token "$JELLYFIN_TOKEN" --output /app/data/jellyfin'
 ```
 
-To trigger a data update manually for Emby:
+**Emby:**
 
 ```bash
 docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$EMBY_URL" --token "$EMBY_TOKEN" --output /app/data/emby'
+```
+
+To manually specify different exclusions for testing:
+
+**Plex with custom exclusions:**
+
+```bash
+docker exec glimpse-media-viewer bash -c 'python /app/scripts/plex_data_fetcher.py --url "$PLEX_URL" --token "$PLEX_TOKEN" --exclude-libraries "Adult Content" "Personal Files" --output /app/data/plex'
+```
+
+**Jellyfin with custom exclusions:**
+
+```bash
+docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$JELLYFIN_URL" --token "$JELLYFIN_TOKEN" --exclude-libraries "Adult Content" "Personal Files" --output /app/data/jellyfin'
+```
+
+**Emby with custom exclusions:**
+
+```bash
+docker exec glimpse-media-viewer bash -c 'python /app/scripts/jellyfin_data_fetcher.py --url "$EMBY_URL" --token "$EMBY_TOKEN" --exclude-libraries "Adult Content" "Personal Files" --output /app/data/emby'
 ```
 
 ### Common Issues
@@ -417,6 +495,24 @@ If the app shows the wrong theme:
 2. Clear your browser cache and reload
 3. Un-install and Re-install PWA
 
+#### Library Exclusion Issues
+
+If excluded libraries are still appearing:
+
+1. **Check library names**: Ensure the library names match exactly (case-sensitive)
+2. **Verify environment variables**: Check that the exclusion variables are set correctly
+3. **Restart container**: Library exclusions are applied during data fetching, so restart after configuration changes
+4. **Check logs**: Look for exclusion messages in the container logs:
+   ```bash
+   docker-compose logs | grep -i "excluded\|skipping"
+   ```
+5. **Manual data update**: Force a data refresh to apply exclusions immediately
+6. **Try library IDs**: If names don't work, try using library IDs instead
+
+#### Finding Library Information
+
+To get detailed library information for troubleshooting exclusions, check the logs during a manual data update. The fetchers will display library names and IDs as they process each one.
+
 ## 🛠️ Advanced Usage
 
 ### Using Behind a Reverse Proxy
@@ -428,6 +524,7 @@ This application works well behind a reverse proxy like Traefik or Nginx Proxy M
 - Media server tokens provide access to your media servers. Keep them secure.
 - All data access is read-only, so there's no risk of modifying your media libraries.
 - Consider using a dedicated API token for Glimpse rather than your main user token.
+- Library exclusions help keep sensitive content private and separate from your main viewing interface.
 
 ## 📝 License
 

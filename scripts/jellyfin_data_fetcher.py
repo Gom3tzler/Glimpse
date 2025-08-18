@@ -14,11 +14,12 @@ import hashlib
 import pickle
 
 class JellyfinDataFetcher:
-    def __init__(self, jellyfin_url, jellyfin_token, output_dir="data/jellyfin", page_size=100):
+    def __init__(self, jellyfin_url, jellyfin_token, output_dir="data/jellyfin", page_size=100, excluded_libraries=None):
         self.jellyfin_url = jellyfin_url.rstrip('/')
         self.jellyfin_token = jellyfin_token
         self.output_dir = Path(output_dir)
         self.page_size = page_size
+        self.excluded_libraries = set(excluded_libraries or [])
         self.checksums_file = self.output_dir / "checksums.pkl"
         self.checksums = self.load_checksums()
         
@@ -80,6 +81,28 @@ class JellyfinDataFetcher:
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
             self.set_permissions(directory)
+
+    def clean_existing_data(self):
+        """Remove existing JSON files to ensure clean data"""
+        movies_file = self.output_dir / "movies.json"
+        tvshows_file = self.output_dir / "tvshows.json"
+        
+        for file_path in [movies_file, tvshows_file]:
+            if file_path.exists():
+                try:
+                    file_path.unlink()
+                    print(f"Removed existing file: {file_path}")
+                except Exception as e:
+                    print(f"Warning: Could not remove {file_path}: {e}")
+
+    def is_library_excluded(self, library_name, library_id):
+        """Check if a library should be excluded based on name or ID"""
+        if not self.excluded_libraries:
+            return False
+        
+        # Check both library name and ID against exclusion list
+        return (library_name in self.excluded_libraries or 
+                str(library_id) in self.excluded_libraries)
 
     def get_user_id(self):
         """Get the first user's ID for API calls"""
@@ -345,6 +368,12 @@ class JellyfinDataFetcher:
         print(f"Starting Jellyfin data fetch at {datetime.now()}")
         print(f"Jellyfin URL: {self.jellyfin_url}")
         
+        if self.excluded_libraries:
+            print(f"Excluded libraries: {', '.join(self.excluded_libraries)}")
+        
+        # Clean existing data files
+        self.clean_existing_data()
+        
         # Get user ID
         user_id = self.get_user_id()
         if not user_id:
@@ -372,6 +401,11 @@ class JellyfinDataFetcher:
             library_name = library.get('Name')
             
             print(f"\nProcessing library: {library_name} (Type: {library_type}, ID: {library_id})")
+            
+            # Check if this library should be excluded
+            if self.is_library_excluded(library_name, library_id):
+                print(f"Skipping excluded library: {library_name}")
+                continue
             
             if library_type not in ['movies', 'tvshows']:
                 print(f"Skipping unsupported library type: {library_type}")
@@ -464,6 +498,10 @@ def main():
     default_output = os.environ.get('OUTPUT_DIR', 'data/jellyfin')
     default_page_size = int(os.environ.get('PAGE_SIZE', '100'))
     
+    # Get excluded libraries from environment variable
+    excluded_libraries_str = os.environ.get('JELLYFIN_EXCLUDE_LIBRARIES', '')
+    excluded_libraries = [lib.strip() for lib in excluded_libraries_str.split(',') if lib.strip()] if excluded_libraries_str else []
+    
     parser = argparse.ArgumentParser(description='Fetch Jellyfin media data and posters')
     
     # Use environment variables as defaults
@@ -471,6 +509,8 @@ def main():
     parser.add_argument('--token', default=default_token, help='Jellyfin API token')
     parser.add_argument('--output', default=default_output, help='Output directory (default: data/jellyfin)')
     parser.add_argument('--page-size', type=int, default=default_page_size, help='Number of items per page (default: 100)')
+    parser.add_argument('--exclude-libraries', nargs='*', default=excluded_libraries, 
+                        help='Libraries to exclude (library names or IDs, space-separated)')
     
     # Handle special case for tokens with leading hyphens
     for i, arg in enumerate(sys.argv):
@@ -488,7 +528,7 @@ def main():
         print("Error: Jellyfin token is required. Set with --token or JELLYFIN_TOKEN environment variable.")
         sys.exit(1)
     
-    fetcher = JellyfinDataFetcher(args.url, args.token, args.output, args.page_size)
+    fetcher = JellyfinDataFetcher(args.url, args.token, args.output, args.page_size, args.exclude_libraries)
     fetcher.fetch_and_save_data()
 
 if __name__ == "__main__":

@@ -14,11 +14,12 @@ import hashlib
 import pickle
 
 class PlexDataFetcher:
-    def __init__(self, plex_url, plex_token, output_dir="data", page_size=100):
+    def __init__(self, plex_url, plex_token, output_dir="data", page_size=100, excluded_libraries=None):
         self.plex_url = plex_url.rstrip('/')
         self.plex_token = plex_token
         self.output_dir = Path(output_dir)
         self.page_size = page_size  # Number of items per page
+        self.excluded_libraries = set(excluded_libraries or [])
         self.checksums_file = self.output_dir / "checksums.pkl"
         self.checksums = self.load_checksums()
         
@@ -80,6 +81,28 @@ class PlexDataFetcher:
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
             self.set_permissions(directory)
+
+    def clean_existing_data(self):
+        """Remove existing JSON files to ensure clean data"""
+        movies_file = self.output_dir / "movies.json"
+        tvshows_file = self.output_dir / "tvshows.json"
+        
+        for file_path in [movies_file, tvshows_file]:
+            if file_path.exists():
+                try:
+                    file_path.unlink()
+                    print(f"Removed existing file: {file_path}")
+                except Exception as e:
+                    print(f"Warning: Could not remove {file_path}: {e}")
+
+    def is_library_excluded(self, library_name, library_id):
+        """Check if a library should be excluded based on name or ID"""
+        if not self.excluded_libraries:
+            return False
+        
+        # Check both library name and ID against exclusion list
+        return (library_name in self.excluded_libraries or 
+                str(library_id) in self.excluded_libraries)
 
     def fetch_sections(self):
         """Get all library sections"""
@@ -332,6 +355,12 @@ class PlexDataFetcher:
         """Main method to fetch all data and save it"""
         print(f"Starting Plex data fetch at {datetime.now()}")
         
+        if self.excluded_libraries:
+            print(f"Excluded libraries: {', '.join(self.excluded_libraries)}")
+        
+        # Clean existing data files
+        self.clean_existing_data()
+        
         # Get all sections
         sections_data = self.fetch_sections()
         if not sections_data or 'MediaContainer' not in sections_data:
@@ -349,6 +378,11 @@ class PlexDataFetcher:
             section_title = section.get('title')
             
             print(f"\nProcessing section: {section_title} (Type: {section_type})")
+            
+            # Check if this library should be excluded
+            if self.is_library_excluded(section_title, section_key):
+                print(f"Skipping excluded library: {section_title}")
+                continue
             
             if section_type not in ['movie', 'show']:
                 print(f"Skipping unsupported section type: {section_type}")
@@ -430,6 +464,10 @@ def main():
     default_output = os.environ.get('OUTPUT_DIR', 'data')
     default_page_size = int(os.environ.get('PAGE_SIZE', '100'))
     
+    # Get excluded libraries from environment variable
+    excluded_libraries_str = os.environ.get('PLEX_EXCLUDE_LIBRARIES', '')
+    excluded_libraries = [lib.strip() for lib in excluded_libraries_str.split(',') if lib.strip()] if excluded_libraries_str else []
+    
     parser = argparse.ArgumentParser(description='Fetch Plex media data and posters')
     
     # Use environment variables as defaults
@@ -437,6 +475,8 @@ def main():
     parser.add_argument('--token', default=default_token, help='Plex authentication token')
     parser.add_argument('--output', default=default_output, help='Output directory (default: data)')
     parser.add_argument('--page-size', type=int, default=default_page_size, help='Number of items per page (default: 100)')
+    parser.add_argument('--exclude-libraries', nargs='*', default=excluded_libraries, 
+                        help='Libraries to exclude (library names or IDs, space-separated)')
     
     # Handle special case for tokens with leading hyphens
     # This allows using "=" syntax for the token (--token=-abc123)
@@ -455,7 +495,7 @@ def main():
         print("Error: Plex token is required. Set with --token or PLEX_TOKEN environment variable.")
         sys.exit(1)
     
-    fetcher = PlexDataFetcher(args.url, args.token, args.output, args.page_size)
+    fetcher = PlexDataFetcher(args.url, args.token, args.output, args.page_size, args.exclude_libraries)
     fetcher.fetch_and_save_data()
 
 if __name__ == "__main__":

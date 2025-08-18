@@ -16,14 +16,17 @@ services:
       # Plex Configuration
       - PLEX_URL=http://your-plex-server:32400
       - PLEX_TOKEN=your-plex-token
+      - PLEX_EXCLUDE_LIBRARIES= # Comma-separated list of library names or IDs to exclude
 
       # Jellyfin Configuration
       - JELLYFIN_URL=http://your-jellyfin-server:8096
       - JELLYFIN_TOKEN=your-jellyfin-api-token
+      - JELLYFIN_EXCLUDE_LIBRARIES= # Comma-separated list of library names or IDs to exclude
 
       # Emby Configuration
       - EMBY_URL=http://your-emby-server:8096
       - EMBY_TOKEN=your-emby-api-token
+      - EMBY_EXCLUDE_LIBRARIES= # Comma-separated list of library names or IDs to exclude
 
       # General Configuration
       - CRON_SCHEDULE=0 */6 * * * # Default: every 6 hours

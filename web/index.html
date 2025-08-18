@@ -1044,6 +1044,11 @@
             margin-bottom: 20px;
         }
 
+        .no-results-help {
+            color: var(--muted-text);
+            line-height: 1.6;
+        }
+
         .search-term {
             color: var(--primary-color);
             font-weight: 600;
@@ -1527,9 +1532,8 @@
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
                 <h3 class="no-results-title">No results found</h3>
-                <p class="no-results-message">We couldn't find any Movies matching "<span class="search-term"></span>"
-                </p>
-                <p>Try searching for something else or clearing your search</p>
+                <p class="no-results-message"></p>
+                <p class="no-results-help"></p>
             </div>
             <div class="media-grid"></div>
         </div>
@@ -1541,9 +1545,8 @@
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
                 <h3 class="no-results-title">No results found</h3>
-                <p class="no-results-message">We couldn't find any TV Shows matching "<span class="search-term"></span>"
-                </p>
-                <p>Try searching for something else or clearing your search</p>
+                <p class="no-results-message"></p>
+                <p class="no-results-help"></p>
             </div>
             <div class="media-grid"></div>
         </div>
@@ -2224,17 +2227,33 @@
             // Check if there are no results to display
             if (data.length === 0) {
                 // Get the current search term
-                const searchTerm = document.querySelector('.search-input').value;
+                const searchTerm = document.querySelector('.search-input').value.trim();
+                const messageElem = contentDiv.querySelector('.no-results-message');
+                const helpElem = contentDiv.querySelector('.no-results-help');
 
-                // Update the no results message content first
+                // Build the appropriate message based on whether there's a search term and/or genre filter
                 if (currentGenre !== 'all') {
-                    contentDiv.querySelector('.no-results-message').innerHTML =
-                        `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                         in the "${currentGenre}" genre${searchTerm ? ` matching "<span class="search-term">${searchTerm}</span>"` : ''}`;
+                    if (searchTerm) {
+                        messageElem.innerHTML =
+                            `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
+                             in the "${currentGenre}" genre matching "<span class="search-term">${searchTerm}</span>"`;
+                        helpElem.textContent = 'Try searching for something else or clearing your search';
+                    } else {
+                        messageElem.innerHTML =
+                            `No ${type === 'movies' ? 'Movies' : 'TV Shows'} found in the "${currentGenre}" genre`;
+                        helpElem.textContent = 'Try selecting a different genre';
+                    }
                 } else {
-                    contentDiv.querySelector('.no-results-message').innerHTML =
-                        `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                         matching "<span class="search-term">${searchTerm}</span>"`;
+                    if (searchTerm) {
+                        messageElem.innerHTML =
+                            `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
+                             matching "<span class="search-term">${searchTerm}</span>"`;
+                        helpElem.textContent = 'Try searching for something else or clearing your search';
+                    } else {
+                        messageElem.innerHTML =
+                            `No ${type === 'movies' ? 'Movies' : 'TV Shows'} available`;
+                        helpElem.textContent = '';
+                    }
                 }
 
                 // Show no results message and hide the grid
