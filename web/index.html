@@ -1443,15 +1443,15 @@
                 </div>
             </div>
             <div class="tabs">
-                <div class="tab active" data-content="movies">Movies</div>
-                <div class="tab" data-content="tvshows">TV Shows</div>
+                <div class="tab active" data-content="movies">Filme</div>
+                <div class="tab" data-content="tvshows">Serien</div>
                 <!-- Sort toggle for desktop -->
                 <div class="sort-toggle">
                     <button class="sort-button active" data-sort="alpha">
                         <span class="sort-icon">A-Z</span>
                     </button>
                     <button class="sort-button" data-sort="date">
-                        <span class="sort-icon">📅 Date Added ▼</span>
+                        <span class="sort-icon">📅 Hinzugefügt ▼</span>
                     </button>
                     <!-- Genre filter dropdown -->
                     <div class="genre-dropdown">
@@ -1459,7 +1459,7 @@
                             <span class="sort-icon">🏷️ Genre</span>
                         </button>
                         <div class="genre-menu">
-                            <div class="genre-item active" data-genre="all">All Genres</div>
+                            <div class="genre-item active" data-genre="all">Alle Genres</div>
                             <!-- Genre items will be populated dynamically -->
                         </div>
                     </div>
@@ -1479,8 +1479,8 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <div class="tabs">
-            <div class="tab active" data-content="movies">Movies</div>
-            <div class="tab" data-content="tvshows">TV Shows</div>
+            <div class="tab active" data-content="movies">Filme</div>
+            <div class="tab" data-content="tvshows">Serien</div>
         </div>
         <!-- Sort toggle for mobile menu -->
         <div class="sort-toggle">
@@ -1489,7 +1489,7 @@
                     <span class="sort-icon">A-Z</span>
                 </button>
                 <button class="sort-button" data-sort="date">
-                    <span class="sort-icon">📅 Date Added ▼</span>
+                    <span class="sort-icon">📅 Hinzugefügt ▼</span>
                 </button>
             </div>
             <!-- Mobile Genre button - now triggers drawer -->
@@ -1505,7 +1505,7 @@
             <!-- Mobile Install Button (will be shown/hidden by JavaScript) -->
             <button class="sort-button install-button mobile-install-button">
                 <span class="install-icon">📱</span>
-                <span class="install-text">Install App</span>
+                <span class="install-text">App installieren</span>
             </button>
         </div>
     </div>
@@ -1514,12 +1514,12 @@
     <div class="genre-drawer-overlay">
         <div class="genre-drawer">
             <div class="genre-drawer-header">
-                <div class="genre-drawer-title">Select Genre</div>
+                <div class="genre-drawer-title">Genre auswählen</div>
                 <button class="genre-drawer-close">×</button>
             </div>
             <div class="genre-drawer-content">
                 <!-- Genre items will be populated dynamically -->
-                <div class="genre-item active" data-genre="all">All Genres</div>
+                <div class="genre-item active" data-genre="all">Alle Genres</div>
             </div>
         </div>
     </div>
@@ -1531,7 +1531,7 @@
             </div>
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
-                <h3 class="no-results-title">No results found</h3>
+                <h3 class="no-results-title">Keine Ergebnisse gefunden</h3>
                 <p class="no-results-message"></p>
                 <p class="no-results-help"></p>
             </div>
@@ -1544,7 +1544,7 @@
             </div>
             <div class="no-results">
                 <span class="no-results-icon">🔍</span>
-                <h3 class="no-results-title">No results found</h3>
+                <h3 class="no-results-title">Keine Ergebnisse gefunden</h3>
                 <p class="no-results-message"></p>
                 <p class="no-results-help"></p>
             </div>
@@ -1565,7 +1565,7 @@
                     <!-- Poster will be populated dynamically -->
                 </div>
                 <div class="modal-title-section">
-                    <h2 class="modal-title">Movie Title</h2>
+                    <h2 class="modal-title">Filmtitel</h2>
                     <div class="modal-year">2023</div>
                     <div class="modal-metadata">
                         <div class="metadata-item" id="modal-rating">PG-13</div>
@@ -1575,7 +1575,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-section summary-section">
-                    <div class="modal-section-title">Overview</div>
+                    <div class="modal-section-title">Übersicht</div>
                     <div id="modal-summary">Loading summary...</div>
                 </div>
 
@@ -1587,7 +1587,7 @@
                 </div>
 
                 <div class="modal-section">
-                    <div class="modal-section-title">Cast</div>
+                    <div class="modal-section-title">Besetzung</div>
                     <div class="cast-grid" id="modal-cast">
                         <!-- Cast members will be added here -->
                     </div>
@@ -1774,7 +1774,7 @@
                     if (method === 'alpha') {
                         iconSpan.textContent = sortDirection[method] === 'asc' ? 'A-Z' : 'Z-A';
                     } else if (method === 'date') {
-                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Date Added ▼' : '📅 Date Added ▲';
+                        iconSpan.textContent = sortDirection[method] === 'desc' ? '📅 Hinzugefügt ▼' : '📅 Hinzugefügt ▲';
                     }
                 } else if (!btn.classList.contains('genre-button')) {
                     btn.classList.remove('active');
@@ -1974,8 +1974,8 @@
 
             // Update genre menus (desktop only)
             dropdowns.forEach(dropdown => {
-                // Keep the "All Genres" item
-                dropdown.innerHTML = `<div class="genre-item ${currentGenre === 'all' ? 'active' : ''}" data-genre="all">All Genres</div>`;
+                // Keep the "Alle Genres" item
+                dropdown.innerHTML = `<div class="genre-item ${currentGenre === 'all' ? 'active' : ''}" data-genre="all">Alle Genres</div>`;
 
                 // Add each genre with count
                 Object.entries(genres).forEach(([genre, count]) => {
@@ -2031,11 +2031,11 @@
             // Clear current content
             drawerContent.innerHTML = '';
 
-            // Add "All Genres" item
+            // Add "Alle Genres" item
             const allGenresItem = document.createElement('div');
             allGenresItem.className = `genre-item ${currentGenre === 'all' ? 'active' : ''}`;
             allGenresItem.dataset.genre = 'all';
-            allGenresItem.innerHTML = 'All Genres';
+            allGenresItem.innerHTML = 'Alle Genres';
             drawerContent.appendChild(allGenresItem);
 
             // Add each genre with count
@@ -2111,9 +2111,9 @@
             } catch (error) {
                 console.error('Error loading media data:', error);
                 document.querySelector('#movies-content .loading').innerHTML =
-                    '<div class="error">Failed to load movie data. Please try again later.</div>';
+                    '<div class="error">Filmdaten konnten nicht geladen werden. Bitte später erneut versuchen.</div>';
                 document.querySelector('#tvshows-content .loading').innerHTML =
-                    '<div class="error">Failed to load TV show data. Please try again later.</div>';
+                    '<div class="error">Seriendaten konnten nicht geladen werden. Bitte später erneut versuchen.</div>';
             }
         }
 
@@ -2540,7 +2540,7 @@
                 const dateSection = document.createElement('div');
                 dateSection.className = 'modal-section date-section';
                 dateSection.innerHTML = `
-                    <div class="modal-section-title">Date Added</div>
+                    <div class="modal-section-title">Hinzugefügt</div>
                     <div id="modal-added-date">${dateAdded}</div>
                 `;
                 document.querySelector('.modal-body').appendChild(dateSection);
@@ -2808,7 +2808,7 @@
         const installButton = document.createElement('button');
         installButton.style.display = 'none';
         installButton.classList.add('install-button');
-        installButton.textContent = 'Install App';
+        installButton.textContent = 'App installieren';
 
         // Function to check if app is running as PWA
         function isPWA() {
@@ -3964,8 +3964,8 @@
                         const iconSpan = btn.querySelector('.sort-icon');
                         if (iconSpan) {
                             iconSpan.textContent = sortDirection['date'] === 'desc'
-                                ? '📅 Date Added ▼'
-                                : '📅 Date Added ▲';
+                                ? '📅 Hinzugefügt ▼'
+                                : '📅 Hinzugefügt ▲';
                         }
                     } else if (btn.dataset.sort === 'alpha' && !btn.classList.contains('genre-button')) {
                         btn.classList.remove('active');
