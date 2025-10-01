@@ -1438,7 +1438,7 @@
             </div>
             <div class="search-box">
                 <div class="search-container">
-                    <input type="text" class="search-input" placeholder="Search...">
+                    <input type="text" class="search-input" placeholder="Suchen...">
                     <button class="search-clear" aria-label="Clear search">×</button>
                 </div>
             </div>
@@ -1467,7 +1467,7 @@
                     <div class="server-toggle">
                         <button class="server-toggle-button" onclick="toggleServer()">
                             <span class="server-icon">🔄</span>
-                            <span class="server-text">Switch to SERVER_NAME</span>
+                            <span class="server-text">Zu SERVER_NAME wechseln</span>
                         </button>
                     </div>
                 </div>
@@ -1500,7 +1500,7 @@
             <button class="sort-button server-toggle-button"
                 onclick="toggleServer(); mobileMenu.classList.remove('open');">
                 <span class="server-icon">🔄</span>
-                <span class="server-text">Switch to SERVER_NAME</span>
+                <span class="server-text">Zu SERVER_NAME wechseln</span>
             </button>
             <!-- Mobile Install Button (will be shown/hidden by JavaScript) -->
             <button class="sort-button install-button mobile-install-button">
@@ -1631,7 +1631,7 @@
         // Format timestamp to readable date
         function formatDate(timestamp) {
             const date = new Date(timestamp * 1000);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            return date.toLocaleDateString('de-CH', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Europe/Zurich' });
         }
 
         // Set up Intersection Observer for lazy loading
@@ -2231,27 +2231,26 @@
                 const messageElem = contentDiv.querySelector('.no-results-message');
                 const helpElem = contentDiv.querySelector('.no-results-help');
 
-                // Build the appropriate message based on whether there's a search term and/or genre filter
+                // Erzeuge die passende Meldung basierend auf Suchbegriff und/oder Genre-Filter
                 if (currentGenre !== 'all') {
                     if (searchTerm) {
                         messageElem.innerHTML =
-                            `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                             in the "${currentGenre}" genre matching "<span class="search-term">${searchTerm}</span>"`;
-                        helpElem.textContent = 'Try searching for something else or clearing your search';
+                            `Keine ${type === 'movies' ? 'Filme' : 'Serien'} 
+                            im Genre "${currentGenre}" gefunden, die zu "<span class="search-term">${searchTerm}</span>" passen.`;
+                        helpElem.textContent = 'Versuche einen anderen Suchbegriff oder lösche die Suche.';
                     } else {
                         messageElem.innerHTML =
-                            `No ${type === 'movies' ? 'Movies' : 'TV Shows'} found in the "${currentGenre}" genre`;
-                        helpElem.textContent = 'Try selecting a different genre';
+                            `Keine ${type === 'movies' ? 'Filme' : 'Serien'} im Genre "${currentGenre}" gefunden.`;
+                        helpElem.textContent = 'Versuche ein anderes Genre auszuwählen.';
                     }
                 } else {
                     if (searchTerm) {
                         messageElem.innerHTML =
-                            `We couldn't find any ${type === 'movies' ? 'Movies' : 'TV Shows'} 
-                             matching "<span class="search-term">${searchTerm}</span>"`;
-                        helpElem.textContent = 'Try searching for something else or clearing your search';
+                            `Keine ${type === 'movies' ? 'Filme' : 'Serien'} gefunden, die zu "<span class="search-term">${searchTerm}</span>" passen.`;
+                        helpElem.textContent = 'Versuche einen anderen Suchbegriff oder lösche die Suche.';
                     } else {
                         messageElem.innerHTML =
-                            `No ${type === 'movies' ? 'Movies' : 'TV Shows'} available`;
+                            `Keine ${type === 'movies' ? 'Filme' : 'Serien'} verfügbar.`;
                         helpElem.textContent = '';
                     }
                 }
@@ -2382,9 +2381,9 @@
                 backdropPlaceholder.className = 'backdrop-text-placeholder';
 
                 if (type === 'movies') {
-                    backdropPlaceholder.textContent = 'Movie';
+                    backdropPlaceholder.textContent = 'Film';
                 } else {
-                    backdropPlaceholder.textContent = 'TV Show';
+                    backdropPlaceholder.textContent = 'TV-Serie';
                 }
 
                 backdropElement.appendChild(backdropPlaceholder);
@@ -2486,7 +2485,7 @@
             }
 
             // Set summary
-            document.getElementById('modal-summary').textContent = item.summary || 'No summary available.';
+            document.getElementById('modal-summary').textContent = item.summary || 'Keine Zusammenfassung verfügbar.';
 
             // Set genres
             const genresContainer = document.getElementById('modal-genres');
@@ -2509,7 +2508,7 @@
                     genresContainer.appendChild(genreElement);
                 });
             } else {
-                genresContainer.innerHTML = '<div>No genres available</div>';
+                genresContainer.innerHTML = '<div>Keine Genres verfügbar</div>';
             }
 
             // Set cast
@@ -2527,7 +2526,7 @@
                     castContainer.appendChild(actorElement);
                 });
             } else {
-                castContainer.innerHTML = '<div>No cast information available</div>';
+                castContainer.innerHTML = '<div>Keine Informationen zur Besetzung verfügbar</div>';
             }
 
             // Add date added information
@@ -2657,7 +2656,7 @@
 
             // Show swipe tip on first load for mobile users
             setTimeout(() => {
-                swipeIndicator.textContent = 'Swipe left or right to switch between Movies and TV Shows';
+                swipeIndicator.textContent = 'Wisch einfach nach links oder rechts, um zwischen Filmen und Serien zu wechseln.';
                 swipeIndicator.style.opacity = '1';
 
                 // Hide the tip after 3 seconds
@@ -2722,14 +2721,14 @@
                             // Swiped left, show TV Shows
                             if (activeTab === 'movies') {
                                 switched = true;
-                                swipeIndicator.textContent = 'Switched to TV Shows';
+                                swipeIndicator.textContent = 'Umgeschaltet auf TV- Serien';
                                 switchTab('tvshows');
                             }
                         } else {
                             // Swiped right, show Movies
                             if (activeTab === 'tvshows') {
                                 switched = true;
-                                swipeIndicator.textContent = 'Switched to Movies';
+                                swipeIndicator.textContent = 'Umgeschaltet auf Filme';
                                 switchTab('movies');
                             }
                         }
@@ -3008,7 +3007,7 @@
                 <!-- Loading indicator will be inserted here -->
                 <div class="trailer-loading">
                     <div class="trailer-spinner"></div>
-                    <div class="trailer-loading-text">Loading trailer...</div>
+                    <div class="trailer-loading-text">Trailer wird geladen...</div>
                 </div>
                 <!-- Iframe will be inserted here dynamically -->
             </div>
@@ -3218,7 +3217,7 @@
             <path d="M8 5v14l11-7L8 5z" />
             </svg>
         </span>
-        Watch Trailer
+        Trailer ansehen
         </button>
 `;
             modalTitleSection.appendChild(modalActions);
@@ -3276,7 +3275,7 @@
                     // Update loading indicator to show error
                     trailerLoading.innerHTML = `
             <div class="trailer-loading-text" style="color: #ff4444;">
-                Failed to load trailer. Please try again later.
+                Trailer konnte nicht geladen werden. Versuche es später nochmal.
             </div>
         `;
                 };
@@ -3308,7 +3307,7 @@
                         trailerLoading.classList.remove('hidden');
                         trailerLoading.innerHTML = `
                 <div class="trailer-spinner"></div>
-                <div class="trailer-loading-text">Loading trailer...</div>
+                <div class="trailer-loading-text">Trailer wird geladen...</div>
             `;
 
                         // Remove the iframe to stop playback
@@ -3396,7 +3395,7 @@
             </div>
             <!-- Error buttons only shown when needed -->
             <div class="roulette-error-buttons" style="display: none;">
-                <button class="roulette-close-btn">Close</button>
+                <button class="roulette-close-btn">Schliessen</button>
             </div>
         </div>
     </div>
@@ -3607,7 +3606,7 @@
                 rouletteButton.className = 'roulette-button';
                 rouletteButton.innerHTML = `
                 <div class="roulette-icon">🎲</div>
-                <span class="roulette-text">Roll the Dice</span>
+                <span class="roulette-text">Würfel werfen</span>
             `;
 
                 // Find the right place to insert it in the header
@@ -3670,14 +3669,14 @@
 
             // Messages for the animation
             const messages = [
-                "Finding something for you...",
-                "Searching for the perfect match...",
-                "How about this one?",
-                "This might be interesting...",
-                "Let's try this one...",
-                "Picking something special...",
-                "Spinning the wheel of entertainment...",
-                "Discovering hidden gems..."
+                "Ich suche was für dich...",
+                "Auf der Suche nach dem perfekten Match...",
+                "Wie wäre es mit dem hier?",
+                "Das könnte interessant sein...",
+                "Probieren wir das hier aus...",
+                "Ich suche etwas Besonderes...",
+                "Ich drehe das Rad der Unterhaltung...",
+                "Ich entdecke verborgene Schätze..."
             ];
 
             // Function to open the roulette overlay
@@ -3793,7 +3792,7 @@
                         openModal(selectedItem, currentContentType);
                     } else {
                         // If no item could be selected, show an error message
-                        findingText.textContent = "No items available to select";
+                        findingText.textContent = "Keine Medien zur Auswahl verfügbar";
 
                         // Show the error button
                         errorButtons.style.display = 'flex';
@@ -3897,7 +3896,7 @@
                 // Create the button and add it to the modal actions
                 const tryAgainBtn = document.createElement('button');
                 tryAgainBtn.className = 'modal-try-again-btn';
-                tryAgainBtn.innerHTML = '<span class="dice-icon">🎲</span> Roll Again';
+                tryAgainBtn.innerHTML = '<span class="dice-icon">🎲</span> Erneut würfeln';
 
                 // Add the event listener
                 tryAgainBtn.addEventListener('click', function () {
